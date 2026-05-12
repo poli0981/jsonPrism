@@ -1,0 +1,23 @@
+name: Announce Release to Discord
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to re-announce"
+        required: true
+        type: string
+
+# Reusable announce-release.yml only needs `contents: read` to fetch
+# release metadata via the gh CLI.
+permissions:
+  contents: read
+
+jobs:
+  announce:
+    uses: poli0981/.github/.github/workflows/announce-release.yml@main
+    with:
+      tag_override: ${{ inputs.tag || '' }}
+    secrets: inherit
