@@ -8,6 +8,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond Phase 3".
 
+## [1.3.1] — 2026-05-13
+
+### Fixed
+
+- **GitHub Pages deploy 404**. The deployed page rendered blank because every asset URL 404'd. Root cause: GitHub Pages serves at `https://poli0981.github.io/jsonPrism/` (case-sensitive, mirrors the repo name), but Vite `base` was `/jsonprism/` (lowercase), so `index.html` referenced `/jsonprism/assets/*.js`. Rebased Vite `base`, React Router basename, and all GitHub URLs in code/docs to match the existing repo case `jsonPrism`. Storage keys / package name / Tauri identifier remain lowercase.
+- **Release workflow macOS Intel build cancelled**. GitHub Actions `macos-13` runners no longer pick up jobs (jobs queue indefinitely then auto-cancel after timeout). Replaced the two-entry macOS matrix (Apple Silicon + Intel) with a single `macos-14` build using `--target universal-apple-darwin`. The resulting `.dmg` / `.app` runs on both Apple Silicon and Intel via the universal2 binary.
+
+### Note on v1.3.0
+
+The v1.3.0 tag was published with a draft GitHub Release containing partial bundles (Windows + macOS Apple Silicon + Linux; macOS Intel missing). It was never un-drafted because of the two bugs above. v1.3.1 carries the same feature set plus the fixes — please use v1.3.1.
+
 ## [1.3.0] — 2026-05-13
 
 ### Added — Đợt sửa lỗi 4: editor UX, batch hygiene, workspace persistence, TERMS
