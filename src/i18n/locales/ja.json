@@ -11,6 +11,7 @@
   },
   "home": {
     "input_label": "JSON 入力",
+    "input_label_format": "{{format}} 入力",
     "input_placeholder": "ここに JSON を貼り付け、ファイルをドロップ、またはサンプルを読み込み…",
     "output_label": "出力",
     "output_empty": "有効な JSON を入力すると、ここに出力が表示されます。",
@@ -226,8 +227,46 @@
     "title": "JSONPrism について",
     "lead": "開発者のための分光ツール。",
     "p1": "JSONPrism は単一の JSON 入力を受け取り、プリズムを通る白色光のように様々なターゲット形式に分散します。すべての処理はクライアントサイドで行われ、データは端末から外に出ません。",
-    "p2": "React 19、Vite 6、Tailwind CSS v4、shadcn/ui で構築。ソースコードは GitHub で公開しています。",
-    "version": "バージョン {{version}}"
+    "p2": "React 19、Vite 8、Tailwind CSS v4、shadcn/ui で構築。ソースコードは GitHub で公開しています。",
+    "version": "バージョン {{version}}",
+    "donate": {
+      "title": "プロジェクトを支援",
+      "lead": "JSONPrism は無料のオープンソースです。役に立った場合はメンテナーをスポンサーすることをご検討ください。",
+      "github": "GitHub Sponsors",
+      "ko_fi": "Ko-fi",
+      "buy_me_a_coffee": "Buy Me a Coffee",
+      "patreon": "Patreon",
+      "paypal": "PayPal"
+    },
+    "third_party": {
+      "title": "オープンソースの上に構築",
+      "lead": "JSONPrism は多くの優れたプロジェクトの上に成り立っています:",
+      "ui": "UI フレームワーク",
+      "editor": "コードエディタ",
+      "parsers": "パーサーとシリアライザ",
+      "build": "ビルドとツール",
+      "tauri": "デスクトップ (Tauri)",
+      "i18n": "国際化",
+      "see_full_list": "完全なリストを見る →"
+    },
+    "build": {
+      "title": "ビルド情報",
+      "version": "バージョン",
+      "commit": "コミット",
+      "date": "ビルド日"
+    },
+    "links": {
+      "title": "リンク",
+      "repo": "ソースコード",
+      "issues": "バグ報告",
+      "discussions": "ディスカッション",
+      "demo": "ライブデモ",
+      "license": "ライセンス (Apache 2.0)"
+    },
+    "disclaimer": {
+      "title": "免責事項",
+      "body": "JSONPrism は AI 支援による 1 人プロジェクトです。保証はありません。翻訳は AI 生成です。詳細は DISCLAIMER.md を参照してください。"
+    }
   },
   "common": {
     "loading": "読み込み中…",

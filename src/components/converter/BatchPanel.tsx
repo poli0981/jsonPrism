@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
 import { Download, FileStack, FolderOpen, Loader2, Play, StopCircle, Trash2 } from 'lucide-react';
@@ -17,9 +17,11 @@ import { isTauri, nativeOpenFiles, nativeSaveBlob, fileFromNativePath } from '@/
 import { getConverter } from '@/converters/registry';
 import type { FormatId } from '@/converters/types';
 import { cn } from '@/lib/utils';
+import type { Direction } from './DirectionToggle';
 
 interface BatchPanelProps {
   format: FormatId;
+  direction: Direction;
   options: Record<string, unknown>;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -27,7 +29,7 @@ interface BatchPanelProps {
   onAddExternalFiles?: (files: File[]) => void;
 }
 
-export function BatchPanel({ format, options, open, onOpenChange }: BatchPanelProps) {
+export function BatchPanel({ format, direction, options, open, onOpenChange }: BatchPanelProps) {
   const { t } = useTranslation();
   const items = useBatchStore((s) => s.items);
   const itemOrder = useBatchStore((s) => s.itemOrder);
@@ -68,9 +70,25 @@ export function BatchPanel({ format, options, open, onOpenChange }: BatchPanelPr
     [handleAddFiles],
   );
 
+  const isReverse = direction === 'reverse';
+  const converter = getConverter(format);
+  const accept = useMemo(() => {
+    if (isReverse) {
+      return {
+        [converter.meta.mimeType]: [`.${converter.meta.extension}`],
+        'text/plain': ['.txt'],
+      };
+    }
+    return { 'application/json': ['.json'], 'text/plain': ['.txt'] };
+  }, [isReverse, converter.meta.mimeType, converter.meta.extension]);
+
+  const fileInputAccept = isReverse
+    ? `.${converter.meta.extension},.txt,${converter.meta.mimeType}`
+    : '.json,.txt,application/json';
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { 'application/json': ['.json'], 'text/plain': ['.txt'] },
+    accept,
     multiple: true,
     noClick: true,
     noKeyboard: true,
@@ -100,6 +118,7 @@ export function BatchPanel({ format, options, open, onOpenChange }: BatchPanelPr
           onUpdate: (id, patch) => updateItem(id, patch),
         },
         controller.signal,
+        direction,
       );
       if (!controller.signal.aborted) {
         toast.success(t('batch.toast.finished'));
@@ -110,7 +129,17 @@ export function BatchPanel({ format, options, open, onOpenChange }: BatchPanelPr
       setProcessing(false);
       setAbortController(null);
     }
-  }, [format, items, itemOrder, options, setAbortController, setProcessing, t, updateItem]);
+  }, [
+    direction,
+    format,
+    items,
+    itemOrder,
+    options,
+    setAbortController,
+    setProcessing,
+    t,
+    updateItem,
+  ]);
 
   const handleCancel = useCallback(() => {
     useBatchStore.getState().abortController?.abort();
@@ -120,7 +149,7 @@ export function BatchPanel({ format, options, open, onOpenChange }: BatchPanelPr
   const handleDownloadZip = useCallback(async () => {
     const done = itemOrder.map((id) => items[id]).filter((it): it is BatchItem => !!it);
     try {
-      const { blob, fileCount } = await zipOutputs(done, format);
+      const { blob, fileCount } = await zipOutputs(done, format, direction);
       const ts = new Date().toISOString().slice(0, 10);
       const filename = `jsonprism-batch-${ts}.zip`;
       if (isTauri()) {
@@ -135,7 +164,7 @@ export function BatchPanel({ format, options, open, onOpenChange }: BatchPanelPr
     } catch (err) {
       toast.error(t('batch.toast.zip_failed', { message: (err as Error).message }));
     }
-  }, [format, items, itemOrder, t]);
+  }, [direction, format, items, itemOrder, t]);
 
   const handleOpenFiles = async () => {
     if (isTauri()) {
@@ -200,7 +229,7 @@ export function BatchPanel({ format, options, open, onOpenChange }: BatchPanelPr
           <input
             ref={fileInputRef}
             type="file"
-            accept=".json,.txt,application/json"
+            accept={fileInputAccept}
             multiple
             className="hidden"
             onChange={onFileInputChange}
@@ -253,7 +282,7 @@ export function BatchPanel({ format, options, open, onOpenChange }: BatchPanelPr
                   <BatchItemRow
                     key={id}
                     item={item}
-                    outputExt={getConverter(format).meta.extension}
+                    outputExt={isReverse ? 'json' : converter.meta.extension}
                     onRemove={() => removeItem(id)}
                     disabled={processing}
                   />

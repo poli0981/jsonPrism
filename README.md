@@ -185,10 +185,39 @@ See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the full phase plan.
 
 ## Contributing
 
-Pull requests welcome — please read [`CONTRIBUTING.md`](CONTRIBUTING.md) first.
+Pull requests welcome — please read [`CONTRIBUTING.md`](CONTRIBUTING.md) first. PRs that match the **auto-ignored** patterns described there (suspicious code, off-topic preamble, no description, etc.) get closed without review.
 
-For bug reports and feature requests, use [GitHub Issues](https://github.com/poli0981/jsonprism/issues).
+For bug reports and feature requests, use [GitHub Issues](https://github.com/poli0981/jsonprism/issues). For security vulnerabilities, use the [private Security Advisory flow](https://github.com/poli0981/jsonprism/security/advisories/new).
+
+## Project docs
+
+| Doc | What's in it |
+|---|---|
+| [`PRIVACY.md`](PRIVACY.md) | Offline-first, localStorage-only, no telemetry. |
+| [`SECURITY.md`](SECURITY.md) | How to report vulnerabilities; response SLAs. |
+| [`DISCLAIMER.md`](DISCLAIMER.md) | One-person + AI-assisted project; no warranty. |
+| [`THIRD-PARTY.md`](THIRD-PARTY.md) | Every dependency: version, license, link. |
+| [`MAINTAINERS.md`](MAINTAINERS.md) | Who's responsible for what. |
+| [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | Contributor Covenant v2.1. |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Phase plan, current status. |
+| [`docs/pc_spec.md`](docs/pc_spec.md) · [`docs/dev_env.md`](docs/dev_env.md) | Maintainer's hardware + toolchain. |
+| [`docs/TAURI-NOTES.md`](docs/TAURI-NOTES.md) | Tauri build / process notes. |
+| [`docs/RESX-MIGRATION.md`](docs/RESX-MIGRATION.md) | i18next JSON → .NET RESX tutorial. |
+
+## Acknowledgements
+
+Substantial parts of JSONPrism's code, tests, translations, and docs
+were drafted with **Claude Chat** and **Claude Code (Opus 4.7, 1M
+context)**. See [DISCLAIMER.md](DISCLAIMER.md) for the full AI-assist
+disclosure. Translation quality for non-English locales is best-effort
+and contributions from native speakers are welcomed.
+
+## Sponsorship
+
+If JSONPrism is useful to you, consider sponsoring the maintainer via
+any of the channels in [`.github/FUNDING.yml`](.github/FUNDING.yml):
+GitHub Sponsors, Ko-fi, Buy Me a Coffee, Patreon, or PayPal.
 
 ## License
 
-[Apache License 2.0](LICENSE) — © 2026 Kokone.
+[Apache License 2.0](LICENSE) — © 2026 Kokone ([@poli0981](https://github.com/poli0981)).

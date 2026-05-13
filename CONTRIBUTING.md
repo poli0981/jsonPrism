@@ -53,7 +53,12 @@ Use the [Feature Request](https://github.com/poli0981/jsonprism/issues/new?templ
 
 ### 🌍 Translations
 
-Currently bundled: **English** and **Tiếng Việt**. To add a new language:
+Currently bundled: **English**, **Tiếng Việt**, **日本語**, **简体中文**.
+Non-English locales are AI-generated and not professionally reviewed —
+see [DISCLAIMER.md](DISCLAIMER.md). Native-speaker corrections are very
+welcome.
+
+To add a new language:
 
 1. Copy `src/i18n/locales/en.json` to `src/i18n/locales/<your-locale>.json`
 2. Translate every value
@@ -87,11 +92,38 @@ chore(deps): bump react to 19.1
 
 Prefixes: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `style`.
 
+## Auto-ignored contributions
+
+To keep the maintainer's review queue manageable, the following are
+closed without review:
+
+- **PRs with suspicious code.** If a diff looks like obfuscated/minified
+  code, hidden network calls, or subtly tampered third-party files, it
+  will be flagged. If CodeQL or Dependabot also flag it, the contributor
+  will be **banned** without exception. The maintainer may also verify
+  suspect sections by hand.
+- **PRs / issues posting unknown / random links** (especially shortened
+  URLs to "demos", "fixes", etc. with no clear source).
+- **Behavior / language violating GitHub's policy** — harassment, hate
+  speech, doxxing, NSFW content, etc.
+- **Off-topic preamble**, e.g. "Chào buổi sáng, hôm nay là 1 ngày trời
+  đẹp…" or any greeting/filler that doesn't immediately address the
+  issue. Get to the point: what's wrong, what's the expected behavior,
+  what reproduces it.
+- **PRs without a meaningful description** or test plan. See the PR
+  template — sections marked required are required.
+
+These rules exist because this is a one-person + AI-assisted project
+(see [DISCLAIMER.md](DISCLAIMER.md)); time spent triaging low-effort
+contributions takes away from real work.
+
 ## Code of Conduct
 
-Be kind. Assume good faith. Disagreements about technical choices are fine; personal attacks are not.
+This project adopts the [Contributor Covenant v2.1](CODE_OF_CONDUCT.md).
+Be kind. Assume good faith. Disagreements about technical choices are
+fine; personal attacks and harassment are not.
 
-Reports to the maintainer via GitHub (DM or email on profile).
+Reports to the maintainer via the [private Security Advisory flow](https://github.com/poli0981/jsonprism/security/advisories/new) for sensitive matters, or a private GitHub Discussion otherwise.
 
 ## License
 
