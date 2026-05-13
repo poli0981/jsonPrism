@@ -70,14 +70,62 @@ export async function nativeReadText(path: string): Promise<string> {
   return readTextFile(path);
 }
 
+// MIME type per extension. Used so File objects created from native paths
+// carry a sensible `type` instead of being hard-coded to `application/json`.
+const TYPE_BY_EXT: Record<string, string> = {
+  json: 'application/json',
+  yaml: 'application/x-yaml',
+  yml: 'application/x-yaml',
+  toml: 'application/toml',
+  xml: 'application/xml',
+  csv: 'text/csv',
+  tsv: 'text/tab-separated-values',
+  resx: 'application/xml',
+  txt: 'text/plain',
+};
+
+/**
+ * FNV-1a 32-bit hash of a path, returned as an unsigned 32-bit integer.
+ * Used as a stable `lastModified` for File objects when `stat()` is
+ * unavailable — `batchStore` dedups on `(name, size, lastModified)`,
+ * so the value must be deterministic across repeated drops of the same path.
+ */
+export function pathHashAsMillis(path: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < path.length; i += 1) {
+    h ^= path.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
 /**
  * Convert a native file path to a browser-style File so the
  * existing batch store and editor flows can consume it unchanged.
+ *
+ * `lastModified` is read from the file's real mtime via `stat()` so that
+ * re-dropping the same file dedups correctly (batchStore keys on
+ * name|size|lastModified). Falling back to `Date.now()` would break dedup
+ * because every drop produces a fresh timestamp.
  */
 export async function fileFromNativePath(path: string): Promise<File> {
   const text = await nativeReadText(path);
   const name = path.replace(/^.*[\\/]/, ''); // basename
-  return new File([text], name, { type: 'application/json' });
+  const ext = (name.split('.').pop() ?? '').toLowerCase();
+  const type = TYPE_BY_EXT[ext] ?? 'application/octet-stream';
+
+  let lastModified: number;
+  try {
+    const { stat } = await import('@tauri-apps/plugin-fs');
+    const info = await stat(path);
+    lastModified = info.mtime ? info.mtime.getTime() : pathHashAsMillis(path);
+  } catch {
+    // Capability missing or file vanished between read + stat — fall back
+    // to a deterministic hash so repeat drops still dedup.
+    lastModified = pathHashAsMillis(path);
+  }
+
+  return new File([text], name, { type, lastModified });
 }
 
 /**
