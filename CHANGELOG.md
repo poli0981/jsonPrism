@@ -8,6 +8,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond Phase 3".
 
+## [1.3.2] — 2026-05-13
+
+### Fixed
+
+- **Tauri native drag-drop bypassed the batch extension filter**. v1.3.0/v1.3.1 desktop bundles accepted any file dropped from File Explorer / Finder / Nautilus into the workspace, because `ConverterWorkspace.handleMultiFileDrop` called `batchStore.addFiles` directly — skipping the `direction × format` extension whitelist that the web `react-dropzone` path enforced. Files like `.cs`/`.py` leaked into the queue with no warning. Extracted `src/lib/file-filter.ts` (`getAllowedExtensions` + `extOf` + `filterByExtension`) and routed the Tauri callback, `BatchPanel`, and `InputPanel` through it so the wrong-format toast surfaces in all three entry points.
+
+### Tests
+
+- 7 new unit tests for `getAllowedExtensions`, `extOf`, and `filterByExtension` in `src/lib/__tests__/file-filter.test.ts`. Total tests: **190**.
+
 ## [1.3.1] — 2026-05-13
 
 ### Fixed

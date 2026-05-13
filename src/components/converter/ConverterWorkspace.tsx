@@ -4,6 +4,7 @@ import { toast } from '@/components/ui/sonner';
 import { getConverter } from '@/converters/registry';
 import type { FormatId } from '@/converters/types';
 import { parseJsonInput } from '@/lib/detect';
+import { filterByExtension, getAllowedExtensions } from '@/lib/file-filter';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useTauriDragDrop } from '@/hooks/useTauriDragDrop';
 import { useBatchStore } from '@/stores/batchStore';
@@ -39,7 +40,16 @@ export function ConverterWorkspace() {
 
   const handleMultiFileDrop = useCallback(
     (files: File[]) => {
-      const result = addBatchFiles(files);
+      const allowed = getAllowedExtensions(
+        direction === 'reverse' ? 'reverse' : 'forward',
+        getConverter(format).meta.extension,
+      );
+      const { valid, wrongFormat } = filterByExtension(files, allowed);
+      if (wrongFormat > 0) {
+        toast.warning(t('batch.toast.wrong_format', { count: wrongFormat }));
+      }
+      if (valid.length === 0) return;
+      const result = addBatchFiles(valid);
       if (result.added > 0) {
         toast.success(t('batch.toast.added', { count: result.added }));
         setBatchOpen(true);
@@ -52,7 +62,7 @@ export function ConverterWorkspace() {
         }
       }
     },
-    [addBatchFiles, t],
+    [addBatchFiles, direction, format, t],
   );
 
   // Native OS drag-drop bridge (no-op outside Tauri).

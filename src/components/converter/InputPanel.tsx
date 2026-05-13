@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
 import { Eraser, FileText, FolderOpen } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
+import { extOf, getAllowedExtensions } from '@/lib/file-filter';
 import { SAMPLE_JSON } from '@/lib/sample';
 import { isTauri, nativeOpenFiles, fileFromNativePath } from '@/lib/tauri';
 import { getConverter } from '@/converters/registry';
@@ -70,15 +71,12 @@ export function InputPanel({
   // Allowed extensions for the single-file "Open" / drag-drop path.
   // `<input accept>` is only a hint to the OS picker — re-validate in JS.
   const allowedExtensions = useMemo(
-    () => (isReverse ? [converter.meta.extension.toLowerCase(), 'txt'] : ['json', 'txt']),
+    () => getAllowedExtensions(isReverse ? 'reverse' : 'forward', converter.meta.extension),
     [isReverse, converter.meta.extension],
   );
 
   const hasAllowedExt = useCallback(
-    (name: string) => {
-      const ext = (name.split('.').pop() ?? '').toLowerCase();
-      return allowedExtensions.includes(ext);
-    },
+    (name: string) => allowedExtensions.includes(extOf(name)),
     [allowedExtensions],
   );
 
