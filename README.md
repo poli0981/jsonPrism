@@ -194,6 +194,7 @@ For bug reports and feature requests, use [GitHub Issues](https://github.com/pol
 | Doc | What's in it |
 |---|---|
 | [`PRIVACY.md`](PRIVACY.md) | Offline-first, localStorage-only, no telemetry. |
+| [`TERMS.md`](TERMS.md) | ToS / EULA — acceptable use, license inheritance, user data ownership. |
 | [`SECURITY.md`](SECURITY.md) | How to report vulnerabilities; response SLAs. |
 | [`DISCLAIMER.md`](DISCLAIMER.md) | One-person + AI-assisted project; no warranty. |
 | [`THIRD-PARTY.md`](THIRD-PARTY.md) | Every dependency: version, license, link. |

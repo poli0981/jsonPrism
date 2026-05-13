@@ -1,17 +1,21 @@
 import { useMemo } from 'react';
 import CodeMirror, { type ReactCodeMirrorRef, EditorView } from '@uiw/react-codemirror';
 import { json, jsonParseLinter } from '@codemirror/lang-json';
+import { yaml } from '@codemirror/lang-yaml';
+import { xml } from '@codemirror/lang-xml';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { lintGutter, linter } from '@codemirror/lint';
 import { tags as t } from '@lezer/highlight';
 import { useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 
+export type EditorLanguage = 'json' | 'plain' | 'yaml' | 'xml';
+
 interface CodeEditorProps {
   value: string;
   onChange?: (v: string) => void;
   readOnly?: boolean;
-  language?: 'json' | 'plain';
+  language?: EditorLanguage;
   className?: string;
   placeholder?: string;
   editorRef?: React.RefObject<ReactCodeMirrorRef | null>;
@@ -49,6 +53,10 @@ export function CodeEditor({
       if (!readOnly) {
         exts.push(lintGutter(), linter(jsonParseLinter()));
       }
+    } else if (language === 'yaml') {
+      exts.push(yaml());
+    } else if (language === 'xml') {
+      exts.push(xml());
     }
     exts.push(syntaxHighlighting(prismHighlightStyle));
     exts.push(EditorView.lineWrapping);
@@ -68,6 +76,11 @@ export function CodeEditor({
         '.cm-scroller': {
           fontFamily: 'var(--font-mono)',
           lineHeight: '1.6',
+          // Hide native scrollbar while keeping wheel/keyboard scroll.
+          scrollbarWidth: 'none',
+        },
+        '.cm-scroller::-webkit-scrollbar': {
+          display: 'none',
         },
         '.cm-content': {
           padding: '16px 0',

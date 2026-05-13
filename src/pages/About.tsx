@@ -90,129 +90,136 @@ export function About() {
   const { t } = useTranslation();
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="font-display text-spectrum mb-4 text-5xl tracking-tight italic">
-        {t('about.title')}
-      </h1>
-      <p className="font-display text-foreground/90 mb-8 text-2xl italic">{t('about.lead')}</p>
-      <div className="text-muted-foreground space-y-4 text-sm leading-relaxed">
-        <p>{t('about.p1')}</p>
-        <p>{t('about.p2')}</p>
-      </div>
-
-      {/* Donate */}
-      <section className="mt-14">
-        <h2 className="font-display mb-1 text-2xl tracking-tight">
-          <Heart className="mr-2 inline-block h-5 w-5 text-rose-400" />
-          {t('about.donate.title')}
-        </h2>
-        <p className="text-muted-foreground mb-4 text-sm">{t('about.donate.lead')}</p>
-        <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {DONATE.map((platform) => (
-            <li key={platform.key}>
-              <a
-                href={platform.url}
-                target="_blank"
-                rel="noreferrer"
-                className={cn(
-                  'border-border/60 bg-card/40 hover:border-primary/40 hover:bg-card/80 inline-flex w-full items-center justify-between rounded-md border px-3 py-2 text-sm transition',
-                )}
-              >
-                <span className="text-foreground font-medium">
-                  {t(`about.donate.${platform.key}`)}
-                </span>
-                <ExternalLink className="text-muted-foreground h-3.5 w-3.5" />
-              </a>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Third-party */}
-      <section className="mt-14">
-        <h2 className="font-display mb-1 text-2xl tracking-tight">
-          {t('about.third_party.title')}
-        </h2>
-        <p className="text-muted-foreground mb-4 text-sm">{t('about.third_party.lead')}</p>
-        <div className="space-y-4">
-          {DEPS.map((cat) => (
-            <div key={cat.key}>
-              <h3 className="text-foreground/80 mb-1 text-xs font-medium tracking-wider uppercase">
-                {t(`about.third_party.${cat.key}`)}
-              </h3>
-              <ul className="flex flex-wrap gap-1.5">
-                {cat.deps.map((dep) => (
-                  <li key={dep.name}>
-                    <a
-                      href={dep.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="border-border/60 bg-card/40 hover:border-primary/40 hover:text-foreground text-muted-foreground inline-flex items-center gap-1 rounded border px-2 py-0.5 font-mono text-xs transition"
-                    >
-                      {dep.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+    // Layout's <main> is `flex flex-1 min-h-0 flex-col` (height-bounded). The
+    // About page has many sections, so it needs its own scroll container —
+    // otherwise content overflows past the Footer at the bottom.
+    <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
+      <div className="mx-auto max-w-3xl px-6 py-16">
+        <h1 className="font-display text-spectrum mb-4 text-5xl tracking-tight italic">
+          {t('about.title')}
+        </h1>
+        <p className="font-display text-foreground/90 mb-8 text-2xl italic">{t('about.lead')}</p>
+        <div className="text-muted-foreground space-y-4 text-sm leading-relaxed">
+          <p>{t('about.p1')}</p>
+          <p>{t('about.p2')}</p>
         </div>
-        <p className="mt-4 text-sm">
-          <a
-            href={`${REPO_URL}/blob/main/THIRD-PARTY.md`}
-            target="_blank"
-            rel="noreferrer"
-            className="text-primary hover:underline"
-          >
-            {t('about.third_party.see_full_list')}
-          </a>
-        </p>
-      </section>
 
-      {/* Build info */}
-      <section className="mt-14">
-        <h2 className="font-display mb-3 text-2xl tracking-tight">{t('about.build.title')}</h2>
-        <dl className="border-border/60 grid grid-cols-[max-content_1fr] gap-x-6 gap-y-1 border-t pt-4 font-mono text-sm">
-          <dt className="text-muted-foreground">{t('about.build.version')}</dt>
-          <dd className="text-foreground">{__APP_VERSION__}</dd>
-          <dt className="text-muted-foreground">{t('about.build.commit')}</dt>
-          <dd className="text-foreground">
+        {/* Donate */}
+        <section className="mt-14">
+          <h2 className="font-display mb-1 text-2xl tracking-tight">
+            <Heart className="mr-2 inline-block h-5 w-5 text-rose-400" />
+            {t('about.donate.title')}
+          </h2>
+          <p className="text-muted-foreground mb-4 text-sm">{t('about.donate.lead')}</p>
+          <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {DONATE.map((platform) => (
+              <li key={platform.key}>
+                <a
+                  href={platform.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={cn(
+                    'border-border/60 bg-card/40 hover:border-primary/40 hover:bg-card/80 inline-flex w-full items-center justify-between rounded-md border px-3 py-2 text-sm transition',
+                  )}
+                >
+                  <span className="text-foreground font-medium">
+                    {t(`about.donate.${platform.key}`)}
+                  </span>
+                  <ExternalLink className="text-muted-foreground h-3.5 w-3.5" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* Third-party */}
+        <section className="mt-14">
+          <h2 className="font-display mb-1 text-2xl tracking-tight">
+            {t('about.third_party.title')}
+          </h2>
+          <p className="text-muted-foreground mb-4 text-sm">{t('about.third_party.lead')}</p>
+          <div className="space-y-4">
+            {DEPS.map((cat) => (
+              <div key={cat.key}>
+                <h3 className="text-foreground/80 mb-1 text-xs font-medium tracking-wider uppercase">
+                  {t(`about.third_party.${cat.key}`)}
+                </h3>
+                <ul className="flex flex-wrap gap-1.5">
+                  {cat.deps.map((dep) => (
+                    <li key={dep.name}>
+                      <a
+                        href={dep.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="border-border/60 bg-card/40 hover:border-primary/40 hover:text-foreground text-muted-foreground inline-flex items-center gap-1 rounded border px-2 py-0.5 font-mono text-xs transition"
+                      >
+                        {dep.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-sm">
             <a
-              href={`${REPO_URL}/commit/${__APP_COMMIT__}`}
+              href={`${REPO_URL}/blob/main/THIRD-PARTY.md`}
               target="_blank"
               rel="noreferrer"
-              className="hover:underline"
+              className="text-primary hover:underline"
             >
-              {__APP_COMMIT__}
+              {t('about.third_party.see_full_list')}
             </a>
-          </dd>
-          <dt className="text-muted-foreground">{t('about.build.date')}</dt>
-          <dd className="text-foreground">{__APP_BUILD_DATE__}</dd>
-        </dl>
-      </section>
+          </p>
+        </section>
 
-      {/* Links */}
-      <section className="mt-14">
-        <h2 className="font-display mb-3 text-2xl tracking-tight">{t('about.links.title')}</h2>
-        <ul className="grid grid-cols-1 gap-1 text-sm sm:grid-cols-2">
-          <LinkRow href={REPO_URL} label={t('about.links.repo')} />
-          <LinkRow href={`${REPO_URL}/issues`} label={t('about.links.issues')} />
-          <LinkRow href={`${REPO_URL}/discussions`} label={t('about.links.discussions')} />
-          <LinkRow href="https://poli0981.github.io/jsonprism/" label={t('about.links.demo')} />
-          <LinkRow href={`${REPO_URL}/blob/main/LICENSE`} label={t('about.links.license')} />
-        </ul>
-      </section>
+        {/* Build info */}
+        <section className="mt-14">
+          <h2 className="font-display mb-3 text-2xl tracking-tight">{t('about.build.title')}</h2>
+          <dl className="border-border/60 grid grid-cols-[max-content_1fr] gap-x-6 gap-y-1 border-t pt-4 font-mono text-sm">
+            <dt className="text-muted-foreground">{t('about.build.version')}</dt>
+            <dd className="text-foreground">{__APP_VERSION__}</dd>
+            <dt className="text-muted-foreground">{t('about.build.commit')}</dt>
+            <dd className="text-foreground">
+              <a
+                href={`${REPO_URL}/commit/${__APP_COMMIT__}`}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:underline"
+              >
+                {__APP_COMMIT__}
+              </a>
+            </dd>
+            <dt className="text-muted-foreground">{t('about.build.date')}</dt>
+            <dd className="text-foreground">{__APP_BUILD_DATE__}</dd>
+          </dl>
+        </section>
 
-      {/* Disclaimer */}
-      <section className="mt-14">
-        <h2 className="font-display mb-2 text-xl tracking-tight">{t('about.disclaimer.title')}</h2>
-        <p className="text-muted-foreground text-sm leading-relaxed">
-          {t('about.disclaimer.body')}
-        </p>
-      </section>
+        {/* Links */}
+        <section className="mt-14">
+          <h2 className="font-display mb-3 text-2xl tracking-tight">{t('about.links.title')}</h2>
+          <ul className="grid grid-cols-1 gap-1 text-sm sm:grid-cols-2">
+            <LinkRow href={REPO_URL} label={t('about.links.repo')} />
+            <LinkRow href={`${REPO_URL}/issues`} label={t('about.links.issues')} />
+            <LinkRow href={`${REPO_URL}/discussions`} label={t('about.links.discussions')} />
+            <LinkRow href="https://poli0981.github.io/jsonprism/" label={t('about.links.demo')} />
+            <LinkRow href={`${REPO_URL}/blob/main/LICENSE`} label={t('about.links.license')} />
+          </ul>
+        </section>
 
-      <div className="border-border/60 text-muted-foreground mt-12 border-t pt-6 font-mono text-xs">
-        {t('about.version', { version: __APP_VERSION__ })}
+        {/* Disclaimer */}
+        <section className="mt-14">
+          <h2 className="font-display mb-2 text-xl tracking-tight">
+            {t('about.disclaimer.title')}
+          </h2>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            {t('about.disclaimer.body')}
+          </p>
+        </section>
+
+        <div className="border-border/60 text-muted-foreground mt-12 border-t pt-6 font-mono text-xs">
+          {t('about.version', { version: __APP_VERSION__ })}
+        </div>
       </div>
     </div>
   );

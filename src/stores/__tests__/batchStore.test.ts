@@ -5,6 +5,12 @@ function makeFile(name: string, content = '{}'): File {
   return new File([content], name, { type: 'application/json' });
 }
 
+// File doesn't accept lastModified in its constructor signature universally,
+// so create a fresh File then override the read-only property via a wrapper.
+function makeFileWithLastModified(name: string, content: string, lastModified: number): File {
+  return new File([content], name, { type: 'application/json', lastModified });
+}
+
 beforeEach(() => {
   useBatchStore.getState().clear();
 });
@@ -81,6 +87,34 @@ describe('batchStore', () => {
     const id = useBatchStore.getState().itemOrder[0]!;
     useBatchStore.getState().updateItem(id, { status: 'done', output: 'x' });
     expect(useBatchStore.getState().ready()).toBe(true);
+  });
+
+  it('addFiles dedups by (name + size + lastModified)', () => {
+    const a = makeFileWithLastModified('a.json', '{"id":1}', 1700000000000);
+    const aDup = makeFileWithLastModified('a.json', '{"id":1}', 1700000000000);
+    const b = makeFileWithLastModified('b.json', '{"id":2}', 1700000000000);
+
+    const r1 = useBatchStore.getState().addFiles([a, b]);
+    expect(r1.added).toBe(2);
+    expect(r1.skipped).toBe(0);
+
+    const r2 = useBatchStore.getState().addFiles([aDup, b]);
+    expect(r2.added).toBe(0);
+    expect(r2.skipped).toBe(2);
+    expect(r2.reason).toBe('duplicate');
+
+    expect(useBatchStore.getState().size()).toBe(2);
+  });
+
+  it('addFiles treats different lastModified as different files', () => {
+    const a = makeFileWithLastModified('a.json', '{"v":1}', 1700000000000);
+    const aEdited = makeFileWithLastModified('a.json', '{"v":2}', 1700000060000);
+
+    useBatchStore.getState().addFiles([a]);
+    const r = useBatchStore.getState().addFiles([aEdited]);
+    expect(r.added).toBe(1);
+    expect(r.skipped).toBe(0);
+    expect(useBatchStore.getState().size()).toBe(2);
   });
 
   it('resetStatuses sets all items back to queued and clears outputs/errors', () => {

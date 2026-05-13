@@ -166,6 +166,15 @@
 }
 
 @layer utilities {
+  /* Hide native scrollbars on internal panels while preserving scroll. */
+  .scrollbar-hide {
+    scrollbar-width: none; /* Firefox + modern Chromium */
+    -ms-overflow-style: none; /* legacy Edge */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   .text-spectrum {
     background: linear-gradient(
       90deg,

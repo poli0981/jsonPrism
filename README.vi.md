@@ -191,6 +191,7 @@ Báo bug hoặc đề xuất tính năng tại [GitHub Issues](https://github.co
 | Doc | Nội dung |
 |---|---|
 | [`PRIVACY.md`](PRIVACY.md) | Offline-first, chỉ localStorage, không telemetry. |
+| [`TERMS.md`](TERMS.md) | ToS / EULA — acceptable use, kế thừa giấy phép, quyền sở hữu dữ liệu. |
 | [`SECURITY.md`](SECURITY.md) | Cách report vulnerability, SLA. |
 | [`DISCLAIMER.md`](DISCLAIMER.md) | Project 1 người + AI-assisted, không bảo hành. |
 | [`THIRD-PARTY.md`](THIRD-PARTY.md) | Mỗi dependency: version, giấy phép, link. |

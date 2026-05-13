@@ -7,7 +7,7 @@ import { SAMPLE_JSON } from '@/lib/sample';
 import { isTauri, nativeOpenFiles, fileFromNativePath } from '@/lib/tauri';
 import { getConverter } from '@/converters/registry';
 import type { FormatId } from '@/converters/types';
-import { CodeEditor } from './CodeEditor';
+import { CodeEditor, type EditorLanguage } from './CodeEditor';
 import type { Direction } from './DirectionToggle';
 
 interface InputPanelProps {
@@ -57,6 +57,31 @@ export function InputPanel({
     ? t('home.input_label_format', { format: t(converter.meta.labelKey) })
     : t('home.input_label');
 
+  // CodeMirror language pack to use for the input. In forward mode the input
+  // is always JSON. In reverse, pick the closest available pack — formats
+  // without an official CodeMirror grammar fall back to plain text.
+  const editorLanguage: EditorLanguage = useMemo(() => {
+    if (!isReverse) return 'json';
+    if (format === 'yaml') return 'yaml';
+    if (format === 'xml' || format === 'resx') return 'xml';
+    return 'plain';
+  }, [isReverse, format]);
+
+  // Allowed extensions for the single-file "Open" / drag-drop path.
+  // `<input accept>` is only a hint to the OS picker — re-validate in JS.
+  const allowedExtensions = useMemo(
+    () => (isReverse ? [converter.meta.extension.toLowerCase(), 'txt'] : ['json', 'txt']),
+    [isReverse, converter.meta.extension],
+  );
+
+  const hasAllowedExt = useCallback(
+    (name: string) => {
+      const ext = (name.split('.').pop() ?? '').toLowerCase();
+      return allowedExtensions.includes(ext);
+    },
+    [allowedExtensions],
+  );
+
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       setDragActive(false);
@@ -66,6 +91,10 @@ export function InputPanel({
         return;
       }
       const file = acceptedFiles[0]!;
+      if (!hasAllowedExt(file.name)) {
+        toast.warning(t('batch.toast.wrong_format', { count: 1 }));
+        return;
+      }
       void readFile(file).then(
         (text) => {
           onChange(text);
@@ -76,11 +105,21 @@ export function InputPanel({
         },
       );
     },
-    [onChange, onMultiFileDrop, t],
+    [hasAllowedExt, onChange, onMultiFileDrop, t],
+  );
+
+  const onDropRejected = useCallback(
+    (rejections: { file: File }[]) => {
+      if (rejections.length > 0) {
+        toast.warning(t('batch.toast.wrong_format', { count: rejections.length }));
+      }
+    },
+    [t],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
+    onDropRejected,
     onDragEnter: () => setDragActive(true),
     onDragLeave: () => setDragActive(false),
     accept,
@@ -95,6 +134,10 @@ export function InputPanel({
       if (!paths || paths.length === 0) return;
       try {
         const file = await fileFromNativePath(paths[0]!);
+        if (!hasAllowedExt(file.name)) {
+          toast.warning(t('batch.toast.wrong_format', { count: 1 }));
+          return;
+        }
         const text = await file.text();
         onChange(text);
         toast.success(t('toast.file_loaded', { name: file.name }));
@@ -109,6 +152,11 @@ export function InputPanel({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!hasAllowedExt(file.name)) {
+      toast.warning(t('batch.toast.wrong_format', { count: 1 }));
+      e.target.value = '';
+      return;
+    }
     void readFile(file).then(
       (text) => {
         onChange(text);
@@ -167,11 +215,11 @@ export function InputPanel({
         </div>
       </div>
 
-      <div className="relative flex-1">
+      <div className="relative min-h-0 flex-1">
         <CodeEditor
           value={value}
           onChange={onChange}
-          language={isReverse ? 'plain' : 'json'}
+          language={editorLanguage}
           placeholder={t('home.input_placeholder')}
         />
         {showOverlay && (

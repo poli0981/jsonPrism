@@ -100,7 +100,7 @@ export function OutputPanel({
           />
         </div>
       </div>
-      <div className="relative flex-1 overflow-auto">
+      <div className="scrollbar-hide relative flex-1 overflow-auto">
         {error ? (
           <div className="text-destructive p-4 font-mono text-sm whitespace-pre-wrap">{error}</div>
         ) : content ? (
