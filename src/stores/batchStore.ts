@@ -29,7 +29,7 @@ interface BatchState {
   hasAny(): boolean;
 
   // Mutations
-  addFiles(files: File[]): { added: number; skipped: number; reason?: string };
+  addFiles(files: File[]): { added: number; skipped: number; reason?: string | undefined };
   removeItem(id: string): void;
   clear(): void;
   setProcessing(p: boolean): void;
@@ -133,13 +133,13 @@ export const useBatchStore = create<BatchState>((set, get) => ({
       const newItems: Record<string, BatchItem> = {};
       for (const id of Object.keys(state.items)) {
         const item = state.items[id]!;
-        newItems[id] = {
-          ...item,
-          status: 'queued',
-          output: undefined,
-          outputSize: undefined,
-          error: undefined,
-        };
+        // Reset to queued; drop any prior output/error fields without
+        // assigning `undefined` (forbidden under exactOptionalPropertyTypes).
+        const { output: _o, outputSize: _os, error: _e, ...rest } = item;
+        void _o;
+        void _os;
+        void _e;
+        newItems[id] = { ...rest, status: 'queued' };
       }
       return { items: newItems };
     }),

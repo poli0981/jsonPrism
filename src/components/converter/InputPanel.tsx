@@ -99,7 +99,7 @@ export function InputPanel({ value, onChange, error, onMultiFileDrop }: InputPan
 
       <div className="border-border/60 flex items-center justify-between border-b px-3 py-2">
         <div className="flex min-w-0 items-center gap-2">
-          <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+          <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
             {t('home.input_label')}
           </span>
           {error && (

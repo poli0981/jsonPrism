@@ -11,14 +11,13 @@ interface State {
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-  state: State = { hasError: false, error: null };
+  override state: State = { hasError: false, error: null };
 
   static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
-    // eslint-disable-next-line no-console
     console.error('JSONPrism error boundary caught:', error, info);
   }
 
@@ -35,7 +34,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="bg-primary text-primary-foreground hover:opacity-90 rounded-md px-4 py-2 text-sm font-medium transition"
+              className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-medium transition hover:opacity-90"
             >
               Reload
             </button>

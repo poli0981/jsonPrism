@@ -35,12 +35,22 @@
     "toml": "TOML",
     "resx": "RESX",
     "markdown": "Bảng Markdown",
-    "sql": "SQL INSERT"
+    "sql": "SQL INSERT",
+    "bson": "BSON",
+    "cbor": "CBOR",
+    "msgpack": "MessagePack"
   },
   "format_status": {
     "ready": "Sẵn sàng",
     "suggested": "Gợi ý cho shape phát hiện được",
-    "planned": "Sẽ có ở Phase {{phase}}"
+    "planned": "Sẽ có ở Phase {{phase}}",
+    "no_reverse": "Format này không hỗ trợ parse ngược"
+  },
+  "direction": {
+    "forward": "JSON →",
+    "reverse": "→ JSON",
+    "title": "Chiều chuyển đổi",
+    "hint": "Đổi chiều chuyển đổi"
   },
   "options": {
     "jsonl": {
@@ -108,6 +118,24 @@
       "include_schema_desc": "Visual Studio yêu cầu. Chỉ tắt khi đang generate diff.",
       "sort_keys": "Sắp xếp entry theo bảng chữ cái",
       "sort_keys_desc": "Hữu ích để diff ổn định giữa các file locale."
+    },
+    "bson": {
+      "encoding": "Encoding hiển thị",
+      "encoding_desc": "Cách hiển thị byte BSON dưới dạng text. File tải về vẫn là raw bytes.",
+      "encoding_base64": "Base64",
+      "encoding_hex": "Hex"
+    },
+    "cbor": {
+      "encoding": "Encoding hiển thị",
+      "encoding_desc": "Cách hiển thị byte CBOR dưới dạng text. File tải về vẫn là raw bytes.",
+      "encoding_base64": "Base64",
+      "encoding_hex": "Hex"
+    },
+    "msgpack": {
+      "encoding": "Encoding hiển thị",
+      "encoding_desc": "Cách hiển thị byte MessagePack dưới dạng text. File tải về vẫn là raw bytes.",
+      "encoding_base64": "Base64",
+      "encoding_hex": "Hex"
     }
   },
   "shape": {

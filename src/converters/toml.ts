@@ -1,4 +1,4 @@
-import { stringify } from 'smol-toml';
+import { parse, stringify } from 'smol-toml';
 import type { Converter } from './types';
 
 interface TomlOptions {
@@ -39,6 +39,14 @@ export const tomlConverter: Converter<TomlOptions> = {
       // We cast through unknown because the library types are strict.
       const output = stringify(processed as Parameters<typeof stringify>[0]);
       return { ok: true, output };
+    } catch (err) {
+      return { ok: false, error: (err as Error).message };
+    }
+  },
+  reverse({ text }) {
+    try {
+      const value = parse(text);
+      return { ok: true, output: JSON.stringify(value, null, 2) };
     } catch (err) {
       return { ok: false, error: (err as Error).message };
     }

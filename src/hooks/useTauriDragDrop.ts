@@ -28,7 +28,6 @@ export function useTauriDragDrop(onFiles: (files: File[]) => void): void {
           const files = await Promise.all(paths.map(fileFromNativePath));
           onFiles(files);
         } catch (err) {
-          // eslint-disable-next-line no-console
           console.error('Tauri drag-drop read failed:', err);
         }
       });

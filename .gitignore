@@ -37,9 +37,14 @@ src-tauri/gen
 src-tauri/icons/*.png
 src-tauri/icons/*.ico
 src-tauri/icons/*.icns
+src-tauri/icons/android/
+src-tauri/icons/ios/
 
 # Test artifacts
 coverage
 .nyc_output
+
+# TypeScript build info
+*.tsbuildinfo
 
 .claude/

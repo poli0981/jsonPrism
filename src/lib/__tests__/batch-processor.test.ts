@@ -1,12 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { unzipSync, strFromU8 } from 'fflate';
-import {
-  outputFilename,
-  processBatch,
-  uniquifyFilenames,
-  zipOutputs,
-} from '../batch-processor';
+import { outputFilename, processBatch, uniquifyFilenames, zipOutputs } from '../batch-processor';
 import type { BatchItem } from '@/stores/batchStore';
+import * as registry from '@/converters/registry';
 
 function makeItem(id: string, name: string, content: string): BatchItem {
   return {
@@ -39,11 +35,7 @@ describe('uniquifyFilenames', () => {
   });
 
   it('appends counter suffix on collisions', () => {
-    expect(uniquifyFilenames(['a.csv', 'a.csv', 'a.csv'])).toEqual([
-      'a.csv',
-      'a_2.csv',
-      'a_3.csv',
-    ]);
+    expect(uniquifyFilenames(['a.csv', 'a.csv', 'a.csv'])).toEqual(['a.csv', 'a_2.csv', 'a_3.csv']);
   });
 
   it('preserves extension when uniquifying', () => {
@@ -53,10 +45,7 @@ describe('uniquifyFilenames', () => {
 
 describe('processBatch', () => {
   it('runs every item and reports done status', async () => {
-    const items = [
-      makeItem('1', 'a.json', '[{"id":1}]'),
-      makeItem('2', 'b.json', '[{"id":2}]'),
-    ];
+    const items = [makeItem('1', 'a.json', '[{"id":1}]'), makeItem('2', 'b.json', '[{"id":2}]')];
     const updates: Record<string, Partial<BatchItem>[]> = {};
     await processBatch(
       items,
@@ -144,16 +133,27 @@ describe('processBatch', () => {
   });
 
   it('marks all items as error if converter is not ready', async () => {
-    const items = [makeItem('1', 'a.json', '{}')];
-    const updates: Partial<BatchItem>[] = [];
-    await processBatch(
-      items,
-      'resx',
-      {},
-      { onUpdate: (_id, patch) => updates.push(patch) },
-      new AbortController().signal,
-    );
-    expect(updates.some((u) => u.status === 'error')).toBe(true);
+    // All shipped converters are `ready: true`, so mock one as not ready to
+    // exercise the defensive branch in processBatch.
+    const original = registry.getConverter('jsonl');
+    const spy = vi.spyOn(registry, 'getConverter').mockReturnValue({
+      ...original,
+      meta: { ...original.meta, ready: false },
+    });
+    try {
+      const items = [makeItem('1', 'a.json', '{}')];
+      const updates: Partial<BatchItem>[] = [];
+      await processBatch(
+        items,
+        'jsonl',
+        {},
+        { onUpdate: (_id, patch) => updates.push(patch) },
+        new AbortController().signal,
+      );
+      expect(updates.some((u) => u.status === 'error')).toBe(true);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
 

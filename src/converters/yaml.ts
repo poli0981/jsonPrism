@@ -60,4 +60,12 @@ export const yamlConverter: Converter<YamlOptions> = {
       return { ok: false, error: (err as Error).message };
     }
   },
+  reverse({ text }) {
+    try {
+      const value = yaml.load(text);
+      return { ok: true, output: JSON.stringify(value, null, 2) };
+    } catch (err) {
+      return { ok: false, error: (err as Error).message };
+    }
+  },
 };

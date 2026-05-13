@@ -26,7 +26,10 @@ describe('xmlConverter', () => {
 
   it('emits the XML declaration when enabled', () => {
     const data = { a: 1 };
-    const result = xmlConverter.convert({ data }, { ...xmlConverter.defaultOptions, declaration: true });
+    const result = xmlConverter.convert(
+      { data },
+      { ...xmlConverter.defaultOptions, declaration: true },
+    );
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.output.startsWith('<?xml version="1.0" encoding="UTF-8"?>')).toBe(true);

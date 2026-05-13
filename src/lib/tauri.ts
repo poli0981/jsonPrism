@@ -23,9 +23,7 @@ export function isTauri(): boolean {
  * Open a native file picker. Returns selected file paths,
  * or null if the user cancelled.
  */
-export async function nativeOpenFiles(options?: {
-  multiple?: boolean;
-}): Promise<string[] | null> {
+export async function nativeOpenFiles(options?: { multiple?: boolean }): Promise<string[] | null> {
   if (!isTauri()) return null;
   const { open } = await import('@tauri-apps/plugin-dialog');
   const result = await open({

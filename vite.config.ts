@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'node:path';
+import pkg from './package.json';
 
 // Tauri exposes env vars during dev/build; presence indicates a Tauri context.
 const isTauriContext = !!process.env.TAURI_ENV_PLATFORM;
@@ -11,6 +12,10 @@ const tauriHost = process.env.TAURI_DEV_HOST;
 export default defineConfig(({ mode }) => ({
   // Web prod build deploys to /jsonprism/. Tauri bundles serve from '/'.
   base: isTauriContext ? '/' : mode === 'production' ? '/jsonprism/' : '/',
+
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
 
   plugins: [react(), tailwindcss()],
 
@@ -26,19 +31,37 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: 'es2022',
     sourcemap: !isTauriContext,
-    // Tauri uses Chromium/WebKit only — drop legacy fallbacks for smaller bundles.
-    minify: isTauriContext ? 'esbuild' : 'esbuild',
+    // Vite 8 uses Rolldown + Oxc minifier by default; legacy `esbuild` requires
+    // installing esbuild separately.
+    minify: 'oxc',
     rollupOptions: {
       output: {
-        manualChunks: {
-          codemirror: [
-            '@codemirror/state',
-            '@codemirror/view',
-            '@codemirror/lang-json',
-            '@uiw/react-codemirror',
-          ],
-          parsers: ['js-yaml', 'smol-toml', 'fast-xml-parser', 'papaparse'],
-          fflate: ['fflate'],
+        // Vite 8 / Rolldown only accepts the function form here.
+        manualChunks(id) {
+          if (
+            id.includes('@codemirror/') ||
+            id.includes('@uiw/react-codemirror') ||
+            id.includes('@lezer/')
+          ) {
+            return 'codemirror';
+          }
+          if (
+            id.includes('js-yaml') ||
+            id.includes('smol-toml') ||
+            id.includes('fast-xml-parser') ||
+            id.includes('papaparse')
+          ) {
+            return 'parsers';
+          }
+          if (
+            id.includes('node_modules/bson/') ||
+            id.includes('node_modules/cbor-x/') ||
+            id.includes('node_modules/@msgpack/')
+          ) {
+            return 'binary-parsers';
+          }
+          if (id.includes('fflate')) return 'fflate';
+          return undefined;
         },
       },
     },

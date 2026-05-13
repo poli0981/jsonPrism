@@ -53,7 +53,7 @@ function NavItem({ to, end, children }: NavItemProps) {
   return (
     <NavLink
       to={to}
-      end={end}
+      {...(end !== undefined ? { end } : {})}
       className={({ isActive }) =>
         cn(
           'inline-flex h-9 items-center rounded-md px-3 text-sm font-medium transition',
@@ -71,7 +71,15 @@ function NavItem({ to, end, children }: NavItemProps) {
 function BrandMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" fill="none" className={className} aria-hidden>
-      <line x1="2" y1="32" x2="22" y2="32" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+      <line
+        x1="2"
+        y1="32"
+        x2="22"
+        y2="32"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
       <path
         d="M22 12 L46 32 L22 52 Z"
         fill="transparent"
@@ -79,10 +87,42 @@ function BrandMark({ className }: { className?: string }) {
         strokeWidth="2.5"
         strokeLinejoin="round"
       />
-      <line x1="46" y1="32" x2="62" y2="20" stroke="var(--color-prism-violet)" strokeWidth="2.5" strokeLinecap="round" />
-      <line x1="46" y1="32" x2="62" y2="28" stroke="var(--color-prism-cyan)" strokeWidth="2.5" strokeLinecap="round" />
-      <line x1="46" y1="32" x2="62" y2="36" stroke="var(--color-prism-amber)" strokeWidth="2.5" strokeLinecap="round" />
-      <line x1="46" y1="32" x2="62" y2="44" stroke="var(--color-prism-rose)" strokeWidth="2.5" strokeLinecap="round" />
+      <line
+        x1="46"
+        y1="32"
+        x2="62"
+        y2="20"
+        stroke="var(--color-prism-violet)"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      <line
+        x1="46"
+        y1="32"
+        x2="62"
+        y2="28"
+        stroke="var(--color-prism-cyan)"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      <line
+        x1="46"
+        y1="32"
+        x2="62"
+        y2="36"
+        stroke="var(--color-prism-amber)"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      <line
+        x1="46"
+        y1="32"
+        x2="62"
+        y2="44"
+        stroke="var(--color-prism-rose)"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }

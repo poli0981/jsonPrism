@@ -20,17 +20,20 @@ JSONPrism is a refracting tool for developers. It takes a single JSON input and 
 
 ## Target formats
 
-| Format            | Extension | Status        |
-| ----------------- | --------- | ------------- |
-| JSONL             | `.jsonl`  | ✅ Phase 1     |
-| CSV               | `.csv`    | ✅ Phase 1     |
-| TSV               | `.tsv`    | ✅ Phase 1     |
-| YAML              | `.yaml`   | ✅ Phase 1     |
-| XML               | `.xml`    | ✅ Phase 2     |
-| TOML              | `.toml`   | ✅ Phase 2     |
-| Markdown table    | `.md`     | ✅ Phase 2     |
-| SQL `INSERT`      | `.sql`    | ✅ Phase 2     |
-| RESX (.NET)       | `.resx`   | ✅ Phase 3     |
+| Format            | Extension   | Status        | Reverse (→ JSON) |
+| ----------------- | ----------- | ------------- | ---------------- |
+| JSONL             | `.jsonl`    | ✅ Phase 1     | ✅                |
+| CSV               | `.csv`      | ✅ Phase 1     | ✅                |
+| TSV               | `.tsv`      | ✅ Phase 1     | ✅                |
+| YAML              | `.yaml`     | ✅ Phase 1     | ✅                |
+| XML               | `.xml`      | ✅ Phase 2     | —                |
+| TOML              | `.toml`     | ✅ Phase 2     | ✅                |
+| Markdown table    | `.md`       | ✅ Phase 2     | —                |
+| SQL `INSERT`      | `.sql`      | ✅ Phase 2     | —                |
+| RESX (.NET)       | `.resx`     | ✅ Phase 3     | ✅                |
+| BSON              | `.bson`     | ✅ Phase 4     | —                |
+| CBOR              | `.cbor`     | ✅ Phase 4     | —                |
+| MessagePack       | `.msgpack`  | ✅ Phase 4     | —                |
 
 ## Features
 

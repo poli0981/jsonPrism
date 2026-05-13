@@ -115,8 +115,8 @@ describe('sqlConverter', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.output).toMatch(/INSERT INTO "records" \("id", "name", "active"\) VALUES/);
-    expect(result.output).toContain('(1, \'Alice\', TRUE)');
-    expect(result.output).toContain('(2, \'Bob\', FALSE)');
+    expect(result.output).toContain("(1, 'Alice', TRUE)");
+    expect(result.output).toContain("(2, 'Bob', FALSE)");
   });
 
   it('emits one INSERT per row when multiRow=false', () => {
@@ -132,10 +132,7 @@ describe('sqlConverter', () => {
 
   it('chunks multi-row inserts at chunkSize boundary', () => {
     const data = Array.from({ length: 5 }, (_, i) => ({ id: i }));
-    const result = sqlConverter.convert(
-      { data },
-      { ...sqlConverter.defaultOptions, chunkSize: 2 },
-    );
+    const result = sqlConverter.convert({ data }, { ...sqlConverter.defaultOptions, chunkSize: 2 });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     // 5 rows, chunkSize 2 → 3 INSERT statements

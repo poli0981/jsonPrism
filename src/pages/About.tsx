@@ -5,7 +5,7 @@ export function About() {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-16">
-      <h1 className="font-display text-spectrum mb-4 text-5xl italic tracking-tight">
+      <h1 className="font-display text-spectrum mb-4 text-5xl tracking-tight italic">
         {t('about.title')}
       </h1>
       <p className="font-display text-foreground/90 mb-8 text-2xl italic">{t('about.lead')}</p>
@@ -14,7 +14,7 @@ export function About() {
         <p>{t('about.p2')}</p>
       </div>
       <div className="border-border/60 text-muted-foreground mt-12 border-t pt-6 font-mono text-xs">
-        {t('about.version', { version: '1.0.0' })}
+        {t('about.version', { version: __APP_VERSION__ })}
       </div>
     </div>
   );

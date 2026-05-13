@@ -23,10 +23,7 @@ describe('yamlConverter', () => {
 
   it('respects indent setting', () => {
     const data = { nested: { deeply: { value: 1 } } };
-    const result = yamlConverter.convert(
-      { data },
-      { ...yamlConverter.defaultOptions, indent: 4 },
-    );
+    const result = yamlConverter.convert({ data }, { ...yamlConverter.defaultOptions, indent: 4 });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     // Indent of 4 spaces should appear before "deeply"

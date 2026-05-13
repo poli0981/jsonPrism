@@ -1,24 +1,40 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, Copy, Download } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
 import type { FormatId } from '@/converters/types';
 import { getConverter } from '@/converters/registry';
+import { decodeBytes } from '@/converters/bson';
+import type { Direction } from './DirectionToggle';
 
 interface OutputPanelProps {
   format: FormatId;
   content: string;
   error?: string | null;
+  /** Current converter options — needed to decode binary output for download. */
+  options?: Record<string, unknown>;
+  /** Forward = JSON→format; reverse = format→JSON. Drives download extension. */
+  direction?: Direction;
   /** Imperative handle so the workspace can trigger download from a keyboard shortcut. */
   registerActions?: (actions: { copy: () => void; download: () => void }) => void;
 }
 
-export function OutputPanel({ format, content, error, registerActions }: OutputPanelProps) {
+export function OutputPanel({
+  format,
+  content,
+  error,
+  options,
+  direction = 'forward',
+  registerActions,
+}: OutputPanelProps) {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const converter = getConverter(format);
+  const isReverse = direction === 'reverse';
+  const outputExt = isReverse ? 'json' : converter.meta.extension;
+  const outputMime = isReverse ? 'application/json' : converter.meta.mimeType;
 
-  const handleCopy = async () => {
+  const handleCopy = useCallback(async () => {
     if (!content) return;
     try {
       await navigator.clipboard.writeText(content);
@@ -28,22 +44,35 @@ export function OutputPanel({ format, content, error, registerActions }: OutputP
     } catch {
       toast.error(t('toast.copy_failed'));
     }
-  };
+  }, [content, converter, t]);
 
-  const handleDownload = () => {
+  const handleDownload = useCallback(() => {
     if (!content) return;
-    const blob = new Blob([content], { type: converter.meta.mimeType });
+    const filename = `output.${outputExt}`;
+    let blob: Blob;
+    if (!isReverse && converter.meta.binary) {
+      // Decode encoded text back to raw bytes so the downloaded file is a
+      // real binary BSON / CBOR / MessagePack payload.
+      const encoding = (options?.['encoding'] ?? 'base64') as 'base64' | 'hex';
+      const bytes = decodeBytes(content, encoding);
+      // .slice() copies into a fresh ArrayBuffer (not SharedArrayBuffer),
+      // which is what Blob's typed constructor accepts.
+      blob = new Blob([bytes.slice()], { type: outputMime });
+    } else {
+      blob = new Blob([content], { type: outputMime });
+    }
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `output.${converter.meta.extension}`;
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success(t('toast.downloaded', { filename: `output.${converter.meta.extension}` }));
-  };
+    toast.success(t('toast.downloaded', { filename }));
+  }, [content, converter, isReverse, outputExt, outputMime, options, t]);
 
-  // Register actions every render — cheap, no useEffect needed.
-  registerActions?.({ copy: handleCopy, download: handleDownload });
+  useEffect(() => {
+    registerActions?.({ copy: handleCopy, download: handleDownload });
+  }, [registerActions, handleCopy, handleDownload]);
 
   const disabled = !content || !!error;
 
@@ -51,12 +80,10 @@ export function OutputPanel({ format, content, error, registerActions }: OutputP
     <div className="flex h-full flex-col">
       <div className="border-border/60 flex items-center justify-between border-b px-3 py-2">
         <div className="flex items-center gap-2">
-          <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+          <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
             {t('home.output_label')}
           </span>
-          <span className="text-muted-foreground/60 font-mono text-xs">
-            · .{converter.meta.extension}
-          </span>
+          <span className="text-muted-foreground/60 font-mono text-xs">· .{outputExt}</span>
         </div>
         <div className="flex items-center gap-1">
           <ToolbarButton
@@ -77,7 +104,7 @@ export function OutputPanel({ format, content, error, registerActions }: OutputP
         {error ? (
           <div className="text-destructive p-4 font-mono text-sm whitespace-pre-wrap">{error}</div>
         ) : content ? (
-          <pre className="font-mono p-4 text-sm leading-relaxed whitespace-pre-wrap break-words">
+          <pre className="p-4 font-mono text-sm leading-relaxed break-words whitespace-pre-wrap">
             {content}
           </pre>
         ) : (

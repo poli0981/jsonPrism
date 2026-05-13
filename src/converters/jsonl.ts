@@ -39,4 +39,19 @@ export const jsonlConverter: Converter<JsonlOptions> = {
       return { ok: false, error: (err as Error).message };
     }
   },
+  reverse({ text }, { pretty }) {
+    const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0);
+    const values: unknown[] = [];
+    for (let i = 0; i < lines.length; i++) {
+      try {
+        values.push(JSON.parse(lines[i]!));
+      } catch (err) {
+        return {
+          ok: false,
+          error: `Line ${i + 1}: ${(err as Error).message}`,
+        };
+      }
+    }
+    return { ok: true, output: pretty ? JSON.stringify(values, null, 2) : JSON.stringify(values) };
+  },
 };

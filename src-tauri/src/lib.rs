@@ -1,5 +1,5 @@
 use serde::Serialize;
-use tauri::Manager;
+use tauri::{Manager, RunEvent, WindowEvent};
 
 /// Metadata about the host system — useful for diagnostics and UI hints.
 /// Exposed to the frontend via the `host_info` command.
@@ -23,12 +23,22 @@ fn host_info() -> HostInfo {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_os::init())
         .invoke_handler(tauri::generate_handler![host_info])
+        .on_window_event(|window, event| {
+            // Ensure the main window doesn't hold up the runtime on close.
+            // Without this, Windows builds occasionally leave the host
+            // process alive when the webview is the last live handle.
+            if let WindowEvent::CloseRequested { .. } = event {
+                if window.label() == "main" {
+                    let _ = window.app_handle().exit(0);
+                }
+            }
+        })
         .setup(|app| {
             // Surface the main window once it's ready — avoids the
             // "blank window flash" some platforms exhibit on cold start.
@@ -43,6 +53,15 @@ pub fn run() {
             }
             Ok(())
         })
-        .run(tauri::generate_context!())
-        .expect("error while running JSONPrism");
+        .build(tauri::generate_context!())
+        .expect("error while building JSONPrism");
+
+    app.run(|app_handle, event| {
+        if let RunEvent::ExitRequested { .. } = event {
+            // Let Tauri's default exit path proceed — plugins clean up on drop.
+            // Explicitly request cleanup so any spawned shell children are
+            // sent SIGTERM/TerminateProcess before the process exits.
+            app_handle.cleanup_before_exit();
+        }
+    });
 }

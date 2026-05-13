@@ -8,6 +8,7 @@ import { loadOptions, saveOptions, clearOptions } from '@/lib/options-storage';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useTauriDragDrop } from '@/hooks/useTauriDragDrop';
 import { useBatchStore } from '@/stores/batchStore';
+import { DirectionToggle, type Direction } from './DirectionToggle';
 import { FormatPicker } from './FormatPicker';
 import { InputPanel } from './InputPanel';
 import { OutputPanel } from './OutputPanel';
@@ -17,6 +18,7 @@ import { StatusBar } from './StatusBar';
 import { BatchPanel } from './BatchPanel';
 
 const STORAGE_FORMAT_KEY = 'jsonprism.selected_format';
+const STORAGE_DIRECTION_KEY = 'jsonprism.direction';
 
 export function ConverterWorkspace() {
   const { t } = useTranslation();
@@ -24,6 +26,10 @@ export function ConverterWorkspace() {
   const [format, setFormat] = useState<FormatId>(() => {
     const stored = window.localStorage.getItem(STORAGE_FORMAT_KEY);
     return (stored as FormatId | null) ?? 'jsonl';
+  });
+  const [direction, setDirection] = useState<Direction>(() => {
+    const stored = window.localStorage.getItem(STORAGE_DIRECTION_KEY);
+    return stored === 'reverse' ? 'reverse' : 'forward';
   });
   const [optionsByFormat, setOptionsByFormat] = useState<Record<string, Record<string, unknown>>>(
     () => {
@@ -35,6 +41,7 @@ export function ConverterWorkspace() {
 
   const actionsRef = useRef<{ copy: () => void; download: () => void } | null>(null);
   const [batchOpen, setBatchOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const addBatchFiles = useBatchStore((s) => s.addFiles);
 
   const handleMultiFileDrop = useCallback(
@@ -64,6 +71,24 @@ export function ConverterWorkspace() {
     });
   }, []);
 
+  const switchDirection = useCallback(
+    (next: Direction) => {
+      setDirection(next);
+      window.localStorage.setItem(STORAGE_DIRECTION_KEY, next);
+      // If the current format doesn't support the new direction, switch to one that does.
+      if (next === 'reverse' && typeof getConverter(format).reverse !== 'function') {
+        const fallback = (['jsonl', 'csv', 'yaml', 'toml', 'resx'] as FormatId[]).find(
+          (id) => typeof getConverter(id).reverse === 'function',
+        );
+        if (fallback) {
+          setFormat(fallback);
+          window.localStorage.setItem(STORAGE_FORMAT_KEY, fallback);
+        }
+      }
+    },
+    [format],
+  );
+
   const currentOptions = optionsByFormat[format] ?? getConverter(format).defaultOptions;
 
   const setCurrentOptions = useCallback(
@@ -86,6 +111,37 @@ export function ConverterWorkspace() {
     if (!input.trim()) {
       return { output: '', inputError: null, outputError: null, shape: null, parseMs: null };
     }
+    const converter = getConverter(format);
+    if (!converter.meta.ready) {
+      return {
+        output: '',
+        inputError: null,
+        outputError: t('errors.converter_not_ready_phase', { phase: converter.meta.phase }),
+        shape: null,
+        parseMs: performance.now() - start,
+      };
+    }
+
+    if (direction === 'reverse') {
+      if (typeof converter.reverse !== 'function') {
+        return {
+          output: '',
+          inputError: null,
+          outputError: t('format_status.no_reverse'),
+          shape: null,
+          parseMs: performance.now() - start,
+        };
+      }
+      const result = converter.reverse(
+        { text: input },
+        currentOptions as Parameters<typeof converter.reverse>[1],
+      );
+      const ms = performance.now() - start;
+      return result.ok
+        ? { output: result.output, inputError: null, outputError: null, shape: null, parseMs: ms }
+        : { output: '', inputError: result.error, outputError: null, shape: null, parseMs: ms };
+    }
+
     const parsed = parseJsonInput(input);
     if (!parsed.ok) {
       const msg = parsed.error === 'empty' ? null : parsed.error;
@@ -97,18 +153,10 @@ export function ConverterWorkspace() {
         parseMs: performance.now() - start,
       };
     }
-    const converter = getConverter(format);
-    if (!converter.meta.ready) {
-      return {
-        output: '',
-        inputError: null,
-        outputError: t('errors.converter_not_ready_phase', { phase: converter.meta.phase }),
-        shape: parsed.shape,
-        parseMs: performance.now() - start,
-      };
-    }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = converter.convert({ data: parsed.value, rawText: input }, currentOptions as any);
+    const result = converter.convert(
+      { data: parsed.value, rawText: input },
+      currentOptions as Parameters<typeof converter.convert>[1],
+    );
     const ms = performance.now() - start;
     if (result.ok) {
       return {
@@ -126,11 +174,12 @@ export function ConverterWorkspace() {
       shape: parsed.shape,
       parseMs: ms,
     };
-  }, [input, format, currentOptions, t]);
+  }, [input, format, currentOptions, direction, t]);
 
   useKeyboardShortcuts([
     { key: 'k', mod: true, handler: () => setInput('') },
     { key: 's', mod: true, handler: () => actionsRef.current?.download() },
+    { key: ',', mod: true, handler: () => setSettingsOpen((v) => !v) },
   ]);
 
   const inputBytes = useMemo(() => new TextEncoder().encode(input).length, [input]);
@@ -139,7 +188,15 @@ export function ConverterWorkspace() {
   return (
     <div className="flex h-full flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <FormatPicker value={format} onChange={switchFormat} shape={shape} />
+        <div className="flex flex-wrap items-center gap-3">
+          <DirectionToggle value={direction} onChange={switchDirection} />
+          <FormatPicker
+            value={format}
+            onChange={switchFormat}
+            shape={shape}
+            direction={direction}
+          />
+        </div>
         <div className="flex items-center gap-3">
           <ShapeHint shape={shape} />
           <BatchPanel
@@ -153,6 +210,8 @@ export function ConverterWorkspace() {
             options={currentOptions}
             onChange={setCurrentOptions}
             onReset={resetCurrentOptions}
+            open={settingsOpen}
+            onOpenChange={setSettingsOpen}
           />
         </div>
       </div>
@@ -172,6 +231,8 @@ export function ConverterWorkspace() {
               format={format}
               content={output}
               error={outputError}
+              options={currentOptions}
+              direction={direction}
               registerActions={(a) => {
                 actionsRef.current = a;
               }}

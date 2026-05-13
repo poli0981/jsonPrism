@@ -51,7 +51,10 @@ export function detectShape(value: unknown): JsonShape {
   if (value === null) return 'scalar';
   if (typeof value !== 'object') return 'scalar';
   if (Array.isArray(value)) {
-    if (value.length > 0 && value.every((v) => v !== null && typeof v === 'object' && !Array.isArray(v))) {
+    if (
+      value.length > 0 &&
+      value.every((v) => v !== null && typeof v === 'object' && !Array.isArray(v))
+    ) {
       return 'array-of-objects';
     }
     return 'array';

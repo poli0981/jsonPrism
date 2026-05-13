@@ -9,13 +9,13 @@ export function suggestedFormats(shape: JsonShape | null): FormatId[] {
   switch (shape) {
     case 'flat-object':
       // Flat-object is RESX's native shape — surface it first.
-      return ['resx', 'yaml', 'toml', 'xml'];
+      return ['resx', 'yaml', 'toml', 'xml', 'bson', 'cbor', 'msgpack'];
     case 'array-of-objects':
-      return ['jsonl', 'csv', 'tsv', 'markdown', 'sql', 'yaml', 'xml'];
+      return ['jsonl', 'csv', 'tsv', 'markdown', 'sql', 'yaml', 'xml', 'cbor', 'msgpack'];
     case 'object':
-      return ['yaml', 'toml', 'xml'];
+      return ['yaml', 'toml', 'xml', 'bson', 'cbor', 'msgpack'];
     case 'array':
-      return ['jsonl', 'yaml', 'xml'];
+      return ['jsonl', 'yaml', 'xml', 'cbor', 'msgpack'];
     case 'scalar':
       return ['yaml'];
     default:
