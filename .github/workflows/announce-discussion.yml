@@ -76,30 +76,38 @@ jobs:
         id: msg
         env:
           EVENT: ${{ github.event_name }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-          RELEASE_URL: ${{ github.event.release.html_url }}
-          RELEASE_BODY: ${{ github.event.release.body }}
-          DEPLOY_SHA: ${{ github.event.workflow_run.head_sha }}
-          DEPLOY_URL: ${{ github.event.workflow_run.html_url }}
-          DISPATCH_MSG: ${{ inputs.message }}
+          # `|| ''` guards each value so the env var is always set to an
+          # empty string (not unset) when the source field is missing for
+          # the active event type. Without this, `set -u` blows up below.
+          RELEASE_TAG: ${{ github.event.release.tag_name || '' }}
+          RELEASE_URL: ${{ github.event.release.html_url || '' }}
+          RELEASE_BODY: ${{ github.event.release.body || '' }}
+          DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || '' }}
+          DEPLOY_URL: ${{ github.event.workflow_run.html_url || '' }}
+          DISPATCH_MSG: ${{ inputs.message || '' }}
         run: |
           set -euo pipefail
+          # NL is a literal newline used to assemble multi-line bodies
+          # without breaking the YAML literal-block-scalar indentation.
+          # Concatenating "$VAR""$NL""$NL""$OTHER" gives both interpolation
+          # AND embedded blank lines.
+          NL=$'\n'
           case "$EVENT" in
             release)
-              title="Release $RELEASE_TAG"
-              body=$'## $RELEASE_TAG\n\n$RELEASE_BODY\n\n[View release →]($RELEASE_URL)'
+              title="Release ${RELEASE_TAG}"
+              body="## ${RELEASE_TAG}${NL}${NL}${RELEASE_BODY}${NL}${NL}[View release →](${RELEASE_URL})"
               ;;
             workflow_run)
               short_sha="${DEPLOY_SHA:0:7}"
-              title="Deploy succeeded — $short_sha"
-              body=$'Latest commit deployed to GitHub Pages.\n\n[Deploy run →]($DEPLOY_URL)'
+              title="Deploy succeeded — ${short_sha}"
+              body="Latest commit deployed to GitHub Pages.${NL}${NL}[Deploy run →](${DEPLOY_URL})"
               ;;
             workflow_dispatch)
               title="Announcement"
-              body="$DISPATCH_MSG"
+              body="${DISPATCH_MSG}"
               ;;
             *)
-              echo "::error::Unsupported event: $EVENT"
+              echo "::error::Unsupported event: ${EVENT}"
               exit 1
               ;;
           esac
@@ -115,6 +123,13 @@ jobs:
       - name: Create Discussion
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Pass dynamic values through env vars (not literal `${{ ... }}`
+          # substitution) so a title/body containing quotes, backticks, or
+          # other shell-special characters doesn't break the command line.
+          REPO_ID: ${{ steps.ids.outputs.repo_id }}
+          CAT_ID: ${{ steps.ids.outputs.cat_id }}
+          TITLE: ${{ steps.msg.outputs.title }}
+          BODY: ${{ steps.msg.outputs.body }}
         run: |
           set -euo pipefail
           MUTATION='mutation($repo: ID!, $cat: ID!, $title: String!, $body: String!) {
@@ -124,8 +139,8 @@ jobs:
           }'
           gh api graphql \
             -f query="$MUTATION" \
-            -F repo="${{ steps.ids.outputs.repo_id }}" \
-            -F cat="${{ steps.ids.outputs.cat_id }}" \
-            -F title="${{ steps.msg.outputs.title }}" \
-            -F body="${{ steps.msg.outputs.body }}" \
+            -F repo="$REPO_ID" \
+            -F cat="$CAT_ID" \
+            -F title="$TITLE" \
+            -F body="$BODY" \
             --jq '.data.createDiscussion.discussion.url'
