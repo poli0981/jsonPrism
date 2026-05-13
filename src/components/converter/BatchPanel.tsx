@@ -13,6 +13,7 @@ import {
 import { toast } from '@/components/ui/sonner';
 import { useBatchStore, BATCH_MAX_FILES, type BatchItem } from '@/stores/batchStore';
 import { processBatch, zipOutputs, downloadBlob } from '@/lib/batch-processor';
+import { filterByExtension, getAllowedExtensions } from '@/lib/file-filter';
 import { isTauri, nativeOpenFiles, nativeSaveBlob, fileFromNativePath } from '@/lib/tauri';
 import { getConverter } from '@/converters/registry';
 import type { FormatId } from '@/converters/types';
@@ -68,19 +69,14 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
   // Whitelist of file extensions that match the current direction × format.
   // The browser's native `<input accept>` is only a hint, so we re-validate
   // in JS to reject files chosen via "Browse" with "All files" filter.
-  const allowedExtensions = useMemo(() => {
-    return isReverse ? [converter.meta.extension.toLowerCase(), 'txt'] : ['json', 'txt'];
-  }, [isReverse, converter.meta.extension]);
+  const allowedExtensions = useMemo(
+    () => getAllowedExtensions(isReverse ? 'reverse' : 'forward', converter.meta.extension),
+    [isReverse, converter.meta.extension],
+  );
 
   const handleAddFiles = useCallback(
     (files: File[]) => {
-      const valid: File[] = [];
-      let wrongFormat = 0;
-      for (const f of files) {
-        const ext = (f.name.split('.').pop() ?? '').toLowerCase();
-        if (allowedExtensions.includes(ext)) valid.push(f);
-        else wrongFormat += 1;
-      }
+      const { valid, wrongFormat } = filterByExtension(files, allowedExtensions);
       if (wrongFormat > 0) {
         toast.warning(t('batch.toast.wrong_format', { count: wrongFormat }));
       }
