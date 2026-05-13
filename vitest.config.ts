@@ -8,6 +8,8 @@ export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
     __IS_TAURI_BUILD__: 'false',
+    __APP_COMMIT__: '"test"',
+    __APP_BUILD_DATE__: '"1970-01-01"',
   },
   resolve: {
     alias: {

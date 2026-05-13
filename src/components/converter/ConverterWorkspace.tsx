@@ -201,6 +201,7 @@ export function ConverterWorkspace() {
           <ShapeHint shape={shape} />
           <BatchPanel
             format={format}
+            direction={direction}
             options={currentOptions}
             open={batchOpen}
             onOpenChange={setBatchOpen}
@@ -223,6 +224,8 @@ export function ConverterWorkspace() {
               value={input}
               onChange={setInput}
               error={inputError}
+              format={format}
+              direction={direction}
               onMultiFileDrop={handleMultiFileDrop}
             />
           </div>

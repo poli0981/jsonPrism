@@ -1,24 +1,61 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
 import { Eraser, FileText, FolderOpen } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
 import { SAMPLE_JSON } from '@/lib/sample';
 import { isTauri, nativeOpenFiles, fileFromNativePath } from '@/lib/tauri';
+import { getConverter } from '@/converters/registry';
+import type { FormatId } from '@/converters/types';
 import { CodeEditor } from './CodeEditor';
+import type { Direction } from './DirectionToggle';
 
 interface InputPanelProps {
   value: string;
   onChange: (v: string) => void;
   error?: string | null;
+  /** Drives accept list, file picker filter, and editor label. */
+  format: FormatId;
+  /** Forward = JSON-only; reverse = the format's native extension. */
+  direction: Direction;
   /** Called when 2+ files are dropped — workspace routes them into batch. */
   onMultiFileDrop?: (files: File[]) => void;
 }
 
-export function InputPanel({ value, onChange, error, onMultiFileDrop }: InputPanelProps) {
+export function InputPanel({
+  value,
+  onChange,
+  error,
+  format,
+  direction,
+  onMultiFileDrop,
+}: InputPanelProps) {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
+
+  const isReverse = direction === 'reverse';
+  const converter = getConverter(format);
+  // In reverse mode the dropzone + file picker accept the format's native
+  // extension; in forward mode JSON is the only useful input.
+  const accept = useMemo(() => {
+    if (isReverse) {
+      const ext = converter.meta.extension;
+      return {
+        [converter.meta.mimeType]: [`.${ext}`],
+        'text/plain': ['.txt'],
+      };
+    }
+    return { 'application/json': ['.json'], 'text/plain': ['.txt'] };
+  }, [isReverse, converter.meta.mimeType, converter.meta.extension]);
+
+  const fileInputAccept = isReverse
+    ? `.${converter.meta.extension},.txt,${converter.meta.mimeType}`
+    : '.json,.txt,application/json';
+
+  const inputLabel = isReverse
+    ? t('home.input_label_format', { format: t(converter.meta.labelKey) })
+    : t('home.input_label');
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -46,7 +83,7 @@ export function InputPanel({ value, onChange, error, onMultiFileDrop }: InputPan
     onDrop,
     onDragEnter: () => setDragActive(true),
     onDragLeave: () => setDragActive(false),
-    accept: { 'application/json': ['.json'], 'text/plain': ['.txt'] },
+    accept,
     multiple: true,
     noClick: true,
     noKeyboard: true,
@@ -92,7 +129,7 @@ export function InputPanel({ value, onChange, error, onMultiFileDrop }: InputPan
       <input
         ref={fileInputRef}
         type="file"
-        accept=".json,.txt,application/json"
+        accept={fileInputAccept}
         className="hidden"
         onChange={handleFileChange}
       />
@@ -100,7 +137,7 @@ export function InputPanel({ value, onChange, error, onMultiFileDrop }: InputPan
       <div className="border-border/60 flex items-center justify-between border-b px-3 py-2">
         <div className="flex min-w-0 items-center gap-2">
           <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-            {t('home.input_label')}
+            {inputLabel}
           </span>
           {error && (
             <span className="text-destructive max-w-md truncate text-xs" title={error}>
@@ -114,11 +151,13 @@ export function InputPanel({ value, onChange, error, onMultiFileDrop }: InputPan
             label={t('home.open_file')}
             icon={<FolderOpen className="h-3.5 w-3.5" />}
           />
-          <ToolbarButton
-            onClick={() => onChange(SAMPLE_JSON)}
-            label={t('home.load_sample')}
-            icon={<FileText className="h-3.5 w-3.5" />}
-          />
+          {!isReverse && (
+            <ToolbarButton
+              onClick={() => onChange(SAMPLE_JSON)}
+              label={t('home.load_sample')}
+              icon={<FileText className="h-3.5 w-3.5" />}
+            />
+          )}
           <ToolbarButton
             onClick={() => onChange('')}
             label={t('home.clear')}
@@ -132,7 +171,7 @@ export function InputPanel({ value, onChange, error, onMultiFileDrop }: InputPan
         <CodeEditor
           value={value}
           onChange={onChange}
-          language="json"
+          language={isReverse ? 'plain' : 'json'}
           placeholder={t('home.input_placeholder')}
         />
         {showOverlay && (

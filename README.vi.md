@@ -182,10 +182,39 @@ Xem [`docs/ROADMAP.md`](docs/ROADMAP.md) để biết kế hoạch phase đầy 
 
 ## Đóng góp
 
-Welcome pull request — vui lòng đọc [`CONTRIBUTING.md`](CONTRIBUTING.md) trước.
+Welcome pull request — vui lòng đọc [`CONTRIBUTING.md`](CONTRIBUTING.md) trước. PR thuộc nhóm **auto-ignored** (code đáng ngờ, lan man không vào vấn đề, không mô tả…) sẽ bị đóng không review.
 
-Báo bug hoặc đề xuất tính năng tại [GitHub Issues](https://github.com/poli0981/jsonprism/issues).
+Báo bug hoặc đề xuất tính năng tại [GitHub Issues](https://github.com/poli0981/jsonprism/issues). Vấn đề bảo mật vui lòng dùng [Security Advisory riêng tư](https://github.com/poli0981/jsonprism/security/advisories/new).
+
+## Tài liệu project
+
+| Doc | Nội dung |
+|---|---|
+| [`PRIVACY.md`](PRIVACY.md) | Offline-first, chỉ localStorage, không telemetry. |
+| [`SECURITY.md`](SECURITY.md) | Cách report vulnerability, SLA. |
+| [`DISCLAIMER.md`](DISCLAIMER.md) | Project 1 người + AI-assisted, không bảo hành. |
+| [`THIRD-PARTY.md`](THIRD-PARTY.md) | Mỗi dependency: version, giấy phép, link. |
+| [`MAINTAINERS.md`](MAINTAINERS.md) | Ai chịu trách nhiệm gì. |
+| [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | Contributor Covenant v2.1. |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Phase plan, trạng thái hiện tại. |
+| [`docs/i18n/vi/pc_spec.md`](docs/i18n/vi/pc_spec.md) · [`docs/i18n/vi/dev_env.md`](docs/i18n/vi/dev_env.md) | Phần cứng + toolchain của maintainer. |
+| [`docs/TAURI-NOTES.md`](docs/TAURI-NOTES.md) | Ghi chú Tauri build / process. |
+| [`docs/RESX-MIGRATION.md`](docs/RESX-MIGRATION.md) | Hướng dẫn i18next JSON → .NET RESX. |
+
+## Ghi nhận
+
+Phần lớn code, test, bản dịch và tài liệu của JSONPrism được draft với
+**Claude Chat** và **Claude Code (Opus 4.7, 1M context)**. Xem
+[DISCLAIMER.md](DISCLAIMER.md) để biết chi tiết về AI-assist. Chất lượng
+bản dịch ngôn ngữ ngoài tiếng Anh là best-effort — rất hoan nghênh
+đóng góp từ người bản ngữ.
+
+## Tài trợ
+
+Nếu JSONPrism hữu ích cho bạn, hãy cân nhắc tài trợ maintainer qua một
+trong các kên trong [`.github/FUNDING.yml`](.github/FUNDING.yml):
+GitHub Sponsors, Ko-fi, Buy Me a Coffee, Patreon hoặc PayPal.
 
 ## Giấy phép
 
-[Apache License 2.0](LICENSE) — © 2026 Kokone.
+[Apache License 2.0](LICENSE) — © 2026 Kokone ([@poli0981](https://github.com/poli0981)).

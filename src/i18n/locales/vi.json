@@ -11,6 +11,7 @@
   },
   "home": {
     "input_label": "JSON đầu vào",
+    "input_label_format": "Đầu vào {{format}}",
     "input_placeholder": "Dán JSON vào đây, thả file, hoặc nạp mẫu…",
     "output_label": "Kết quả",
     "output_empty": "Kết quả sẽ hiện ở đây khi bạn cung cấp JSON hợp lệ.",
@@ -226,8 +227,46 @@
     "title": "Về JSONPrism",
     "lead": "Một công cụ tán sắc cho developer.",
     "p1": "JSONPrism nhận một JSON đầu vào và tán sắc nó ra nhiều định dạng đích — như ánh sáng trắng đi qua lăng kính. Mọi thứ chạy client-side, nên dữ liệu của bạn không bao giờ rời khỏi máy.",
-    "p2": "Xây dựng với React 19, Vite 6, Tailwind CSS v4 và shadcn/ui. Mã nguồn trên GitHub.",
-    "version": "Phiên bản {{version}}"
+    "p2": "Xây dựng với React 19, Vite 8, Tailwind CSS v4 và shadcn/ui. Mã nguồn trên GitHub.",
+    "version": "Phiên bản {{version}}",
+    "donate": {
+      "title": "Ủng hộ project",
+      "lead": "JSONPrism miễn phí và open-source. Nếu nó giúp ích cho bạn, hãy cân nhắc tài trợ maintainer.",
+      "github": "GitHub Sponsors",
+      "ko_fi": "Ko-fi",
+      "buy_me_a_coffee": "Buy Me a Coffee",
+      "patreon": "Patreon",
+      "paypal": "PayPal"
+    },
+    "third_party": {
+      "title": "Đứng trên vai open source",
+      "lead": "JSONPrism được xây dựng trên nhiều project tuyệt vời:",
+      "ui": "UI framework",
+      "editor": "Code editor",
+      "parsers": "Parser & serializer",
+      "build": "Build & tooling",
+      "tauri": "Desktop (Tauri)",
+      "i18n": "Đa ngôn ngữ",
+      "see_full_list": "Xem danh sách đầy đủ →"
+    },
+    "build": {
+      "title": "Thông tin build",
+      "version": "Phiên bản",
+      "commit": "Commit",
+      "date": "Build ngày"
+    },
+    "links": {
+      "title": "Liên kết",
+      "repo": "Mã nguồn",
+      "issues": "Báo bug",
+      "discussions": "Thảo luận",
+      "demo": "Demo trực tuyến",
+      "license": "Giấy phép (Apache 2.0)"
+    },
+    "disclaimer": {
+      "title": "Lưu ý",
+      "body": "JSONPrism là project 1 người, có AI-assisted. Không bảo hành. Bản dịch do AI sinh ra. Xem DISCLAIMER.md để biết thêm chi tiết."
+    }
   },
   "common": {
     "loading": "Đang tải…",

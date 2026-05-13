@@ -3,6 +3,7 @@ import { getConverter } from '@/converters/registry';
 import type { FormatId } from '@/converters/types';
 import { parseJsonInput } from './detect';
 import type { BatchItem } from '@/stores/batchStore';
+import type { Direction } from '@/components/converter/DirectionToggle';
 
 export interface ProcessingCallbacks {
   onUpdate(id: string, patch: Partial<BatchItem>): void;
@@ -44,6 +45,7 @@ export async function processBatch(
   options: unknown,
   callbacks: ProcessingCallbacks,
   signal: AbortSignal,
+  direction: Direction = 'forward',
 ): Promise<void> {
   const converter = getConverter(format);
   if (!converter.meta.ready) {
@@ -51,6 +53,17 @@ export async function processBatch(
       callbacks.onUpdate(item.id, {
         status: 'error',
         error: `Converter "${format}" is not implemented yet.`,
+      });
+    }
+    return;
+  }
+
+  const isReverse = direction === 'reverse';
+  if (isReverse && typeof converter.reverse !== 'function') {
+    for (const item of items) {
+      callbacks.onUpdate(item.id, {
+        status: 'error',
+        error: `Converter "${format}" does not support reverse parsing.`,
       });
     }
     return;
@@ -67,16 +80,12 @@ export async function processBatch(
       const text = await readFileText(item.file);
       if (signal.aborted) return;
 
-      const parsed = parseJsonInput(text);
-      if (!parsed.ok) {
-        callbacks.onUpdate(item.id, {
-          status: 'error',
-          error: parsed.error === 'empty' ? 'Empty file.' : parsed.error,
-        });
-      } else {
-        const result = converter.convert(
-          { data: parsed.value, rawText: text, sourceName: item.filename },
-          options as Parameters<typeof converter.convert>[1],
+      if (isReverse) {
+        // Reverse mode: skip JSON parsing entirely — feed the raw text into
+        // the format's parser.
+        const result = converter.reverse!(
+          { text, sourceName: item.filename },
+          options as Parameters<NonNullable<typeof converter.reverse>>[1],
         );
         if (result.ok) {
           const outputSize = new TextEncoder().encode(result.output).length;
@@ -87,6 +96,29 @@ export async function processBatch(
           });
         } else {
           callbacks.onUpdate(item.id, { status: 'error', error: result.error });
+        }
+      } else {
+        const parsed = parseJsonInput(text);
+        if (!parsed.ok) {
+          callbacks.onUpdate(item.id, {
+            status: 'error',
+            error: parsed.error === 'empty' ? 'Empty file.' : parsed.error,
+          });
+        } else {
+          const result = converter.convert(
+            { data: parsed.value, rawText: text, sourceName: item.filename },
+            options as Parameters<typeof converter.convert>[1],
+          );
+          if (result.ok) {
+            const outputSize = new TextEncoder().encode(result.output).length;
+            callbacks.onUpdate(item.id, {
+              status: 'done',
+              output: result.output,
+              outputSize,
+            });
+          } else {
+            callbacks.onUpdate(item.id, { status: 'error', error: result.error });
+          }
         }
       }
     } catch (err) {
@@ -134,10 +166,14 @@ export function uniquifyFilenames(names: string[]): string[] {
 export async function zipOutputs(
   items: BatchItem[],
   format: FormatId,
+  direction: Direction = 'forward',
 ): Promise<{ blob: Blob; fileCount: number }> {
   const converter = getConverter(format);
+  // In reverse mode the outputs are JSON, so they get the .json extension
+  // regardless of which source format the user dropped in.
+  const outputExt = direction === 'reverse' ? 'json' : converter.meta.extension;
   const done = items.filter((i) => i.status === 'done' && i.output !== undefined);
-  const rawNames = done.map((i) => outputFilename(i.filename, converter.meta.extension));
+  const rawNames = done.map((i) => outputFilename(i.filename, outputExt));
   const uniqueNames = uniquifyFilenames(rawNames);
 
   const filesForZip: Record<string, Uint8Array> = {};

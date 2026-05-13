@@ -11,6 +11,7 @@
   },
   "home": {
     "input_label": "Input JSON",
+    "input_label_format": "Input {{format}}",
     "input_placeholder": "Paste your JSON here, drop files, or load a sample…",
     "output_label": "Output",
     "output_empty": "Output will appear here once you provide valid JSON.",
@@ -226,8 +227,46 @@
     "title": "About JSONPrism",
     "lead": "A refracting tool for developers.",
     "p1": "JSONPrism takes a single JSON input and disperses it into many target formats — like white light through a prism. Everything runs client-side, so your data never leaves your device.",
-    "p2": "Built with React 19, Vite 6, Tailwind CSS v4, and shadcn/ui. Source on GitHub.",
-    "version": "Version {{version}}"
+    "p2": "Built with React 19, Vite 8, Tailwind CSS v4, and shadcn/ui. Source on GitHub.",
+    "version": "Version {{version}}",
+    "donate": {
+      "title": "Support the project",
+      "lead": "JSONPrism is free and open-source. If it saved you time, consider sponsoring the maintainer.",
+      "github": "GitHub Sponsors",
+      "ko_fi": "Ko-fi",
+      "buy_me_a_coffee": "Buy Me a Coffee",
+      "patreon": "Patreon",
+      "paypal": "PayPal"
+    },
+    "third_party": {
+      "title": "Built on open source",
+      "lead": "JSONPrism stands on the shoulders of many great projects:",
+      "ui": "UI framework",
+      "editor": "Code editor",
+      "parsers": "Parsers & serializers",
+      "build": "Build & tooling",
+      "tauri": "Desktop (Tauri)",
+      "i18n": "Internationalization",
+      "see_full_list": "See the full list →"
+    },
+    "build": {
+      "title": "Build info",
+      "version": "Version",
+      "commit": "Commit",
+      "date": "Built on"
+    },
+    "links": {
+      "title": "Links",
+      "repo": "Source code",
+      "issues": "Report a bug",
+      "discussions": "Discussions",
+      "demo": "Live demo",
+      "license": "License (Apache 2.0)"
+    },
+    "disclaimer": {
+      "title": "Disclaimer",
+      "body": "JSONPrism is a one-person, AI-assisted project. No warranty. Translations are AI-generated. See DISCLAIMER.md for details."
+    }
   },
   "common": {
     "loading": "Loading…",

@@ -11,6 +11,7 @@
   },
   "home": {
     "input_label": "JSON 输入",
+    "input_label_format": "{{format}} 输入",
     "input_placeholder": "在此处粘贴 JSON、拖入文件或加载示例…",
     "output_label": "输出",
     "output_empty": "提供有效的 JSON 后,输出将显示在此处。",
@@ -226,8 +227,46 @@
     "title": "关于 JSONPrism",
     "lead": "为开发者打造的分光工具。",
     "p1": "JSONPrism 接收单份 JSON 输入,并像白光穿过棱镜一样将其分散为多种目标格式。一切都在客户端完成,数据不会离开你的设备。",
-    "p2": "使用 React 19、Vite 6、Tailwind CSS v4 与 shadcn/ui 构建。源码在 GitHub。",
-    "version": "版本 {{version}}"
+    "p2": "使用 React 19、Vite 8、Tailwind CSS v4 与 shadcn/ui 构建。源码在 GitHub。",
+    "version": "版本 {{version}}",
+    "donate": {
+      "title": "支持本项目",
+      "lead": "JSONPrism 免费且开源。如果它为你节省了时间,欢迎赞助维护者。",
+      "github": "GitHub Sponsors",
+      "ko_fi": "Ko-fi",
+      "buy_me_a_coffee": "Buy Me a Coffee",
+      "patreon": "Patreon",
+      "paypal": "PayPal"
+    },
+    "third_party": {
+      "title": "构建于开源之上",
+      "lead": "JSONPrism 站在众多优秀项目的肩膀上:",
+      "ui": "UI 框架",
+      "editor": "代码编辑器",
+      "parsers": "解析与序列化",
+      "build": "构建与工具链",
+      "tauri": "桌面端 (Tauri)",
+      "i18n": "国际化",
+      "see_full_list": "查看完整列表 →"
+    },
+    "build": {
+      "title": "构建信息",
+      "version": "版本",
+      "commit": "Commit",
+      "date": "构建日期"
+    },
+    "links": {
+      "title": "链接",
+      "repo": "源代码",
+      "issues": "反馈 bug",
+      "discussions": "讨论区",
+      "demo": "在线演示",
+      "license": "许可证 (Apache 2.0)"
+    },
+    "disclaimer": {
+      "title": "免责声明",
+      "body": "JSONPrism 是 1 人 + AI 协助的项目。不提供任何保证。译文由 AI 生成。详情参见 DISCLAIMER.md。"
+    }
   },
   "common": {
     "loading": "加载中…",
