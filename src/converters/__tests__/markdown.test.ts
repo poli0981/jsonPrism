@@ -102,7 +102,10 @@ describe('markdownConverter', () => {
   });
 
   it('preserves key insertion order from the first occurrence', () => {
-    const data = [{ z: 1, a: 2 }, { a: 3, z: 4 }];
+    const data = [
+      { z: 1, a: 2 },
+      { a: 3, z: 4 },
+    ];
     const result = markdownConverter.convert({ data }, markdownConverter.defaultOptions);
     expect(result.ok).toBe(true);
     if (!result.ok) return;

@@ -41,7 +41,7 @@ export function FormatPicker({ value, onChange, shape, direction = 'forward' }: 
                 : 'border-border bg-card/40 text-muted-foreground hover:text-foreground hover:border-border',
               !enabled && 'cursor-not-allowed opacity-50',
               dimmed && !active && 'opacity-50',
-              suggested && !active && 'ring-1 ring-primary/30 ring-offset-1 ring-offset-background',
+              suggested && !active && 'ring-primary/30 ring-offset-background ring-1 ring-offset-1',
             )}
             title={
               !c.meta.ready

@@ -32,7 +32,9 @@ export function SettingsPanel({
 }: SettingsPanelProps) {
   const { t } = useTranslation();
   const converter = getConverter(format);
-  const schema = converter.optionSchema as ReadonlyArray<OptionSchemaField<Record<string, unknown>>>;
+  const schema = converter.optionSchema as ReadonlyArray<
+    OptionSchemaField<Record<string, unknown>>
+  >;
   const formatLabel = t(converter.meta.labelKey);
   const hasFields = schema.length > 0;
 
@@ -45,7 +47,7 @@ export function SettingsPanel({
       <SheetTrigger asChild>
         <button
           type="button"
-          className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1.5 rounded-md border border-border/60 px-2.5 py-1 text-xs transition"
+          className="text-muted-foreground hover:bg-muted hover:text-foreground border-border/60 inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition"
           aria-label={t('home.options')}
         >
           <Settings2 className="h-3.5 w-3.5" />
@@ -159,7 +161,7 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
             const n = Number(e.target.value);
             if (Number.isFinite(n)) onChange(n);
           }}
-          className="border-border bg-background focus:ring-ring rounded-md border px-3 py-1.5 font-mono text-sm focus:outline-none focus:ring-2"
+          className="border-border bg-background focus:ring-ring rounded-md border px-3 py-1.5 font-mono text-sm focus:ring-2 focus:outline-none"
         />
       )}
 
@@ -170,7 +172,7 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
           value={String(value ?? '')}
           placeholder={field.placeholder}
           onChange={(e) => onChange(e.target.value)}
-          className="border-border bg-background focus:ring-ring rounded-md border px-3 py-1.5 font-mono text-sm focus:outline-none focus:ring-2"
+          className="border-border bg-background focus:ring-ring rounded-md border px-3 py-1.5 font-mono text-sm focus:ring-2 focus:outline-none"
         />
       )}
 

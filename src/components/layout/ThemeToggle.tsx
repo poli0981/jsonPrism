@@ -51,7 +51,7 @@ export function ThemeToggle() {
       {open && (
         <div
           role="menu"
-          className="border-border bg-popover absolute right-0 top-full z-50 mt-1 w-32 rounded-md border p-1 shadow-lg"
+          className="border-border bg-popover absolute top-full right-0 z-50 mt-1 w-32 rounded-md border p-1 shadow-lg"
         >
           {(['light', 'dark', 'system'] as Theme[]).map((t2) => (
             <button

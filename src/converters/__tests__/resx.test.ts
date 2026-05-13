@@ -24,10 +24,7 @@ describe('escapeAttr', () => {
 
 describe('resxConverter', () => {
   it('emits the XML declaration and root element', () => {
-    const result = resxConverter.convert(
-      { data: { Hello: 'Hi' } },
-      resxConverter.defaultOptions,
-    );
+    const result = resxConverter.convert({ data: { Hello: 'Hi' } }, resxConverter.defaultOptions);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.output.startsWith('<?xml version="1.0" encoding="utf-8"?>\n<root>')).toBe(true);
@@ -35,10 +32,7 @@ describe('resxConverter', () => {
   });
 
   it('emits the standard schema header by default', () => {
-    const result = resxConverter.convert(
-      { data: { K: 'V' } },
-      resxConverter.defaultOptions,
-    );
+    const result = resxConverter.convert({ data: { K: 'V' } }, resxConverter.defaultOptions);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.output).toContain('<xsd:schema id="root"');
@@ -99,9 +93,7 @@ describe('resxConverter', () => {
     const result = resxConverter.convert({ data }, resxConverter.defaultOptions);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.output).toContain(
-      '&lt;script&gt;alert("x")&lt;/script&gt; &amp; co.',
-    );
+    expect(result.output).toContain('&lt;script&gt;alert("x")&lt;/script&gt; &amp; co.');
   });
 
   it('escapes special characters in key names (attribute context)', () => {
@@ -181,10 +173,7 @@ describe('resxConverter', () => {
   });
 
   it('matches Visual Studio resmimetype + version exactly', () => {
-    const result = resxConverter.convert(
-      { data: { K: 'V' } },
-      resxConverter.defaultOptions,
-    );
+    const result = resxConverter.convert({ data: { K: 'V' } }, resxConverter.defaultOptions);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     // These literal strings must round-trip through Visual Studio's editor without churn.

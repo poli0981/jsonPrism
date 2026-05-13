@@ -49,9 +49,7 @@ export interface ReverseInput {
   sourceName?: string;
 }
 
-export type ConversionResult =
-  | { ok: true; output: string }
-  | { ok: false; error: string };
+export type ConversionResult = { ok: true; output: string } | { ok: false; error: string };
 
 /**
  * Schema describing a single option field, used by the settings UI

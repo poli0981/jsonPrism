@@ -7,7 +7,10 @@ import { resxConverter } from '../resx';
 
 describe('reverse: JSONL → JSON', () => {
   it('round-trips an array of records', () => {
-    const data = [{ id: 1, name: 'a' }, { id: 2, name: 'b' }];
+    const data = [
+      { id: 1, name: 'a' },
+      { id: 2, name: 'b' },
+    ];
     const forward = jsonlConverter.convert({ data }, jsonlConverter.defaultOptions);
     expect(forward.ok).toBe(true);
     if (!forward.ok) return;
@@ -42,10 +45,7 @@ describe('reverse: CSV → JSON', () => {
 
   it('returns arrays when header is disabled', () => {
     const text = '1,alpha\n2,beta\n';
-    const back = csvConverter.reverse!(
-      { text },
-      { ...csvConverter.defaultOptions, header: false },
-    );
+    const back = csvConverter.reverse!({ text }, { ...csvConverter.defaultOptions, header: false });
     expect(back.ok).toBe(true);
     if (!back.ok) return;
     expect(JSON.parse(back.output)).toEqual([

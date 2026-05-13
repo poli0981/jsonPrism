@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
 export interface ShortcutDef {
-  key: string;          // lowercase key, e.g. 'k', 's', '/'
-  mod?: boolean;        // require Ctrl (Win/Linux) or Cmd (macOS)
+  key: string; // lowercase key, e.g. 'k', 's', '/'
+  mod?: boolean; // require Ctrl (Win/Linux) or Cmd (macOS)
   shift?: boolean;
   preventDefault?: boolean;
   handler: () => void;

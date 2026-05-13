@@ -80,12 +80,10 @@ export function OutputPanel({
     <div className="flex h-full flex-col">
       <div className="border-border/60 flex items-center justify-between border-b px-3 py-2">
         <div className="flex items-center gap-2">
-          <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+          <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
             {t('home.output_label')}
           </span>
-          <span className="text-muted-foreground/60 font-mono text-xs">
-            · .{outputExt}
-          </span>
+          <span className="text-muted-foreground/60 font-mono text-xs">· .{outputExt}</span>
         </div>
         <div className="flex items-center gap-1">
           <ToolbarButton
@@ -106,7 +104,7 @@ export function OutputPanel({
         {error ? (
           <div className="text-destructive p-4 font-mono text-sm whitespace-pre-wrap">{error}</div>
         ) : content ? (
-          <pre className="font-mono p-4 text-sm leading-relaxed whitespace-pre-wrap break-words">
+          <pre className="p-4 font-mono text-sm leading-relaxed break-words whitespace-pre-wrap">
             {content}
           </pre>
         ) : (

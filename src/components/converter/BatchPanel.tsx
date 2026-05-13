@@ -1,15 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
-import {
-  Download,
-  FileStack,
-  FolderOpen,
-  Loader2,
-  Play,
-  StopCircle,
-  Trash2,
-} from 'lucide-react';
+import { Download, FileStack, FolderOpen, Loader2, Play, StopCircle, Trash2 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -177,7 +169,7 @@ export function BatchPanel({ format, options, open, onOpenChange }: BatchPanelPr
         <button
           type="button"
           className={cn(
-            'text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1.5 rounded-md border border-border/60 px-2.5 py-1 text-xs transition',
+            'text-muted-foreground hover:bg-muted hover:text-foreground border-border/60 inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition',
             totalCount > 0 && 'border-primary/40 text-foreground',
           )}
         >
@@ -199,9 +191,7 @@ export function BatchPanel({ format, options, open, onOpenChange }: BatchPanelPr
               · {totalCount} / {BATCH_MAX_FILES}
             </span>
           </SheetTitle>
-          <SheetDescription>
-            {t('batch.description', { format: t(formatLabel) })}
-          </SheetDescription>
+          <SheetDescription>{t('batch.description', { format: t(formatLabel) })}</SheetDescription>
         </SheetHeader>
 
         {/* Drop zone */}
@@ -230,7 +220,7 @@ export function BatchPanel({ format, options, open, onOpenChange }: BatchPanelPr
             <button
               type="button"
               onClick={handleOpenFiles}
-              className="text-primary hover:underline text-xs"
+              className="text-primary text-xs hover:underline"
             >
               {t('batch.browse')}
             </button>
@@ -242,7 +232,9 @@ export function BatchPanel({ format, options, open, onOpenChange }: BatchPanelPr
           <div className="text-muted-foreground flex flex-wrap items-center gap-2 px-6 pb-3 font-mono text-[11px]">
             <Chip label={t('batch.stat.queued')} value={queuedCount} />
             <Chip label={t('batch.stat.done')} value={doneCount} tone="ok" />
-            {errorCount > 0 && <Chip label={t('batch.stat.failed')} value={errorCount} tone="err" />}
+            {errorCount > 0 && (
+              <Chip label={t('batch.stat.failed')} value={errorCount} tone="err" />
+            )}
           </div>
         )}
 
@@ -253,7 +245,7 @@ export function BatchPanel({ format, options, open, onOpenChange }: BatchPanelPr
               {t('batch.empty')}
             </p>
           ) : (
-            <ul className="flex flex-col divide-y divide-border/40">
+            <ul className="divide-border/40 flex flex-col divide-y">
               {itemOrder.map((id) => {
                 const item = items[id];
                 if (!item) return null;
@@ -365,12 +357,14 @@ function BatchItemRow({ item, outputExt, onRemove, disabled }: BatchItemRowProps
           {item.outputSize !== undefined && (
             <>
               <span>·</span>
-              <span>{t('batch.row.out')}: {formatBytes(item.outputSize)}</span>
+              <span>
+                {t('batch.row.out')}: {formatBytes(item.outputSize)}
+              </span>
             </>
           )}
         </div>
         {item.error && (
-          <p className="text-destructive mt-1 break-words font-mono text-[10px]">{item.error}</p>
+          <p className="text-destructive mt-1 font-mono text-[10px] break-words">{item.error}</p>
         )}
       </div>
       <button
@@ -428,7 +422,13 @@ function ProcessingIcon({ className }: { className?: string }) {
 function CheckIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 16 16" fill="none" className={className} aria-hidden>
-      <path d="M3 8.5L6.5 12L13 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M3 8.5L6.5 12L13 5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }

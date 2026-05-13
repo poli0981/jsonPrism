@@ -22,11 +22,9 @@ describe('batchStore', () => {
   });
 
   it('addFiles adds queued items preserving order', () => {
-    const result = useBatchStore.getState().addFiles([
-      makeFile('a.json'),
-      makeFile('b.json'),
-      makeFile('c.json'),
-    ]);
+    const result = useBatchStore
+      .getState()
+      .addFiles([makeFile('a.json'), makeFile('b.json'), makeFile('c.json')]);
     expect(result.added).toBe(3);
     expect(result.skipped).toBe(0);
     const s = useBatchStore.getState();
@@ -38,10 +36,9 @@ describe('batchStore', () => {
   it('addFiles enforces BATCH_MAX_FILES', () => {
     const fitting = Array.from({ length: BATCH_MAX_FILES - 1 }, (_, i) => makeFile(`f${i}.json`));
     useBatchStore.getState().addFiles(fitting);
-    const result = useBatchStore.getState().addFiles([
-      makeFile('one_more.json'),
-      makeFile('over_the_limit.json'),
-    ]);
+    const result = useBatchStore
+      .getState()
+      .addFiles([makeFile('one_more.json'), makeFile('over_the_limit.json')]);
     expect(result.added).toBe(1);
     expect(result.skipped).toBe(1);
     expect(result.reason).toBe('limit');

@@ -59,7 +59,7 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.02 270);
 
-  --primary: oklch(0.55 0.18 290);     /* violet */
+  --primary: oklch(0.55 0.18 290); /* violet */
   --primary-foreground: oklch(0.99 0 0);
 
   --secondary: oklch(0.95 0.01 270);
@@ -68,7 +68,7 @@
   --muted: oklch(0.96 0.005 270);
   --muted-foreground: oklch(0.48 0.02 270);
 
-  --accent: oklch(0.94 0.03 200);      /* cyan tint */
+  --accent: oklch(0.94 0.03 200); /* cyan tint */
   --accent-foreground: oklch(0.22 0.02 270);
 
   --destructive: oklch(0.62 0.22 25);
@@ -90,7 +90,7 @@
   --popover: oklch(0.16 0.018 270);
   --popover-foreground: oklch(0.96 0.005 270);
 
-  --primary: oklch(0.78 0.16 290);     /* brighter violet on dark */
+  --primary: oklch(0.78 0.16 290); /* brighter violet on dark */
   --primary-foreground: oklch(0.13 0.015 270);
 
   --secondary: oklch(0.22 0.02 270);
@@ -139,8 +139,16 @@
     pointer-events: none;
     z-index: -1;
     background:
-      radial-gradient(ellipse 80% 50% at 20% 0%, color-mix(in oklch, var(--color-prism-violet) 8%, transparent), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 100% 100%, color-mix(in oklch, var(--color-prism-cyan) 6%, transparent), transparent 60%);
+      radial-gradient(
+        ellipse 80% 50% at 20% 0%,
+        color-mix(in oklch, var(--color-prism-violet) 8%, transparent),
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse 60% 50% at 100% 100%,
+        color-mix(in oklch, var(--color-prism-cyan) 6%, transparent),
+        transparent 60%
+      );
   }
 
   h1,

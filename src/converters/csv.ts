@@ -11,7 +11,10 @@ interface CsvOptions {
   nestedStrategy: 'json' | 'flatten';
 }
 
-function tabularizeForCsv(data: unknown, strategy: 'json' | 'flatten'): Array<Record<string, unknown>> {
+function tabularizeForCsv(
+  data: unknown,
+  strategy: 'json' | 'flatten',
+): Array<Record<string, unknown>> {
   if (!Array.isArray(data)) {
     throw new Error('CSV/TSV requires the root value to be an array of objects.');
   }

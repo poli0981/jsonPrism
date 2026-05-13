@@ -11,9 +11,7 @@ export function Home() {
           <h1 className="font-display text-4xl leading-none tracking-tight md:text-5xl">
             <span className="text-spectrum italic">Disperse</span> JSON.
           </h1>
-          <p className="text-muted-foreground mt-2 max-w-xl text-sm">
-            {t('app.description')}
-          </p>
+          <p className="text-muted-foreground mt-2 max-w-xl text-sm">{t('app.description')}</p>
         </div>
         <div className="text-muted-foreground/60 hidden font-mono text-xs md:block">
           {t('home.drop_zone_hint')}
