@@ -6,11 +6,11 @@
 
 Một JSON đầu vào. Tám định dạng đích. Chạy hoàn toàn trong trình duyệt.
 
-[![CI](https://github.com/poli0981/jsonprism/actions/workflows/ci.yml/badge.svg)](https://github.com/poli0981/jsonprism/actions/workflows/ci.yml)
-[![Deploy](https://github.com/poli0981/jsonprism/actions/workflows/deploy.yml/badge.svg)](https://github.com/poli0981/jsonprism/actions/workflows/deploy.yml)
+[![CI](https://github.com/poli0981/jsonPrism/actions/workflows/ci.yml/badge.svg)](https://github.com/poli0981/jsonPrism/actions/workflows/ci.yml)
+[![Deploy](https://github.com/poli0981/jsonPrism/actions/workflows/deploy.yml/badge.svg)](https://github.com/poli0981/jsonPrism/actions/workflows/deploy.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-[Bản demo](https://poli0981.github.io/jsonprism/) · [English](README.md) · [Lộ trình](docs/ROADMAP.md)
+[Bản demo](https://poli0981.github.io/jsonPrism/) · [English](README.md) · [Lộ trình](docs/ROADMAP.md)
 
 </div>
 
@@ -56,7 +56,7 @@ JSONPrism là công cụ "tán sắc" cho developer. Nhận một JSON đầu v�
 **Yêu cầu**: Node.js **22 LTS** trở lên.
 
 ```bash
-git clone https://github.com/poli0981/jsonprism.git
+git clone https://github.com/poli0981/jsonPrism.git
 cd jsonprism
 npm install
 npm run dev          # http://localhost:5173
@@ -184,7 +184,7 @@ Xem [`docs/ROADMAP.md`](docs/ROADMAP.md) để biết kế hoạch phase đầy 
 
 Welcome pull request — vui lòng đọc [`CONTRIBUTING.md`](CONTRIBUTING.md) trước. PR thuộc nhóm **auto-ignored** (code đáng ngờ, lan man không vào vấn đề, không mô tả…) sẽ bị đóng không review.
 
-Báo bug hoặc đề xuất tính năng tại [GitHub Issues](https://github.com/poli0981/jsonprism/issues). Vấn đề bảo mật vui lòng dùng [Security Advisory riêng tư](https://github.com/poli0981/jsonprism/security/advisories/new).
+Báo bug hoặc đề xuất tính năng tại [GitHub Issues](https://github.com/poli0981/jsonPrism/issues). Vấn đề bảo mật vui lòng dùng [Security Advisory riêng tư](https://github.com/poli0981/jsonPrism/security/advisories/new).
 
 ## Tài liệu project
 

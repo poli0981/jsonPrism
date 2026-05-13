@@ -39,7 +39,7 @@ trường tương đương:
 
 ```bash
 # Một lần
-git clone https://github.com/poli0981/jsonprism.git
+git clone https://github.com/poli0981/jsonPrism.git
 cd jsonprism
 npm install
 

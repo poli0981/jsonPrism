@@ -25,8 +25,9 @@ const appBuildDate = new Date().toISOString().slice(0, 10);
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
-  // Web prod build deploys to /jsonprism/. Tauri bundles serve from '/'.
-  base: isTauriContext ? '/' : mode === 'production' ? '/jsonprism/' : '/',
+  // Web prod build deploys to /jsonPrism/ (GH Pages mirrors the repo name
+  // case). Tauri bundles serve from '/'.
+  base: isTauriContext ? '/' : mode === 'production' ? '/jsonPrism/' : '/',
 
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),

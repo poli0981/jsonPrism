@@ -32,7 +32,7 @@ This project openly uses AI tools during development:
   and reviewing PRs.
 - All AI-generated code is reviewed by the maintainer before being
   merged. Errors that slip through are bugs — please report them via
-  [GitHub Issues](https://github.com/poli0981/jsonprism/issues).
+  [GitHub Issues](https://github.com/poli0981/jsonPrism/issues).
 
 ### Translations
 
@@ -57,6 +57,6 @@ key — it surfaces this disclaimer to users at runtime.
 
 ## Reporting concerns
 
-- Bugs: [GitHub Issues](https://github.com/poli0981/jsonprism/issues)
-- Security: [Private Security Advisory](https://github.com/poli0981/jsonprism/security/advisories/new)
+- Bugs: [GitHub Issues](https://github.com/poli0981/jsonPrism/issues)
+- Security: [Private Security Advisory](https://github.com/poli0981/jsonPrism/security/advisories/new)
 - Translation accuracy: GitHub Discussions

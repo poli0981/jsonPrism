@@ -29,7 +29,7 @@ export function Header() {
           <LanguageSwitcher />
           <ThemeToggle />
           <a
-            href="https://github.com/poli0981/jsonprism"
+            href="https://github.com/poli0981/jsonPrism"
             target="_blank"
             rel="noreferrer"
             className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-9 w-9 items-center justify-center rounded-md transition"
