@@ -12,17 +12,26 @@ No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` und
 
 ### Fixed
 
-- **Tauri native drag-drop / file picker bỏ qua batch dedup**. v1.3.0–v1.3.2 desktop bundles cho phép drop cùng một file vào queue nhiều lần mà không hiển thị toast `duplicate`. Root cause: `fileFromNativePath` tạo `new File([text], name, { type })` không truyền `lastModified`, nên File API default về `Date.now()` mỗi lần gọi; key dedup của `batchStore` (`name|size|lastModified`) khác nhau giữa các lần drop cùng một file. Sửa: stat file qua `@tauri-apps/plugin-fs` để lấy mtime thật, fall back về hash FNV-1a của path nếu stat fail. Bonus: infer `type` từ extension thay vì hard-code `application/json`. Thêm permission `fs:allow-stat` vào default capability.
+- **Tauri native drag-drop / file picker bypassed batch dedup**. v1.3.0–v1.3.2 desktop bundles let users drop the same file into the queue repeatedly without surfacing the `duplicate` toast. Root cause: `fileFromNativePath` constructed `new File([text], name, { type })` without `lastModified`, so the File API defaulted to `Date.now()` on every call; `batchStore`'s dedup key (`name|size|lastModified`) differed across re-drops of the same on-disk file. Fix: stat the file via `@tauri-apps/plugin-fs` and use the real `mtime`, falling back to an FNV-1a hash of the path if `stat()` throws. Bonus: infer `type` from the file extension instead of hard-coding `application/json`. Added the `fs:allow-stat` permission to the default capability.
 
 ### Tests
 
-- 3 unit test mới cho `pathHashAsMillis` trong `src/lib/__tests__/tauri.test.ts`. Total tests: **193**.
+- 3 new unit tests for `pathHashAsMillis` in `src/lib/__tests__/tauri.test.ts`. Total tests: **193**.
+
+### Verified
+
+- Windows Sandbox (Windows 11): manual smoke test passed — re-dropping the same `.json` file surfaces the `duplicate` toast and keeps the queue at one entry.
+- Ubuntu 22.04 LTS on a Hyper-V VM: full smoke test passed at 100% (drag-drop dedup, extension filter, batch processing).
 
 ## [1.3.2] — 2026-05-13
 
 ### Fixed
 
-- **Tauri native drag-drop bypassed the batch extension filter**. v1.3.0/v1.3.1 desktop bundles accepted any file dropped from File Explorer / Finder / Nautilus into the workspace, because `ConverterWorkspace.handleMultiFileDrop` called `batchStore.addFiles` directly — skipping the `direction × format` extension whitelist that the web `react-dropzone` path enforced. Files like `.cs`/`.py` leaked into the queue with no warning. Extracted `src/lib/file-filter.ts` (`getAllowedExtensions` + `extOf` + `filterByExtension`) and routed the Tauri callback, `BatchPanel`, and `InputPanel` through it so the wrong-format toast surfaces in all three entry points.
+- **Tauri native drag-drop bypassed the batch extension filter** *(misdiagnosis — see note below)*. v1.3.0/v1.3.1 desktop bundles accepted any file dropped from File Explorer / Finder / Nautilus into the workspace, because `ConverterWorkspace.handleMultiFileDrop` called `batchStore.addFiles` directly — skipping the `direction × format` extension whitelist that the web `react-dropzone` path enforced. Files like `.cs`/`.py` leaked into the queue with no warning. Extracted `src/lib/file-filter.ts` (`getAllowedExtensions` + `extOf` + `filterByExtension`) and routed the Tauri callback, `BatchPanel`, and `InputPanel` through it so the wrong-format toast surfaces in all three entry points.
+
+### Note on root cause
+
+This release shipped on a misdiagnosis. The user-visible bug they were investigating turned out to be **batch dedup not working under Tauri** (fixed in v1.3.3), not the missing extension filter on the native drag-drop path. The fix in this release is still correct on its own — the Tauri code path *was* missing the wrong-format filter — but it did not change the behaviour the user was actually seeing. Treat v1.3.2 as a defensive hardening that closes a real-but-cosmetic gap; functional impact for end users is negligible.
 
 ### Tests
 
