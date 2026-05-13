@@ -23,7 +23,25 @@ fn host_info() -> HostInfo {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let app = tauri::Builder::default()
+    let mut builder = tauri::Builder::default();
+
+    // Single-instance plugin must be registered FIRST so it can intercept
+    // launches before other plugins initialize. Desktop only — the plugin
+    // doesn't compile for mobile.
+    #[cfg(desktop)]
+    {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            // A second JSONPrism launch arrived — focus the existing window
+            // instead of starting another process.
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.unminimize();
+                let _ = window.show();
+                let _ = window.set_focus();
+            }
+        }));
+    }
+
+    let app = builder
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())

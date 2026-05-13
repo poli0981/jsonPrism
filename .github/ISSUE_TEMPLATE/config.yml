@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & general discussion
+    url: https://github.com/poli0981/jsonprism/discussions
+    about: Ask about usage, share workflows, or propose ideas before opening an issue.
+  - name: Security vulnerability
+    url: https://github.com/poli0981/jsonprism/security/advisories/new
+    about: Report security issues privately via GitHub Security Advisory (not in public issues).
+  - name: Live demo
+    url: https://poli0981.github.io/jsonprism/
+    about: Try the latest deployed build in your browser before filing a bug.

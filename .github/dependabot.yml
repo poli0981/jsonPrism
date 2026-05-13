@@ -1,0 +1,65 @@
+version: 2
+
+# Dependency update schedule for JSONPrism.
+# Groups minor + patch bumps together to reduce PR churn; majors get their
+# own PR so they can be evaluated individually.
+
+updates:
+  # npm ecosystem (root package.json + lockfile)
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+      timezone: Asia/Ho_Chi_Minh
+    open-pull-requests-limit: 10
+    versioning-strategy: increase
+    labels:
+      - dependencies
+      - npm
+    groups:
+      npm-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
+
+  # GitHub Actions used in .github/workflows/
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+      timezone: Asia/Ho_Chi_Minh
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - github-actions
+    groups:
+      actions-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
+
+  # Cargo ecosystem for the Tauri shell.
+  - package-ecosystem: cargo
+    directory: "/src-tauri"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+      timezone: Asia/Ho_Chi_Minh
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - rust
+      - tauri
+    groups:
+      cargo-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch

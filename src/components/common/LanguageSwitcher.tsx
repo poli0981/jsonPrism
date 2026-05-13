@@ -4,6 +4,8 @@ import { cn } from '@/lib/utils';
 const LANGUAGES = [
   { code: 'en', label: 'EN' },
   { code: 'vi', label: 'VI' },
+  { code: 'ja', label: 'JA' },
+  { code: 'zh-CN', label: 'ZH' },
 ] as const;
 
 export function LanguageSwitcher() {

@@ -233,5 +233,8 @@
     "loading": "Loading…",
     "error": "Error",
     "retry": "Retry"
+  },
+  "disclaimer": {
+    "translation": "Non-English translations are AI-generated. Accuracy is not guaranteed."
   }
 }

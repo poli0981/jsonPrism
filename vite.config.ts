@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => ({
 
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
+    __IS_TAURI_BUILD__: JSON.stringify(isTauriContext),
   },
 
   plugins: [react(), tailwindcss()],

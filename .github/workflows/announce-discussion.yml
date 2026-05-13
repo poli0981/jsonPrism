@@ -1,0 +1,131 @@
+name: Announce Release / Deploy in Discussions
+
+# Create a Discussion post in the "Announcements" category when:
+#   • a GitHub Release is published (tag-based deploys)
+#   • the Deploy to GitHub Pages workflow finishes successfully
+#
+# Prerequisites (one-time manual setup):
+#   1. Enable Discussions in the repo Settings → Features.
+#   2. Create a category named "Announcements" (any kind; this workflow
+#      auto-discovers its node ID at runtime).
+#
+# Permissions:
+#   • `contents: read`     — read commit / release metadata.
+#   • `discussions: write` — required to create the post.
+
+on:
+  release:
+    types: [published]
+  workflow_run:
+    workflows: ["Deploy to GitHub Pages"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'Announcement body (Markdown)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  discussions: write
+
+concurrency:
+  group: announce-discussion-${{ github.event_name }}
+  cancel-in-progress: false
+
+jobs:
+  announce:
+    name: Create Discussion post
+    runs-on: ubuntu-latest
+    # Skip when triggered by a failed deploy.
+    if: >
+      github.event_name == 'release'
+      || github.event_name == 'workflow_dispatch'
+      || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    timeout-minutes: 5
+    steps:
+      - name: Resolve repository + category IDs
+        id: ids
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          QUERY='query($owner: String!, $name: String!) {
+            repository(owner: $owner, name: $name) {
+              id
+              discussionCategories(first: 25) {
+                nodes { id name }
+              }
+            }
+          }'
+          response=$(gh api graphql \
+            -f query="$QUERY" \
+            -F owner="${{ github.repository_owner }}" \
+            -F name="${{ github.event.repository.name }}")
+          repo_id=$(echo "$response" | jq -r '.data.repository.id')
+          cat_id=$(echo "$response" | jq -r '.data.repository.discussionCategories.nodes[] | select(.name == "Announcements") | .id')
+          if [ -z "$cat_id" ] || [ "$cat_id" = "null" ]; then
+            echo "::error::Discussion category 'Announcements' not found. Enable Discussions and create the category in Settings → Features."
+            exit 1
+          fi
+          echo "repo_id=$repo_id" >> "$GITHUB_OUTPUT"
+          echo "cat_id=$cat_id"   >> "$GITHUB_OUTPUT"
+
+      - name: Compose title + body
+        id: msg
+        env:
+          EVENT: ${{ github.event_name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
+          RELEASE_BODY: ${{ github.event.release.body }}
+          DEPLOY_SHA: ${{ github.event.workflow_run.head_sha }}
+          DEPLOY_URL: ${{ github.event.workflow_run.html_url }}
+          DISPATCH_MSG: ${{ inputs.message }}
+        run: |
+          set -euo pipefail
+          case "$EVENT" in
+            release)
+              title="Release $RELEASE_TAG"
+              body=$'## $RELEASE_TAG\n\n$RELEASE_BODY\n\n[View release →]($RELEASE_URL)'
+              ;;
+            workflow_run)
+              short_sha="${DEPLOY_SHA:0:7}"
+              title="Deploy succeeded — $short_sha"
+              body=$'Latest commit deployed to GitHub Pages.\n\n[Deploy run →]($DEPLOY_URL)'
+              ;;
+            workflow_dispatch)
+              title="Announcement"
+              body="$DISPATCH_MSG"
+              ;;
+            *)
+              echo "::error::Unsupported event: $EVENT"
+              exit 1
+              ;;
+          esac
+          {
+            echo "title<<EOF"
+            echo "$title"
+            echo "EOF"
+            echo "body<<EOF"
+            echo "$body"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create Discussion
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          MUTATION='mutation($repo: ID!, $cat: ID!, $title: String!, $body: String!) {
+            createDiscussion(input: {repositoryId: $repo, categoryId: $cat, title: $title, body: $body}) {
+              discussion { url }
+            }
+          }'
+          gh api graphql \
+            -f query="$MUTATION" \
+            -F repo="${{ steps.ids.outputs.repo_id }}" \
+            -F cat="${{ steps.ids.outputs.cat_id }}" \
+            -F title="${{ steps.msg.outputs.title }}" \
+            -F body="${{ steps.msg.outputs.body }}" \
+            --jq '.data.createDiscussion.discussion.url'

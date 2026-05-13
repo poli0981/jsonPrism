@@ -1,0 +1,240 @@
+{
+  "app": {
+    "name": "JSONPrism",
+    "tagline": "JSON を様々な形式に分散",
+    "description": "JSON 入力ひとつ。ターゲット形式は 8 種類以上。ブラウザ内で完結。"
+  },
+  "nav": {
+    "home": "変換",
+    "about": "概要",
+    "github": "GitHub"
+  },
+  "home": {
+    "input_label": "JSON 入力",
+    "input_placeholder": "ここに JSON を貼り付け、ファイルをドロップ、またはサンプルを読み込み…",
+    "output_label": "出力",
+    "output_empty": "有効な JSON を入力すると、ここに出力が表示されます。",
+    "drop_zone": "JSON ファイルをここにドロップ",
+    "drop_zone_active": "ドロップして読み込み",
+    "drop_zone_hint": "最大 500 ファイル。すべてブラウザ内で処理 — データは端末から外に出ません。",
+    "load_sample": "サンプル",
+    "open_file": "開く",
+    "clear": "クリア",
+    "format_picker_label": "ターゲット形式",
+    "convert": "変換",
+    "copy": "コピー",
+    "download": "ダウンロード",
+    "options": "オプション"
+  },
+  "formats": {
+    "jsonl": "JSONL",
+    "csv": "CSV",
+    "tsv": "TSV",
+    "yaml": "YAML",
+    "xml": "XML",
+    "toml": "TOML",
+    "resx": "RESX",
+    "markdown": "Markdown テーブル",
+    "sql": "SQL INSERT",
+    "bson": "BSON",
+    "cbor": "CBOR",
+    "msgpack": "MessagePack"
+  },
+  "format_status": {
+    "ready": "利用可能",
+    "suggested": "検出されたデータ形状に適しています",
+    "planned": "Phase {{phase}} で対応予定",
+    "no_reverse": "この形式は逆方向のパースに対応していません"
+  },
+  "direction": {
+    "forward": "JSON →",
+    "reverse": "→ JSON",
+    "title": "変換方向",
+    "hint": "変換方向を切り替え"
+  },
+  "options": {
+    "jsonl": {
+      "pretty": "各行を整形して出力",
+      "pretty_desc": "標準の JSONL は 1 行 1 レコードです。人間が読みやすい複数行を希望する場合に有効化。"
+    },
+    "csv": {
+      "header": "ヘッダー行を含める",
+      "header_desc": "オブジェクトのキーから生成した列名を最初の行に出力します。",
+      "newline": "改行コード",
+      "newline_lf": "LF (\\n)",
+      "newline_crlf": "CRLF (\\r\\n)",
+      "nested_strategy": "ネストされた値",
+      "nested_strategy_desc": "セル内のオブジェクト/配列の扱いを指定します。",
+      "nested_json": "JSON 文字列化",
+      "nested_flatten": "キーをフラット化 (アルファ版)"
+    },
+    "yaml": {
+      "indent": "インデント (スペース数)",
+      "quote_style": "クォートスタイル",
+      "quote_auto": "自動",
+      "quote_single": "シングル",
+      "quote_double": "ダブル"
+    },
+    "xml": {
+      "indent": "インデント (スペース数)",
+      "root_name": "ルート要素名",
+      "item_name": "配列項目の要素名",
+      "item_name_desc": "ルートが配列の場合に使用されます。オブジェクトキーは自身の配列項目を命名します。",
+      "declaration": "XML 宣言を含める",
+      "declaration_desc": "<?xml version=\"1.0\" encoding=\"UTF-8\"?> を先頭に追加します。"
+    },
+    "toml": {
+      "sort_keys": "キーをアルファベット順に並べ替え",
+      "sort_keys_desc": "ネストの全階層に再帰的に適用。安定した diff に有用。"
+    },
+    "markdown": {
+      "alignment": "列の配置",
+      "align_left": "左",
+      "align_center": "中央",
+      "align_right": "右",
+      "align_none": "なし",
+      "escape_pipes": "セル内のパイプをエスケープ",
+      "escape_pipes_desc": "| を \\| に置換してテーブルが壊れないようにします。"
+    },
+    "sql": {
+      "table_name": "テーブル名",
+      "dialect": "方言",
+      "dialect_standard": "標準 SQL",
+      "dialect_postgres": "PostgreSQL",
+      "dialect_mysql": "MySQL",
+      "dialect_sqlite": "SQLite",
+      "dialect_mssql": "MS SQL Server",
+      "multi_row": "複数行 INSERT",
+      "multi_row_desc": "チャンクごとに 1 つの INSERT 文に複数行をまとめます。",
+      "chunk_size": "チャンクサイズ",
+      "chunk_size_desc": "複数行モード時、INSERT あたりの最大行数。",
+      "include_create": "CREATE TABLE を含める",
+      "include_create_desc": "最初の行から列の型を推定し、CREATE TABLE 文を出力します。"
+    },
+    "resx": {
+      "comment_key": "コメントキー",
+      "comment_key_desc": "エントリが { value, _comment } の形を持つ場合、このキーが <comment> 要素になります。",
+      "include_schema": "xsd:schema ヘッダーを含める",
+      "include_schema_desc": "Visual Studio はこれを期待します。diff 生成時のみ無効化してください。",
+      "sort_keys": "エントリをアルファベット順に並べ替え",
+      "sort_keys_desc": "ロケールファイル間で安定した diff を取りたい時に有用。"
+    },
+    "bson": {
+      "encoding": "表示エンコーディング",
+      "encoding_desc": "バイナリ BSON 出力をテキストとして表示する方法。ダウンロード時は常に生バイトです。",
+      "encoding_base64": "Base64",
+      "encoding_hex": "Hex"
+    },
+    "cbor": {
+      "encoding": "表示エンコーディング",
+      "encoding_desc": "バイナリ CBOR 出力をテキストとして表示する方法。ダウンロード時は常に生バイトです。",
+      "encoding_base64": "Base64",
+      "encoding_hex": "Hex"
+    },
+    "msgpack": {
+      "encoding": "表示エンコーディング",
+      "encoding_desc": "バイナリ MessagePack 出力をテキストとして表示する方法。ダウンロード時は常に生バイトです。",
+      "encoding_base64": "Base64",
+      "encoding_hex": "Hex"
+    }
+  },
+  "shape": {
+    "detected": "検出された形状",
+    "scalar": "スカラー",
+    "object": "オブジェクト",
+    "array": "配列",
+    "flat-object": "フラットオブジェクト",
+    "array-of-objects": "オブジェクトの配列",
+    "unknown": "不明"
+  },
+  "status": {
+    "in": "入力",
+    "out": "出力",
+    "time": "parse"
+  },
+  "shortcut": {
+    "clear": "クリア",
+    "download": "ダウンロード",
+    "settings": "設定"
+  },
+  "settings": {
+    "title": "オプション",
+    "description": "この形式の生成方法を調整します。設定は形式ごとに保存されます。",
+    "no_options": "この形式には現在オプションがありません。",
+    "no_options_long": "このコンバーターはまだオプションを公開していません。Phase 2 で方言、インデントなどが追加される予定です。",
+    "reset": "デフォルトに戻す"
+  },
+  "toast": {
+    "copied": "{{format}} をクリップボードにコピーしました",
+    "copy_failed": "クリップボードへのコピーに失敗しました",
+    "downloaded": "{{filename}} をダウンロードしました",
+    "file_loaded": "{{name}} を読み込みました",
+    "file_failed": "ファイルの読み込みに失敗: {{message}}",
+    "options_reset": "オプションをデフォルトに戻しました"
+  },
+  "batch": {
+    "trigger": "バッチ",
+    "title": "バッチキュー",
+    "description": "複数の JSON ファイルを {{format}} に一括変換します。すべてブラウザ内で処理されます。",
+    "drop_idle": "JSON ファイルをここにドロップ",
+    "drop_active": "離してファイルを追加",
+    "browse": "またはクリックして選択…",
+    "empty": "キューにファイルがありません。上に JSON ファイルをドロップして開始してください。",
+    "stat": {
+      "queued": "待機中",
+      "done": "完了",
+      "failed": "失敗"
+    },
+    "process": "処理開始",
+    "cancel": "キャンセル",
+    "clear": "クリア",
+    "download_zip": ".zip をダウンロード",
+    "row": {
+      "out": "出力",
+      "remove": "キューから削除"
+    },
+    "toast": {
+      "added": "{{count}} ファイルをキューに追加しました",
+      "added_other": "{{count}} ファイルをキューに追加しました",
+      "skipped": "{{count}} ファイルをスキップ (上限: {{max}})",
+      "skipped_other": "{{count}} ファイルをスキップ (上限: {{max}})",
+      "started": "{{count}} ファイルを処理中…",
+      "started_other": "{{count}} ファイルを処理中…",
+      "finished": "バッチ完了",
+      "cancelled": "バッチをキャンセルしました",
+      "failed": "バッチ失敗: {{message}}",
+      "zipped": "{{count}} ファイルを .zip にまとめました",
+      "zipped_other": "{{count}} ファイルを .zip にまとめました",
+      "zip_failed": ".zip の作成に失敗: {{message}}",
+      "nothing_to_process": "処理するキューがありません。"
+    }
+  },
+  "theme": {
+    "light": "ライト",
+    "dark": "ダーク",
+    "system": "システム"
+  },
+  "errors": {
+    "invalid_json": "無効な JSON: {{message}}",
+    "empty_input": "入力が空です。",
+    "converter_not_ready": "このコンバーターはまだ実装されていません。",
+    "converter_not_ready_phase": "このコンバーターは Phase {{phase}} で対応予定です。ロードマップを参照してください。",
+    "batch_limit": "バッチ上限に達しました ({{max}} ファイル)。一部のファイルを削除してください。",
+    "unknown": "問題が発生しました。{{message}}"
+  },
+  "about": {
+    "title": "JSONPrism について",
+    "lead": "開発者のための分光ツール。",
+    "p1": "JSONPrism は単一の JSON 入力を受け取り、プリズムを通る白色光のように様々なターゲット形式に分散します。すべての処理はクライアントサイドで行われ、データは端末から外に出ません。",
+    "p2": "React 19、Vite 6、Tailwind CSS v4、shadcn/ui で構築。ソースコードは GitHub で公開しています。",
+    "version": "バージョン {{version}}"
+  },
+  "common": {
+    "loading": "読み込み中…",
+    "error": "エラー",
+    "retry": "再試行"
+  },
+  "disclaimer": {
+    "translation": "このページの翻訳は AI 生成です。100% の正確性は保証されません。"
+  }
+}
