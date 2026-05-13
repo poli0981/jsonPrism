@@ -8,6 +8,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond Phase 3".
 
+## [1.3.3] — 2026-05-13
+
+### Fixed
+
+- **Tauri native drag-drop / file picker bỏ qua batch dedup**. v1.3.0–v1.3.2 desktop bundles cho phép drop cùng một file vào queue nhiều lần mà không hiển thị toast `duplicate`. Root cause: `fileFromNativePath` tạo `new File([text], name, { type })` không truyền `lastModified`, nên File API default về `Date.now()` mỗi lần gọi; key dedup của `batchStore` (`name|size|lastModified`) khác nhau giữa các lần drop cùng một file. Sửa: stat file qua `@tauri-apps/plugin-fs` để lấy mtime thật, fall back về hash FNV-1a của path nếu stat fail. Bonus: infer `type` từ extension thay vì hard-code `application/json`. Thêm permission `fs:allow-stat` vào default capability.
+
+### Tests
+
+- 3 unit test mới cho `pathHashAsMillis` trong `src/lib/__tests__/tauri.test.ts`. Total tests: **193**.
+
 ## [1.3.2] — 2026-05-13
 
 ### Fixed
