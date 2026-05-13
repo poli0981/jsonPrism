@@ -6,7 +6,80 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
-Project is feature-complete for the original Phase 0–3 plan. Future work tracked in `docs/ROADMAP.md` under "Beyond Phase 3".
+No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond Phase 3".
+
+## [1.3.0] — 2026-05-13
+
+### Added — Đợt sửa lỗi 4: editor UX, batch hygiene, workspace persistence, TERMS
+
+- **Reverse-mode syntax highlighting** in the input editor — YAML and XML/RESX now get proper token colors via `@codemirror/lang-yaml` and `@codemirror/lang-xml`; CSV/TOML/JSONL/Markdown/SQL/BSON/CBOR/MessagePack fall back to plain text (no upstream grammar).
+- **Workspace state persistence**: Convert → About → Convert no longer wipes the editor. New `src/stores/workspaceStore.ts` (Zustand) owns `input` + `format` + `direction` + `optionsByFormat`; `input` is in-memory only, the rest persist to localStorage via existing helpers.
+- **Batch dedup** by `(filename + size + lastModified)` — re-dropping the same files reports a duplicate-skipped toast instead of double-queuing.
+- **Batch format filter**: drag-drop, "Browse", and Tauri native dialog all reject files whose extension is outside the allowed list (`.json`/`.txt` forward; `<format>`/`.txt` reverse) with a warning toast. Files like `.cs` or `.py` no longer leak into the queue via "Browse".
+- **`.scrollbar-hide` utility class** in `globals.css` — applied to `.cm-scroller` (CodeEditor theme), OutputPanel, and the About page wrapper. Window scrollbar untouched for a11y.
+- **Direction-aware batch text**: `batch.description` interpolates `{{from}}`/`{{to}}` ("Process multiple YAML files into JSON…"); new `drop_idle_format` + `empty_format` use `{{format}}`. All four locales (en/vi/ja/zh-CN) updated.
+- **`TERMS.md`** (root, ToS / EULA): acceptance, GitHub ToS compliance, Apache 2.0 inheritance, no warranty, user data ownership, acceptable use (anti-malware PR, no-PII-on-public-deploy, no Tauri capability bypass), trademarks, modifications, termination, contact. Linked from `README.md` and `README.vi.md`.
+
+### Fixed
+
+- **Input editor overflow**: long pastes now scroll inside `.cm-scroller` instead of pushing past the `StatusBar`. Root cause was a missing `min-h-0` on the InputPanel wrapper inside its flex column.
+- **About page overlap**: long content no longer overflows onto the Footer. About is now wrapped in `flex-1 min-h-0 overflow-y-auto`, scrolling within `<main>`.
+
+### Dependencies
+
+- Added `@codemirror/lang-yaml` and `@codemirror/lang-xml` (both MIT). Both fold into the existing `codemirror` manualChunk.
+
+### Tests
+
+- **8 new unit tests**: 6 for `workspaceStore` (setters, persistence, format-switch options retention), 2 for `batchStore` dedup behavior. Total tests: **183**.
+
+## [1.2.0] — 2026-05-13
+
+### Added — Đợt sửa lỗi 3: Tauri fixes, workflow hygiene, JP/ZH-CN, reverse UX, docs
+
+- **Tauri 2 single-instance** via `tauri-plugin-single-instance`. Launching the app while it's already open now focuses the existing window instead of spawning a new process.
+- **Japanese (`ja`) and Simplified Chinese (`zh-CN`)** locales — AI-translated, surfaced under the existing `disclaimer.translation` i18n key.
+- **Reverse batch processing** — drag-drop multiple non-JSON files in reverse mode, get a `.zip` of `.json` outputs back. `batch-processor` gained a `direction` parameter that routes through `converter.reverse()` instead of `parseJsonInput`.
+- **Reverse UX**: InputPanel + BatchPanel accept list, file picker, and editor label all switch dynamically when direction = reverse. The label reads e.g. "Input YAML" / "Input CSV".
+- **Auto-discussion workflow** (`.github/workflows/announce-discussion.yml`): publishes a Discussion post when a release is created or a GH Pages deploy succeeds. Uses GraphQL `createDiscussion` mutation; requires Discussions + an `Announcements` category enabled in repo settings (one-time setup).
+- **Docs suite** (root, GitHub auto-detects): `PRIVACY.md`, `SECURITY.md`, `DISCLAIMER.md`, `MAINTAINERS.md`, `THIRD-PARTY.md` (canonical categorized dep list), `CODE_OF_CONDUCT.md` (Contributor Covenant v2.1).
+- **Docs operational**: `docs/pc_spec.md` + `docs/dev_env.md` + Vietnamese mirrors under `docs/i18n/vi/`.
+- **About page expansion**: Donate grid (5 channels from `.github/FUNDING.yml`), categorized third-party summary, build info (version + commit SHA + date — injected via Vite `define` from `git rev-parse`), Links section, Disclaimer footer.
+- **CONTRIBUTING update**: "Auto-ignored cases" rules for suspicious code, off-topic preamble, missing PR descriptions.
+- **Community files**: `.github/dependabot.yml` (weekly npm + actions + cargo, grouped), `PULL_REQUEST_TEMPLATE.md`, `ISSUE_TEMPLATE/config.yml`.
+
+### Fixed
+
+- **Tauri build black screen.** React Router basename was driven by `import.meta.env.PROD`, which is true in both web and Tauri prod builds — basename became `/jsonprism` in Tauri bundles (which serve from `/`), so no routes matched and the page rendered blank. Introduced build-time `__IS_TAURI_BUILD__` Vite define keyed off `TAURI_ENV_PLATFORM`.
+- **Workflow skip noise**: `notify-ci-failure.yml` and `notify-release-pipeline.yml` dropped `workflows: ["*"]` catch-all in favor of explicit workflow names; massively fewer "skipped" runs in the Actions tab.
+
+### Changed
+
+- **GitHub Actions bumped**: `actions/checkout` v4 → v6, `actions/setup-node` v4 → v6 (Node 24 LTS-ready).
+
+## [1.1.0] — 2026-05-13
+
+### Added — Đợt sửa lỗi 2: hygiene, dep upgrades, Tauri process, binary formats, reverse
+
+- **BSON / CBOR / MessagePack converters** — 3 new binary target formats. Output is rendered as base64 (default) or hex via per-format `encoding` option; downloads decode back to raw bytes for proper binary files (`.bson`, `.cbor`, `.msgpack`). New `ConverterMeta.binary` flag.
+- **Reverse conversion** — `Converter<T>.reverse(input, options)` optional interface method. Five reverse implementations: `JSONL`, `CSV/TSV`, `YAML`, `TOML`, `RESX` → JSON. UI: new `DirectionToggle` component persisted to localStorage; `FormatPicker` disables formats without `reverse()`; `OutputPanel` swaps extension to `.json` in reverse mode.
+- **Tauri process hygiene**: explicit `RunEvent::ExitRequested` + `WindowEvent::CloseRequested` cleanup in `src-tauri/src/lib.rs`. Calls `cleanup_before_exit()` so any spawned shell children are signaled before shutdown. New `docs/TAURI-NOTES.md` documents the upstream WebView2 GDI leak.
+
+### Fixed
+
+- **8 TypeScript strict errors** (override modifier, exactOptional, Blob `Uint8Array<ArrayBuffer>`).
+- **`npm run typecheck`** script switched from `tsc --noEmit` (no-op with the root tsconfig) to `tsc -b --noEmit`. CI now actually catches type errors.
+- **Theme toggle** rewritten: replaced racy `onBlur` timeout with `pointerdown` click-outside detection + Escape key + ARIA `role="menu"`.
+- **10 pre-existing test failures** (jsdom localStorage shim, outdated registry/CSV assertions, batch-processor mock for not-ready branch).
+
+### Changed
+
+- **Dependency upgrades**: `jsdom` ^25 → ^29, `vite` ^6 → ^8 (Rolldown bundler — ~5× faster builds), `@vitejs/plugin-react` ^4 → ^6, `engines.node` >=22.0 → >=22.11. `vite.config.ts` `manualChunks` converted to function form (Rolldown requires it).
+- **Vite minifier**: `esbuild` → `oxc` (Rolldown-native, no separate install).
+
+### Tests
+
+- 175 tests pass (was 137). New coverage for the 3 binary converters (17 tests) and 5 reverse converters (11 tests).
 
 ## [1.0.0] — 2026-05-12
 
