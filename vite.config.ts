@@ -31,8 +31,9 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: 'es2022',
     sourcemap: !isTauriContext,
-    // Tauri uses Chromium/WebKit only — drop legacy fallbacks for smaller bundles.
-    minify: isTauriContext ? 'esbuild' : 'esbuild',
+    // Vite 8 uses Rolldown + Oxc minifier by default; legacy `esbuild` requires
+    // installing esbuild separately.
+    minify: 'oxc',
     rollupOptions: {
       output: {
         // Vite 8 / Rolldown only accepts the function form here.
