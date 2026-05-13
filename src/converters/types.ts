@@ -16,9 +16,12 @@ export type FormatId =
   | 'toml'
   | 'resx'
   | 'markdown'
-  | 'sql';
+  | 'sql'
+  | 'bson'
+  | 'cbor'
+  | 'msgpack';
 
-export type ImplementationPhase = 1 | 2 | 3;
+export type ImplementationPhase = 1 | 2 | 3 | 4;
 
 export interface ConverterMeta {
   id: FormatId;
@@ -27,11 +30,22 @@ export interface ConverterMeta {
   mimeType: string;
   phase: ImplementationPhase;
   ready: boolean;
+  /**
+   * Binary formats render their `convert()` output as a hex/base64 string
+   * for display, but downloads decode back to raw bytes via the MIME type.
+   */
+  binary?: boolean;
 }
 
 export interface ConversionInput {
   data: unknown;
   rawText?: string;
+  sourceName?: string;
+}
+
+export interface ReverseInput {
+  /** The raw text in the source format (e.g. CSV, YAML, JSONL, …). */
+  text: string;
   sourceName?: string;
 }
 
@@ -79,4 +93,9 @@ export interface Converter<TOptions = Record<string, never>> {
   /** Schema for auto-generating the settings UI. Empty for stub converters. */
   optionSchema: ReadonlyArray<OptionSchemaField<TOptions>>;
   convert(input: ConversionInput, options: TOptions): ConversionResult;
+  /**
+   * Parse text in this format back to a JSON string. Optional — converters
+   * for lossy or impractical reverses (XML, SQL, Markdown) omit it.
+   */
+  reverse?(input: ReverseInput, options: TOptions): ConversionResult;
 }

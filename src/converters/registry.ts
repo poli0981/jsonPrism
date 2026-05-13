@@ -7,6 +7,9 @@ import { tomlConverter } from './toml';
 import { resxConverter } from './resx';
 import { markdownConverter } from './markdown';
 import { sqlConverter } from './sql';
+import { bsonConverter } from './bson';
+import { cborConverter } from './cbor';
+import { msgpackConverter } from './msgpack';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const CONVERTERS: Record<FormatId, Converter<any>> = {
@@ -19,6 +22,9 @@ export const CONVERTERS: Record<FormatId, Converter<any>> = {
   resx: resxConverter,
   markdown: markdownConverter,
   sql: sqlConverter,
+  bson: bsonConverter,
+  cbor: cborConverter,
+  msgpack: msgpackConverter,
 };
 
 export const ALL_FORMATS: FormatId[] = [
@@ -31,6 +37,9 @@ export const ALL_FORMATS: FormatId[] = [
   'resx',
   'markdown',
   'sql',
+  'bson',
+  'cbor',
+  'msgpack',
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

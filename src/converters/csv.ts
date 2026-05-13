@@ -23,7 +23,11 @@ function tabularizeForCsv(data: unknown, strategy: 'json' | 'flatten'): Array<Re
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(obj)) {
       if (v !== null && typeof v === 'object') {
-        out[k] = strategy === 'json' ? JSON.stringify(v) : flatten(v, k, out);
+        if (strategy === 'json') {
+          out[k] = JSON.stringify(v);
+        } else {
+          flatten(v, k, out);
+        }
       } else {
         out[k] = v;
       }
@@ -32,19 +36,19 @@ function tabularizeForCsv(data: unknown, strategy: 'json' | 'flatten'): Array<Re
   });
 }
 
-function flatten(value: unknown, prefix: string, out: Record<string, unknown>): unknown {
+function flatten(value: unknown, prefix: string, out: Record<string, unknown>): void {
   if (value === null || typeof value !== 'object') {
     out[prefix] = value;
-    return value;
+    return;
   }
   if (Array.isArray(value)) {
-    out[prefix] = JSON.stringify(value); // arrays still get stringified for now
-    return value;
+    // arrays still get stringified for now
+    out[prefix] = JSON.stringify(value);
+    return;
   }
   for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
     flatten(v, `${prefix}.${k}`, out);
   }
-  return '';
 }
 
 function makeCsv(delimiter: ',' | '\t'): Converter<CsvOptions> {
@@ -103,6 +107,20 @@ function makeCsv(delimiter: ',' | '\t'): Converter<CsvOptions> {
       } catch (err) {
         return { ok: false, error: (err as Error).message };
       }
+    },
+    reverse({ text }, opts) {
+      const parsed = Papa.parse<Record<string, unknown>>(text, {
+        delimiter: opts.delimiter,
+        header: opts.header,
+        skipEmptyLines: true,
+        dynamicTyping: true,
+      });
+      if (parsed.errors.length > 0) {
+        const first = parsed.errors[0]!;
+        return { ok: false, error: `${first.type}: ${first.message} (row ${first.row ?? '?'})` };
+      }
+      // When header=true PapaParse returns objects; otherwise arrays.
+      return { ok: true, output: JSON.stringify(parsed.data, null, 2) };
     },
   };
 }

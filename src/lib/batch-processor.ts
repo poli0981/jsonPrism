@@ -74,11 +74,9 @@ export async function processBatch(
           error: parsed.error === 'empty' ? 'Empty file.' : parsed.error,
         });
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const result = converter.convert(
           { data: parsed.value, rawText: text, sourceName: item.filename },
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          options as any,
+          options as Parameters<typeof converter.convert>[1],
         );
         if (result.ok) {
           const outputSize = new TextEncoder().encode(result.output).length;
@@ -86,7 +84,6 @@ export async function processBatch(
             status: 'done',
             output: result.output,
             outputSize,
-            error: undefined,
           });
         } else {
           callbacks.onUpdate(item.id, { status: 'error', error: result.error });
@@ -157,8 +154,10 @@ export async function zipOutputs(
     });
   });
 
+  // .slice() returns a fresh Uint8Array<ArrayBuffer> — narrows the BlobPart
+  // type so it satisfies the DOM lib's `ArrayBufferView<ArrayBuffer>` constraint.
   return {
-    blob: new Blob([zipped], { type: 'application/zip' }),
+    blob: new Blob([zipped.slice()], { type: 'application/zip' }),
     fileCount: done.length,
   };
 }

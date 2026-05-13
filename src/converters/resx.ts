@@ -1,3 +1,4 @@
+import { XMLParser } from 'fast-xml-parser';
 import type { Converter } from './types';
 
 interface ResxOptions {
@@ -173,7 +174,42 @@ export const resxConverter: Converter<ResxOptions> = {
 
     return { ok: true, output: buildResx(entries, opts) };
   },
+  reverse({ text }, opts) {
+    try {
+      const parser = new XMLParser({
+        ignoreAttributes: false,
+        attributeNamePrefix: '@_',
+      });
+      const xml = parser.parse(text) as {
+        root?: { data?: ResxDataEntry | ResxDataEntry[] };
+      };
+      const dataEntries = xml.root?.data;
+      if (!dataEntries) return { ok: true, output: '{}' };
+      const entries = Array.isArray(dataEntries) ? dataEntries : [dataEntries];
+      const out: Record<string, unknown> = {};
+      for (const e of entries) {
+        const key = e['@_name'];
+        if (typeof key !== 'string') continue;
+        const value = e.value ?? '';
+        const comment = e.comment;
+        if (comment !== undefined && comment !== '') {
+          out[key] = { value: String(value), [opts.commentKey]: String(comment) };
+        } else {
+          out[key] = String(value);
+        }
+      }
+      return { ok: true, output: JSON.stringify(out, null, 2) };
+    } catch (err) {
+      return { ok: false, error: (err as Error).message };
+    }
+  },
 };
+
+interface ResxDataEntry {
+  '@_name'?: string;
+  value?: unknown;
+  comment?: unknown;
+}
 
 function buildResx(
   entries: Array<{ key: string; value: string; comment?: string }>,

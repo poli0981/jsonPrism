@@ -35,12 +35,22 @@
     "toml": "TOML",
     "resx": "RESX",
     "markdown": "Markdown table",
-    "sql": "SQL INSERT"
+    "sql": "SQL INSERT",
+    "bson": "BSON",
+    "cbor": "CBOR",
+    "msgpack": "MessagePack"
   },
   "format_status": {
     "ready": "Ready",
     "suggested": "Suggested for the detected shape",
-    "planned": "Coming in Phase {{phase}}"
+    "planned": "Coming in Phase {{phase}}",
+    "no_reverse": "Reverse parse not supported for this format"
+  },
+  "direction": {
+    "forward": "JSON →",
+    "reverse": "→ JSON",
+    "title": "Direction",
+    "hint": "Switch the conversion direction"
   },
   "options": {
     "jsonl": {
@@ -108,6 +118,24 @@
       "include_schema_desc": "Visual Studio expects this. Disable only if you're generating diffs.",
       "sort_keys": "Sort entries alphabetically",
       "sort_keys_desc": "Useful for stable diffs across locale files."
+    },
+    "bson": {
+      "encoding": "Display encoding",
+      "encoding_desc": "How to render the binary BSON output as text. Downloads always contain raw bytes.",
+      "encoding_base64": "Base64",
+      "encoding_hex": "Hex"
+    },
+    "cbor": {
+      "encoding": "Display encoding",
+      "encoding_desc": "How to render the binary CBOR output as text. Downloads always contain raw bytes.",
+      "encoding_base64": "Base64",
+      "encoding_hex": "Hex"
+    },
+    "msgpack": {
+      "encoding": "Display encoding",
+      "encoding_desc": "How to render the binary MessagePack output as text. Downloads always contain raw bytes.",
+      "encoding_base64": "Base64",
+      "encoding_hex": "Hex"
     }
   },
   "shape": {

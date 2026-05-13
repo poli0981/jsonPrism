@@ -3,8 +3,8 @@ import { ALL_FORMATS, CONVERTERS, getConverter } from '../registry';
 import type { FormatId } from '../types';
 
 describe('converter registry', () => {
-  it('exposes all 9 format IDs', () => {
-    expect(ALL_FORMATS).toHaveLength(9);
+  it('exposes all 12 format IDs', () => {
+    expect(ALL_FORMATS).toHaveLength(12);
     expect(new Set(ALL_FORMATS)).toEqual(
       new Set<FormatId>([
         'jsonl',
@@ -16,6 +16,9 @@ describe('converter registry', () => {
         'resx',
         'markdown',
         'sql',
+        'bson',
+        'cbor',
+        'msgpack',
       ]),
     );
   });
@@ -39,17 +42,15 @@ describe('converter registry', () => {
     }
   });
 
-  it('Phase 1 converters are marked ready', () => {
-    const phase1 = ['jsonl', 'csv', 'tsv', 'yaml'] as const;
-    for (const id of phase1) {
+  it('all 9 converters are marked ready', () => {
+    for (const id of ALL_FORMATS) {
       expect(getConverter(id).meta.ready).toBe(true);
     }
   });
 
-  it('Phase 2/3 converters are marked not ready', () => {
-    const notReady = ['xml', 'toml', 'markdown', 'sql', 'resx'] as const;
-    for (const id of notReady) {
-      expect(getConverter(id).meta.ready).toBe(false);
-    }
+  it('phase metadata covers all expected phases', () => {
+    const phases = ALL_FORMATS.map((id) => getConverter(id).meta.phase);
+    // P1 jsonl/csv/tsv/yaml, P2 xml/toml/markdown/sql, P3 resx, P4 bson/cbor/msgpack.
+    expect(new Set(phases)).toEqual(new Set([1, 2, 3, 4]));
   });
 });

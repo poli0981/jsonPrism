@@ -18,9 +18,18 @@ interface SettingsPanelProps {
   options: Record<string, unknown>;
   onChange: (next: Record<string, unknown>) => void;
   onReset: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function SettingsPanel({ format, options, onChange, onReset }: SettingsPanelProps) {
+export function SettingsPanel({
+  format,
+  options,
+  onChange,
+  onReset,
+  open,
+  onOpenChange,
+}: SettingsPanelProps) {
   const { t } = useTranslation();
   const converter = getConverter(format);
   const schema = converter.optionSchema as ReadonlyArray<OptionSchemaField<Record<string, unknown>>>;
@@ -32,7 +41,7 @@ export function SettingsPanel({ format, options, onChange, onReset }: SettingsPa
   };
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>
         <button
           type="button"

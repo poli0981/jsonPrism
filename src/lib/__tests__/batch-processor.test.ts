@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { unzipSync, strFromU8 } from 'fflate';
 import {
   outputFilename,
@@ -7,6 +7,7 @@ import {
   zipOutputs,
 } from '../batch-processor';
 import type { BatchItem } from '@/stores/batchStore';
+import * as registry from '@/converters/registry';
 
 function makeItem(id: string, name: string, content: string): BatchItem {
   return {
@@ -144,16 +145,27 @@ describe('processBatch', () => {
   });
 
   it('marks all items as error if converter is not ready', async () => {
-    const items = [makeItem('1', 'a.json', '{}')];
-    const updates: Partial<BatchItem>[] = [];
-    await processBatch(
-      items,
-      'resx',
-      {},
-      { onUpdate: (_id, patch) => updates.push(patch) },
-      new AbortController().signal,
-    );
-    expect(updates.some((u) => u.status === 'error')).toBe(true);
+    // All shipped converters are `ready: true`, so mock one as not ready to
+    // exercise the defensive branch in processBatch.
+    const original = registry.getConverter('jsonl');
+    const spy = vi.spyOn(registry, 'getConverter').mockReturnValue({
+      ...original,
+      meta: { ...original.meta, ready: false },
+    });
+    try {
+      const items = [makeItem('1', 'a.json', '{}')];
+      const updates: Partial<BatchItem>[] = [];
+      await processBatch(
+        items,
+        'jsonl',
+        {},
+        { onUpdate: (_id, patch) => updates.push(patch) },
+        new AbortController().signal,
+      );
+      expect(updates.some((u) => u.status === 'error')).toBe(true);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
 

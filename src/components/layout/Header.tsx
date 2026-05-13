@@ -53,7 +53,7 @@ function NavItem({ to, end, children }: NavItemProps) {
   return (
     <NavLink
       to={to}
-      end={end}
+      {...(end !== undefined ? { end } : {})}
       className={({ isActive }) =>
         cn(
           'inline-flex h-9 items-center rounded-md px-3 text-sm font-medium transition',

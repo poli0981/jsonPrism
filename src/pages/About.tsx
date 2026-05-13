@@ -14,7 +14,7 @@ export function About() {
         <p>{t('about.p2')}</p>
       </div>
       <div className="border-border/60 text-muted-foreground mt-12 border-t pt-6 font-mono text-xs">
-        {t('about.version', { version: '1.0.0' })}
+        {t('about.version', { version: __APP_VERSION__ })}
       </div>
     </div>
   );

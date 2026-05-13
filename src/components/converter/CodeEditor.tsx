@@ -111,10 +111,10 @@ export function CodeEditor({
       <CodeMirror
         ref={editorRef}
         value={value}
-        onChange={onChange}
         readOnly={readOnly}
         editable={!readOnly}
-        placeholder={placeholder}
+        {...(onChange !== undefined ? { onChange } : {})}
+        {...(placeholder !== undefined ? { placeholder } : {})}
         extensions={[...extensions, themeExt]}
         basicSetup={{
           lineNumbers: true,
