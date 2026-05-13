@@ -10,9 +10,9 @@ merged PR.
 
 ## Contact
 
-- Bug reports & feature requests: [GitHub Issues](https://github.com/poli0981/jsonprism/issues)
-- Discussion / Q&A: [GitHub Discussions](https://github.com/poli0981/jsonprism/discussions)
-- Security: [Private Security Advisory](https://github.com/poli0981/jsonprism/security/advisories/new)
+- Bug reports & feature requests: [GitHub Issues](https://github.com/poli0981/jsonPrism/issues)
+- Discussion / Q&A: [GitHub Discussions](https://github.com/poli0981/jsonPrism/discussions)
+- Security: [Private Security Advisory](https://github.com/poli0981/jsonPrism/security/advisories/new)
 
 ## Becoming a maintainer
 

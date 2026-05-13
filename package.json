@@ -6,10 +6,10 @@
   "description": "Disperse JSON into many formats — JSONL, CSV, YAML, XML, TOML, RESX, Markdown, SQL — fully client-side.",
   "author": "poli0981 <https://github.com/poli0981>",
   "license": "Apache-2.0",
-  "homepage": "https://poli0981.github.io/jsonprism/",
+  "homepage": "https://poli0981.github.io/jsonPrism/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/poli0981/jsonprism.git"
+    "url": "https://github.com/poli0981/jsonPrism.git"
   },
   "engines": {
     "node": ">=22.11.0"

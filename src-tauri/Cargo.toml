@@ -4,7 +4,7 @@ version = "1.3.0"
 description = "Disperse JSON into many formats."
 authors = ["poli0981 <https://github.com/poli0981>"]
 license = "Apache-2.0"
-repository = "https://github.com/poli0981/jsonprism"
+repository = "https://github.com/poli0981/jsonPrism"
 edition = "2021"
 rust-version = "1.77"
 

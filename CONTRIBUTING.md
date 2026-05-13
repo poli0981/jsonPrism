@@ -5,7 +5,7 @@ Thanks for considering a contribution! JSONPrism is an open-source project under
 ## Quick start
 
 ```bash
-git clone https://github.com/poli0981/jsonprism.git
+git clone https://github.com/poli0981/jsonPrism.git
 cd jsonprism
 npm install
 npm run dev
@@ -36,7 +36,7 @@ Open <http://localhost:5173>.
 
 ### 🐛 Bug reports
 
-Use the [Bug Report](https://github.com/poli0981/jsonprism/issues/new?template=bug_report.md) template. Include:
+Use the [Bug Report](https://github.com/poli0981/jsonPrism/issues/new?template=bug_report.md) template. Include:
 
 - Browser + OS
 - Steps to reproduce
@@ -45,7 +45,7 @@ Use the [Bug Report](https://github.com/poli0981/jsonprism/issues/new?template=b
 
 ### 💡 Feature requests
 
-Use the [Feature Request](https://github.com/poli0981/jsonprism/issues/new?template=feature_request.md) template. We prioritize features that:
+Use the [Feature Request](https://github.com/poli0981/jsonPrism/issues/new?template=feature_request.md) template. We prioritize features that:
 
 - Fit the "one JSON → many formats" core mission
 - Don't require server-side processing (we're client-only by design)
@@ -123,7 +123,7 @@ This project adopts the [Contributor Covenant v2.1](CODE_OF_CONDUCT.md).
 Be kind. Assume good faith. Disagreements about technical choices are
 fine; personal attacks and harassment are not.
 
-Reports to the maintainer via the [private Security Advisory flow](https://github.com/poli0981/jsonprism/security/advisories/new) for sensitive matters, or a private GitHub Discussion otherwise.
+Reports to the maintainer via the [private Security Advisory flow](https://github.com/poli0981/jsonPrism/security/advisories/new) for sensitive matters, or a private GitHub Discussion otherwise.
 
 ## License
 

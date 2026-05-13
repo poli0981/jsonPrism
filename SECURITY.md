@@ -16,7 +16,7 @@ latest minor of the current major receives security fixes.
 
 Use GitHub's private vulnerability reporting:
 
-→ <https://github.com/poli0981/jsonprism/security/advisories/new>
+→ <https://github.com/poli0981/jsonPrism/security/advisories/new>
 
 This routes the report directly to the maintainer through a private
 channel. You can include a proof-of-concept, suggested fix, and your

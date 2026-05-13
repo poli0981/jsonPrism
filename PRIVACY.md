@@ -67,5 +67,5 @@ The Tauri build inlines these fonts and never makes the request.
 
 ## Questions
 
-Open a [GitHub Discussion](https://github.com/poli0981/jsonprism/discussions) if anything here is unclear.
-For security-relevant reports, use the [private Security Advisory flow](https://github.com/poli0981/jsonprism/security/advisories/new).
+Open a [GitHub Discussion](https://github.com/poli0981/jsonPrism/discussions) if anything here is unclear.
+For security-relevant reports, use the [private Security Advisory flow](https://github.com/poli0981/jsonPrism/security/advisories/new).

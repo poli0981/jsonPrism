@@ -6,11 +6,11 @@
 
 One JSON input. Eight target formats. Fully in your browser.
 
-[![CI](https://github.com/poli0981/jsonprism/actions/workflows/ci.yml/badge.svg)](https://github.com/poli0981/jsonprism/actions/workflows/ci.yml)
-[![Deploy](https://github.com/poli0981/jsonprism/actions/workflows/deploy.yml/badge.svg)](https://github.com/poli0981/jsonprism/actions/workflows/deploy.yml)
+[![CI](https://github.com/poli0981/jsonPrism/actions/workflows/ci.yml/badge.svg)](https://github.com/poli0981/jsonPrism/actions/workflows/ci.yml)
+[![Deploy](https://github.com/poli0981/jsonPrism/actions/workflows/deploy.yml/badge.svg)](https://github.com/poli0981/jsonPrism/actions/workflows/deploy.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-[Live demo](https://poli0981.github.io/jsonprism/) · [Tiếng Việt](README.vi.md) · [Roadmap](docs/ROADMAP.md)
+[Live demo](https://poli0981.github.io/jsonPrism/) · [Tiếng Việt](README.vi.md) · [Roadmap](docs/ROADMAP.md)
 
 </div>
 
@@ -59,7 +59,7 @@ JSONPrism is a refracting tool for developers. It takes a single JSON input and 
 **Requirements**: Node.js **22 LTS** or newer.
 
 ```bash
-git clone https://github.com/poli0981/jsonprism.git
+git clone https://github.com/poli0981/jsonPrism.git
 cd jsonprism
 npm install
 npm run dev          # http://localhost:5173
@@ -187,7 +187,7 @@ See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the full phase plan.
 
 Pull requests welcome — please read [`CONTRIBUTING.md`](CONTRIBUTING.md) first. PRs that match the **auto-ignored** patterns described there (suspicious code, off-topic preamble, no description, etc.) get closed without review.
 
-For bug reports and feature requests, use [GitHub Issues](https://github.com/poli0981/jsonprism/issues). For security vulnerabilities, use the [private Security Advisory flow](https://github.com/poli0981/jsonprism/security/advisories/new).
+For bug reports and feature requests, use [GitHub Issues](https://github.com/poli0981/jsonPrism/issues). For security vulnerabilities, use the [private Security Advisory flow](https://github.com/poli0981/jsonPrism/security/advisories/new).
 
 ## Project docs
 

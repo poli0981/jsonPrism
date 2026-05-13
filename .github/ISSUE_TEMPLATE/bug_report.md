@@ -38,7 +38,7 @@ What actually happened. Include the error message and target format.
 - Browser: [e.g. Chrome 130, Firefox 132, Safari 18]
 - OS: [e.g. Windows 11, macOS 15, Ubuntu 24.04]
 - JSONPrism version: [e.g. 0.1.0 — check the footer]
-- Is this on the hosted version (poli0981.github.io/jsonprism/) or local dev?
+- Is this on the hosted version (poli0981.github.io/jsonPrism/) or local dev?
 
 ## Screenshots
 

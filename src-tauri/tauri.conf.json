@@ -44,7 +44,7 @@
     "longDescription": "JSONPrism is a refracting tool for developers. It takes a single JSON input and disperses it into many target formats — JSONL, CSV/TSV, YAML, XML, TOML, Markdown, SQL INSERT — fully on your machine.",
     "copyright": "Copyright (c) 2026 poli0981",
     "publisher": "poli0981",
-    "homepage": "https://github.com/poli0981/jsonprism",
+    "homepage": "https://github.com/poli0981/jsonPrism",
     "windows": {
       "wix": {
         "language": "en-US"

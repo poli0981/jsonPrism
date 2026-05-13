@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { ExternalLink, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const REPO_URL = 'https://github.com/poli0981/jsonprism';
+const REPO_URL = 'https://github.com/poli0981/jsonPrism';
 
 interface DonatePlatform {
   key: 'github' | 'ko_fi' | 'buy_me_a_coffee' | 'patreon' | 'paypal';
@@ -202,7 +202,7 @@ export function About() {
             <LinkRow href={REPO_URL} label={t('about.links.repo')} />
             <LinkRow href={`${REPO_URL}/issues`} label={t('about.links.issues')} />
             <LinkRow href={`${REPO_URL}/discussions`} label={t('about.links.discussions')} />
-            <LinkRow href="https://poli0981.github.io/jsonprism/" label={t('about.links.demo')} />
+            <LinkRow href="https://poli0981.github.io/jsonPrism/" label={t('about.links.demo')} />
             <LinkRow href={`${REPO_URL}/blob/main/LICENSE`} label={t('about.links.license')} />
           </ul>
         </section>

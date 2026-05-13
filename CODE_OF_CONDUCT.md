@@ -12,7 +12,7 @@ In short:
 The maintainer ([@poli0981](https://github.com/poli0981)) is responsible
 for enforcement. Reports of misconduct can be sent through:
 
-- A [private Discussion](https://github.com/poli0981/jsonprism/discussions) addressed to the maintainer, or
+- A [private Discussion](https://github.com/poli0981/jsonPrism/discussions) addressed to the maintainer, or
 - Email via the address on the GitHub profile.
 
 Reports are handled confidentially. Possible outcomes include: a warning,

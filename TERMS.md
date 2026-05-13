@@ -15,7 +15,7 @@ not agree, stop using it.
 
 ## 1. Acceptance
 
-Accessing the web app at <https://poli0981.github.io/jsonprism/>,
+Accessing the web app at <https://poli0981.github.io/jsonPrism/>,
 running the Tauri desktop bundle, cloning or downloading the repository,
 or otherwise interacting with the project constitutes acceptance of
 these terms.

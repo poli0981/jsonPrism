@@ -22,12 +22,9 @@ jobs:
           - name: Windows
             runner: windows-latest
             args: ''
-          - name: macOS (Apple Silicon)
+          - name: macOS (universal)
             runner: macos-14
-            args: '--target aarch64-apple-darwin'
-          - name: macOS (Intel)
-            runner: macos-13
-            args: '--target x86_64-apple-darwin'
+            args: '--target universal-apple-darwin'
           - name: Linux
             runner: ubuntu-22.04
             args: ''
@@ -57,7 +54,8 @@ jobs:
       - name: Setup Rust (stable)
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform.runner == 'macos-14' && 'aarch64-apple-darwin' || matrix.platform.runner == 'macos-13' && 'x86_64-apple-darwin' || '' }}
+          # macOS universal2 build needs both aarch64 + x86_64 targets installed.
+          targets: ${{ matrix.platform.runner == 'macos-14' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
       - name: Cache Cargo build artifacts
         uses: swatinem/rust-cache@v2
@@ -86,7 +84,7 @@ jobs:
           releaseBody: |
             Native desktop builds for Windows, macOS, and Linux.
 
-            See the [CHANGELOG](https://github.com/poli0981/jsonprism/blob/main/CHANGELOG.md) for what's new.
+            See the [CHANGELOG](https://github.com/poli0981/jsonPrism/blob/main/CHANGELOG.md) for what's new.
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.platform.args }}
