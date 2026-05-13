@@ -233,5 +233,8 @@
     "loading": "Đang tải…",
     "error": "Lỗi",
     "retry": "Thử lại"
+  },
+  "disclaimer": {
+    "translation": "Các bản dịch không phải tiếng Anh do AI tạo, không đảm bảo chính xác 100%."
   }
 }

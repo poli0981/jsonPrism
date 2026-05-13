@@ -2,7 +2,10 @@ name: Notify Release Pipeline
 
 on:
   workflow_run:
-    workflows: ["*"]
+    # Subscribe only to release-pipeline workflows. The previous catch-all
+    # ("*") triggered this workflow on every completion (including CI and
+    # this workflow itself), most of which immediately skipped.
+    workflows: ["Release Tauri bundles", "Deploy to GitHub Pages"]
     types: [completed]
 
 permissions:

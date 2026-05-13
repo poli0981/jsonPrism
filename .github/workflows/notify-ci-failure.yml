@@ -2,7 +2,11 @@ name: Notify CI Failures
 
 on:
   workflow_run:
-    workflows: ["*"]
+    # Subscribe only to the workflow we actually want failure notifications
+    # for. The previous catch-all ("*") triggered this workflow on every
+    # completion (deploy, release, notify itself), most of which immediately
+    # skipped — adding noise to the Actions tab.
+    workflows: ["CI"]
     types: [completed]
 
 # REQUIRED: declare permissions matching the reusable workflow's needs.

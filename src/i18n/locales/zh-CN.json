@@ -1,0 +1,240 @@
+{
+  "app": {
+    "name": "JSONPrism",
+    "tagline": "将 JSON 分散为多种格式",
+    "description": "一份 JSON 输入,八种以上目标格式,全程在浏览器中完成。"
+  },
+  "nav": {
+    "home": "转换",
+    "about": "关于",
+    "github": "GitHub"
+  },
+  "home": {
+    "input_label": "JSON 输入",
+    "input_placeholder": "在此处粘贴 JSON、拖入文件或加载示例…",
+    "output_label": "输出",
+    "output_empty": "提供有效的 JSON 后,输出将显示在此处。",
+    "drop_zone": "将 JSON 文件拖到此处",
+    "drop_zone_active": "释放即可加载",
+    "drop_zone_hint": "最多 500 个文件。全部在浏览器中运行 — 数据不会离开你的设备。",
+    "load_sample": "示例",
+    "open_file": "打开",
+    "clear": "清除",
+    "format_picker_label": "目标格式",
+    "convert": "转换",
+    "copy": "复制",
+    "download": "下载",
+    "options": "选项"
+  },
+  "formats": {
+    "jsonl": "JSONL",
+    "csv": "CSV",
+    "tsv": "TSV",
+    "yaml": "YAML",
+    "xml": "XML",
+    "toml": "TOML",
+    "resx": "RESX",
+    "markdown": "Markdown 表格",
+    "sql": "SQL INSERT",
+    "bson": "BSON",
+    "cbor": "CBOR",
+    "msgpack": "MessagePack"
+  },
+  "format_status": {
+    "ready": "可用",
+    "suggested": "适用于检测到的数据形状",
+    "planned": "将在阶段 {{phase}} 推出",
+    "no_reverse": "此格式不支持反向解析"
+  },
+  "direction": {
+    "forward": "JSON →",
+    "reverse": "→ JSON",
+    "title": "转换方向",
+    "hint": "切换转换方向"
+  },
+  "options": {
+    "jsonl": {
+      "pretty": "美化每一行",
+      "pretty_desc": "标准 JSONL 为每条记录一行。如需多行人类可读输出,请启用此项。"
+    },
+    "csv": {
+      "header": "包含表头行",
+      "header_desc": "以对象键作为列名输出第一行。",
+      "newline": "换行符",
+      "newline_lf": "LF (\\n)",
+      "newline_crlf": "CRLF (\\r\\n)",
+      "nested_strategy": "嵌套值处理",
+      "nested_strategy_desc": "单元格中嵌套对象或数组的处理方式。",
+      "nested_json": "JSON 字符串化",
+      "nested_flatten": "扁平化键 (alpha)"
+    },
+    "yaml": {
+      "indent": "缩进 (空格数)",
+      "quote_style": "引号样式",
+      "quote_auto": "自动",
+      "quote_single": "单引号",
+      "quote_double": "双引号"
+    },
+    "xml": {
+      "indent": "缩进 (空格数)",
+      "root_name": "根元素名称",
+      "item_name": "数组项元素名称",
+      "item_name_desc": "当根为数组时使用。对象键则为各自的数组项命名。",
+      "declaration": "包含 XML 声明",
+      "declaration_desc": "在开头添加 <?xml version=\"1.0\" encoding=\"UTF-8\"?>。"
+    },
+    "toml": {
+      "sort_keys": "按字母顺序排序键",
+      "sort_keys_desc": "递归应用到每一层嵌套,有助于产生稳定的 diff。"
+    },
+    "markdown": {
+      "alignment": "列对齐方式",
+      "align_left": "左对齐",
+      "align_center": "居中",
+      "align_right": "右对齐",
+      "align_none": "无",
+      "escape_pipes": "转义单元格中的竖线",
+      "escape_pipes_desc": "将 | 替换为 \\|,避免破坏表格结构。"
+    },
+    "sql": {
+      "table_name": "表名",
+      "dialect": "方言",
+      "dialect_standard": "标准 SQL",
+      "dialect_postgres": "PostgreSQL",
+      "dialect_mysql": "MySQL",
+      "dialect_sqlite": "SQLite",
+      "dialect_mssql": "MS SQL Server",
+      "multi_row": "多行 INSERT",
+      "multi_row_desc": "按 chunk 将多行合并到同一条 INSERT 语句中。",
+      "chunk_size": "分块大小",
+      "chunk_size_desc": "启用多行模式时,每条 INSERT 的最大行数。",
+      "include_create": "包含 CREATE TABLE",
+      "include_create_desc": "从第一行推断列类型并输出 CREATE TABLE 语句。"
+    },
+    "resx": {
+      "comment_key": "注释键",
+      "comment_key_desc": "当条目形如 { value, _comment } 时,该键的值将作为 <comment> 元素。",
+      "include_schema": "包含 xsd:schema 头",
+      "include_schema_desc": "Visual Studio 需要该头。仅在生成 diff 时关闭。",
+      "sort_keys": "按字母顺序排序条目",
+      "sort_keys_desc": "便于在不同 locale 文件之间产生稳定的 diff。"
+    },
+    "bson": {
+      "encoding": "显示编码",
+      "encoding_desc": "将二进制 BSON 输出渲染为文本的方式。下载时始终为原始字节。",
+      "encoding_base64": "Base64",
+      "encoding_hex": "Hex"
+    },
+    "cbor": {
+      "encoding": "显示编码",
+      "encoding_desc": "将二进制 CBOR 输出渲染为文本的方式。下载时始终为原始字节。",
+      "encoding_base64": "Base64",
+      "encoding_hex": "Hex"
+    },
+    "msgpack": {
+      "encoding": "显示编码",
+      "encoding_desc": "将二进制 MessagePack 输出渲染为文本的方式。下载时始终为原始字节。",
+      "encoding_base64": "Base64",
+      "encoding_hex": "Hex"
+    }
+  },
+  "shape": {
+    "detected": "检测到的形状",
+    "scalar": "标量",
+    "object": "对象",
+    "array": "数组",
+    "flat-object": "扁平对象",
+    "array-of-objects": "对象数组",
+    "unknown": "未知"
+  },
+  "status": {
+    "in": "输入",
+    "out": "输出",
+    "time": "parse"
+  },
+  "shortcut": {
+    "clear": "清除",
+    "download": "下载",
+    "settings": "设置"
+  },
+  "settings": {
+    "title": "选项",
+    "description": "调整该格式的生成方式。设置按格式分别保存。",
+    "no_options": "该格式暂无可用选项。",
+    "no_options_long": "此转换器尚未暴露任何选项。阶段 2 落地后,你将在此找到方言、缩进等设置。",
+    "reset": "恢复默认"
+  },
+  "toast": {
+    "copied": "已将 {{format}} 复制到剪贴板",
+    "copy_failed": "无法复制到剪贴板",
+    "downloaded": "已下载 {{filename}}",
+    "file_loaded": "已加载 {{name}}",
+    "file_failed": "加载文件失败: {{message}}",
+    "options_reset": "已恢复默认选项"
+  },
+  "batch": {
+    "trigger": "批量",
+    "title": "批量队列",
+    "description": "一次性将多个 JSON 文件转换为 {{format}}。全部在浏览器中处理。",
+    "drop_idle": "将 JSON 文件拖到此处",
+    "drop_active": "释放以添加文件",
+    "browse": "或点击浏览…",
+    "empty": "队列中暂无文件。将 JSON 文件拖到上方即可开始。",
+    "stat": {
+      "queued": "等待中",
+      "done": "完成",
+      "failed": "失败"
+    },
+    "process": "处理",
+    "cancel": "取消",
+    "clear": "清空",
+    "download_zip": "下载 .zip",
+    "row": {
+      "out": "输出",
+      "remove": "从队列中移除"
+    },
+    "toast": {
+      "added": "已添加 {{count}} 个文件到队列",
+      "added_other": "已添加 {{count}} 个文件到队列",
+      "skipped": "已跳过 {{count}} 个文件 (上限: {{max}})",
+      "skipped_other": "已跳过 {{count}} 个文件 (上限: {{max}})",
+      "started": "正在处理 {{count}} 个文件…",
+      "started_other": "正在处理 {{count}} 个文件…",
+      "finished": "批量完成",
+      "cancelled": "已取消批量任务",
+      "failed": "批量失败: {{message}}",
+      "zipped": "已将 {{count}} 个文件打包为 .zip",
+      "zipped_other": "已将 {{count}} 个文件打包为 .zip",
+      "zip_failed": "无法构建 .zip: {{message}}",
+      "nothing_to_process": "队列中没有可处理的内容。"
+    }
+  },
+  "theme": {
+    "light": "浅色",
+    "dark": "深色",
+    "system": "跟随系统"
+  },
+  "errors": {
+    "invalid_json": "无效的 JSON: {{message}}",
+    "empty_input": "输入为空。",
+    "converter_not_ready": "该转换器尚未实现。",
+    "converter_not_ready_phase": "该转换器将在阶段 {{phase}} 推出。详见路线图。",
+    "batch_limit": "已达批量上限 ({{max}} 个文件)。请先移除一些文件。",
+    "unknown": "发生错误。{{message}}"
+  },
+  "about": {
+    "title": "关于 JSONPrism",
+    "lead": "为开发者打造的分光工具。",
+    "p1": "JSONPrism 接收单份 JSON 输入,并像白光穿过棱镜一样将其分散为多种目标格式。一切都在客户端完成,数据不会离开你的设备。",
+    "p2": "使用 React 19、Vite 6、Tailwind CSS v4 与 shadcn/ui 构建。源码在 GitHub。",
+    "version": "版本 {{version}}"
+  },
+  "common": {
+    "loading": "加载中…",
+    "error": "错误",
+    "retry": "重试"
+  },
+  "disclaimer": {
+    "translation": "本页面译文由 AI 生成,不保证 100% 准确。"
+  }
+}
