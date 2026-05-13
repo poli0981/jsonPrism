@@ -17,6 +17,8 @@ export interface BatchItem {
 /** Hard upper bound on queue size. UI may suggest a smaller default. */
 export const BATCH_MAX_FILES = 500;
 
+export type AddFilesReason = 'limit' | 'duplicate' | undefined;
+
 interface BatchState {
   items: Record<string, BatchItem>;
   itemOrder: string[];
@@ -29,7 +31,7 @@ interface BatchState {
   hasAny(): boolean;
 
   // Mutations
-  addFiles(files: File[]): { added: number; skipped: number; reason?: string | undefined };
+  addFiles(files: File[]): { added: number; skipped: number; reason?: AddFilesReason };
   removeItem(id: string): void;
   clear(): void;
   setProcessing(p: boolean): void;
@@ -42,6 +44,12 @@ let idSeq = 0;
 function nextId(): string {
   idSeq += 1;
   return `b${Date.now().toString(36)}_${idSeq.toString(36)}`;
+}
+
+/** Stable key for deduplication. File objects are ephemeral but
+ * `(name, size, lastModified)` is the standard "same file" heuristic. */
+function fileKey(file: File): string {
+  return `${file.name}|${file.size}|${file.lastModified}`;
 }
 
 export const useBatchStore = create<BatchState>((set, get) => ({
@@ -57,7 +65,7 @@ export const useBatchStore = create<BatchState>((set, get) => ({
   addFiles: (files) => {
     let added = 0;
     let skipped = 0;
-    let reason: string | undefined;
+    let reason: AddFilesReason;
 
     set((state) => {
       const remaining = BATCH_MAX_FILES - state.itemOrder.length;
@@ -70,12 +78,27 @@ export const useBatchStore = create<BatchState>((set, get) => ({
       const newItems: Record<string, BatchItem> = { ...state.items };
       const newOrder = [...state.itemOrder];
 
+      // Seed dedup set with the current queue's file keys.
+      const seen = new Set<string>();
+      for (const id of state.itemOrder) {
+        const existing = state.items[id];
+        if (existing) seen.add(fileKey(existing.file));
+      }
+
       for (const file of files) {
         if (newOrder.length >= BATCH_MAX_FILES) {
           skipped += 1;
           reason = 'limit';
           continue;
         }
+        const key = fileKey(file);
+        if (seen.has(key)) {
+          skipped += 1;
+          // Don't overwrite a 'limit' reason — limit is more actionable.
+          if (reason !== 'limit') reason = 'duplicate';
+          continue;
+        }
+        seen.add(key);
         const id = nextId();
         newItems[id] = {
           id,

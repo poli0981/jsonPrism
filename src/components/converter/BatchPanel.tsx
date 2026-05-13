@@ -49,27 +49,6 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
   const errorCount = itemOrder.filter((id) => items[id]?.status === 'error').length;
   const queuedCount = itemOrder.filter((id) => items[id]?.status === 'queued').length;
 
-  const handleAddFiles = useCallback(
-    (files: File[]) => {
-      const result = addFiles(files);
-      if (result.added > 0) {
-        toast.success(t('batch.toast.added', { count: result.added }));
-      }
-      if (result.skipped > 0) {
-        toast.warning(t('batch.toast.skipped', { count: result.skipped, max: BATCH_MAX_FILES }));
-      }
-    },
-    [addFiles, t],
-  );
-
-  const onDrop = useCallback(
-    (accepted: File[]) => {
-      if (accepted.length === 0) return;
-      handleAddFiles(accepted);
-    },
-    [handleAddFiles],
-  );
-
   const isReverse = direction === 'reverse';
   const converter = getConverter(format);
   const accept = useMemo(() => {
@@ -86,8 +65,63 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
     ? `.${converter.meta.extension},.txt,${converter.meta.mimeType}`
     : '.json,.txt,application/json';
 
+  // Whitelist of file extensions that match the current direction × format.
+  // The browser's native `<input accept>` is only a hint, so we re-validate
+  // in JS to reject files chosen via "Browse" with "All files" filter.
+  const allowedExtensions = useMemo(() => {
+    return isReverse ? [converter.meta.extension.toLowerCase(), 'txt'] : ['json', 'txt'];
+  }, [isReverse, converter.meta.extension]);
+
+  const handleAddFiles = useCallback(
+    (files: File[]) => {
+      const valid: File[] = [];
+      let wrongFormat = 0;
+      for (const f of files) {
+        const ext = (f.name.split('.').pop() ?? '').toLowerCase();
+        if (allowedExtensions.includes(ext)) valid.push(f);
+        else wrongFormat += 1;
+      }
+      if (wrongFormat > 0) {
+        toast.warning(t('batch.toast.wrong_format', { count: wrongFormat }));
+      }
+      if (valid.length === 0) return;
+      const result = addFiles(valid);
+      if (result.added > 0) {
+        toast.success(t('batch.toast.added', { count: result.added }));
+      }
+      if (result.skipped > 0) {
+        if (result.reason === 'duplicate') {
+          toast.warning(t('batch.toast.duplicate', { count: result.skipped }));
+        } else {
+          toast.warning(t('batch.toast.skipped', { count: result.skipped, max: BATCH_MAX_FILES }));
+        }
+      }
+    },
+    [addFiles, allowedExtensions, t],
+  );
+
+  const onDrop = useCallback(
+    (accepted: File[]) => {
+      if (accepted.length === 0) return;
+      handleAddFiles(accepted);
+    },
+    [handleAddFiles],
+  );
+
+  const onDropRejected = useCallback(
+    (rejections: { file: File }[]) => {
+      // react-dropzone rejects via MIME mismatch; surface as wrong-format toast
+      // so the user sees something, not a silent drop.
+      if (rejections.length > 0) {
+        toast.warning(t('batch.toast.wrong_format', { count: rejections.length }));
+      }
+    },
+    [t],
+  );
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
+    onDropRejected,
     accept,
     multiple: true,
     noClick: true,
@@ -190,7 +224,11 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
     }
   }, [totalCount, processing]);
 
-  const formatLabel = getConverter(format).meta.labelKey;
+  const formatLabel = t(converter.meta.labelKey);
+  // Direction-aware labels for the SheetDescription and dropzone text.
+  // In reverse mode the user supplies `<format>` files and gets JSON back.
+  const fromLabel = isReverse ? formatLabel : 'JSON';
+  const toLabel = isReverse ? 'JSON' : formatLabel;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -220,7 +258,9 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
               · {totalCount} / {BATCH_MAX_FILES}
             </span>
           </SheetTitle>
-          <SheetDescription>{t('batch.description', { format: t(formatLabel) })}</SheetDescription>
+          <SheetDescription>
+            {t('batch.description', { from: fromLabel, to: toLabel })}
+          </SheetDescription>
         </SheetHeader>
 
         {/* Drop zone */}
@@ -244,7 +284,9 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
           >
             <FolderOpen className="h-5 w-5" />
             <p className="text-xs">
-              {isDragActive ? t('batch.drop_active') : t('batch.drop_idle')}
+              {isDragActive
+                ? t('batch.drop_active')
+                : t('batch.drop_idle_format', { format: fromLabel })}
             </p>
             <button
               type="button"
@@ -271,7 +313,7 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
         <div className="flex-1 overflow-y-auto px-6 pb-3">
           {totalCount === 0 ? (
             <p className="text-muted-foreground py-12 text-center text-sm italic">
-              {t('batch.empty')}
+              {t('batch.empty_format', { format: fromLabel })}
             </p>
           ) : (
             <ul className="divide-border/40 flex flex-col divide-y">

@@ -4,10 +4,10 @@ import { toast } from '@/components/ui/sonner';
 import { getConverter } from '@/converters/registry';
 import type { FormatId } from '@/converters/types';
 import { parseJsonInput } from '@/lib/detect';
-import { loadOptions, saveOptions, clearOptions } from '@/lib/options-storage';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useTauriDragDrop } from '@/hooks/useTauriDragDrop';
 import { useBatchStore } from '@/stores/batchStore';
+import { useWorkspaceStore } from '@/stores/workspaceStore';
 import { DirectionToggle, type Direction } from './DirectionToggle';
 import { FormatPicker } from './FormatPicker';
 import { InputPanel } from './InputPanel';
@@ -17,27 +17,20 @@ import { ShapeHint } from './ShapeHint';
 import { StatusBar } from './StatusBar';
 import { BatchPanel } from './BatchPanel';
 
-const STORAGE_FORMAT_KEY = 'jsonprism.selected_format';
-const STORAGE_DIRECTION_KEY = 'jsonprism.direction';
-
 export function ConverterWorkspace() {
   const { t } = useTranslation();
-  const [input, setInput] = useState('');
-  const [format, setFormat] = useState<FormatId>(() => {
-    const stored = window.localStorage.getItem(STORAGE_FORMAT_KEY);
-    return (stored as FormatId | null) ?? 'jsonl';
-  });
-  const [direction, setDirection] = useState<Direction>(() => {
-    const stored = window.localStorage.getItem(STORAGE_DIRECTION_KEY);
-    return stored === 'reverse' ? 'reverse' : 'forward';
-  });
-  const [optionsByFormat, setOptionsByFormat] = useState<Record<string, Record<string, unknown>>>(
-    () => {
-      // Lazy-load on demand; start with default options for current format.
-      const c = getConverter(format);
-      return { [format]: loadOptions(format, c.defaultOptions) };
-    },
-  );
+
+  // Convert-tab state lives in a global Zustand store so it survives route
+  // changes (Convert → About → Convert) instead of getting wiped on unmount.
+  const input = useWorkspaceStore((s) => s.input);
+  const setInput = useWorkspaceStore((s) => s.setInput);
+  const format = useWorkspaceStore((s) => s.format);
+  const setFormat = useWorkspaceStore((s) => s.setFormat);
+  const direction = useWorkspaceStore((s) => s.direction);
+  const setDirection = useWorkspaceStore((s) => s.setDirection);
+  const optionsByFormat = useWorkspaceStore((s) => s.optionsByFormat);
+  const setOptionsForFormat = useWorkspaceStore((s) => s.setOptionsForFormat);
+  const resetOptionsForFormat = useWorkspaceStore((s) => s.resetOptionsForFormat);
 
   const actionsRef = useRef<{ copy: () => void; download: () => void } | null>(null);
   const [batchOpen, setBatchOpen] = useState(false);
@@ -52,7 +45,11 @@ export function ConverterWorkspace() {
         setBatchOpen(true);
       }
       if (result.skipped > 0) {
-        toast.warning(t('batch.toast.skipped', { count: result.skipped, max: 500 }));
+        if (result.reason === 'duplicate') {
+          toast.warning(t('batch.toast.duplicate', { count: result.skipped }));
+        } else {
+          toast.warning(t('batch.toast.skipped', { count: result.skipped, max: 500 }));
+        }
       }
     },
     [addBatchFiles, t],
@@ -61,50 +58,40 @@ export function ConverterWorkspace() {
   // Native OS drag-drop bridge (no-op outside Tauri).
   useTauriDragDrop(handleMultiFileDrop);
 
-  const switchFormat = useCallback((next: FormatId) => {
-    setFormat(next);
-    window.localStorage.setItem(STORAGE_FORMAT_KEY, next);
-    setOptionsByFormat((prev) => {
-      if (prev[next]) return prev;
-      const c = getConverter(next);
-      return { ...prev, [next]: loadOptions(next, c.defaultOptions) };
-    });
-  }, []);
+  const switchFormat = useCallback(
+    (next: FormatId) => {
+      setFormat(next);
+    },
+    [setFormat],
+  );
 
   const switchDirection = useCallback(
     (next: Direction) => {
       setDirection(next);
-      window.localStorage.setItem(STORAGE_DIRECTION_KEY, next);
       // If the current format doesn't support the new direction, switch to one that does.
       if (next === 'reverse' && typeof getConverter(format).reverse !== 'function') {
         const fallback = (['jsonl', 'csv', 'yaml', 'toml', 'resx'] as FormatId[]).find(
           (id) => typeof getConverter(id).reverse === 'function',
         );
-        if (fallback) {
-          setFormat(fallback);
-          window.localStorage.setItem(STORAGE_FORMAT_KEY, fallback);
-        }
+        if (fallback) setFormat(fallback);
       }
     },
-    [format],
+    [format, setDirection, setFormat],
   );
 
   const currentOptions = optionsByFormat[format] ?? getConverter(format).defaultOptions;
 
   const setCurrentOptions = useCallback(
     (next: Record<string, unknown>) => {
-      setOptionsByFormat((prev) => ({ ...prev, [format]: next }));
-      saveOptions(format, next);
+      setOptionsForFormat(format, next);
     },
-    [format],
+    [format, setOptionsForFormat],
   );
 
   const resetCurrentOptions = useCallback(() => {
-    const c = getConverter(format);
-    clearOptions(format);
-    setOptionsByFormat((prev) => ({ ...prev, [format]: { ...c.defaultOptions } }));
+    resetOptionsForFormat(format);
     toast.success(t('toast.options_reset'));
-  }, [format, t]);
+  }, [format, resetOptionsForFormat, t]);
 
   const { output, inputError, outputError, shape, parseMs } = useMemo(() => {
     const start = performance.now();
