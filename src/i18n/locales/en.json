@@ -1,0 +1,209 @@
+{
+  "app": {
+    "name": "JSONPrism",
+    "tagline": "Disperse JSON into many formats",
+    "description": "One JSON input. Eight target formats. Fully in your browser."
+  },
+  "nav": {
+    "home": "Convert",
+    "about": "About",
+    "github": "GitHub"
+  },
+  "home": {
+    "input_label": "Input JSON",
+    "input_placeholder": "Paste your JSON here, drop files, or load a sample…",
+    "output_label": "Output",
+    "output_empty": "Output will appear here once you provide valid JSON.",
+    "drop_zone": "Drop JSON files here",
+    "drop_zone_active": "Drop to load",
+    "drop_zone_hint": "Up to 500 files. Everything runs in your browser — nothing leaves your device.",
+    "load_sample": "Sample",
+    "open_file": "Open",
+    "clear": "Clear",
+    "format_picker_label": "Target format",
+    "convert": "Convert",
+    "copy": "Copy",
+    "download": "Download",
+    "options": "Options"
+  },
+  "formats": {
+    "jsonl": "JSONL",
+    "csv": "CSV",
+    "tsv": "TSV",
+    "yaml": "YAML",
+    "xml": "XML",
+    "toml": "TOML",
+    "resx": "RESX",
+    "markdown": "Markdown table",
+    "sql": "SQL INSERT"
+  },
+  "format_status": {
+    "ready": "Ready",
+    "suggested": "Suggested for the detected shape",
+    "planned": "Coming in Phase {{phase}}"
+  },
+  "options": {
+    "jsonl": {
+      "pretty": "Pretty-print each line",
+      "pretty_desc": "Canonical JSONL is single-line. Enable for human-readable multi-line records."
+    },
+    "csv": {
+      "header": "Include header row",
+      "header_desc": "Emit the first row as column names derived from object keys.",
+      "newline": "Newline",
+      "newline_lf": "LF (\\n)",
+      "newline_crlf": "CRLF (\\r\\n)",
+      "nested_strategy": "Nested values",
+      "nested_strategy_desc": "How to handle nested objects/arrays inside cells.",
+      "nested_json": "JSON-stringify",
+      "nested_flatten": "Flatten keys (alpha)"
+    },
+    "yaml": {
+      "indent": "Indent (spaces)",
+      "quote_style": "Quote style",
+      "quote_auto": "Auto",
+      "quote_single": "Single",
+      "quote_double": "Double"
+    },
+    "xml": {
+      "indent": "Indent (spaces)",
+      "root_name": "Root element name",
+      "item_name": "Array item element name",
+      "item_name_desc": "Used for items when the root is an array. Object keys name their own array items.",
+      "declaration": "Include XML declaration",
+      "declaration_desc": "Prepend <?xml version=\"1.0\" encoding=\"UTF-8\"?>."
+    },
+    "toml": {
+      "sort_keys": "Sort keys alphabetically",
+      "sort_keys_desc": "Recursive — applies at every nesting level. Useful for stable diffs."
+    },
+    "markdown": {
+      "alignment": "Column alignment",
+      "align_left": "Left",
+      "align_center": "Center",
+      "align_right": "Right",
+      "align_none": "None",
+      "escape_pipes": "Escape pipes in cells",
+      "escape_pipes_desc": "Replace | with \\| inside cell values so they don't break the table."
+    },
+    "sql": {
+      "table_name": "Table name",
+      "dialect": "Dialect",
+      "dialect_standard": "Standard",
+      "dialect_postgres": "PostgreSQL",
+      "dialect_mysql": "MySQL",
+      "dialect_sqlite": "SQLite",
+      "dialect_mssql": "MS SQL Server",
+      "multi_row": "Multi-row INSERT",
+      "multi_row_desc": "Combine rows into a single INSERT statement per chunk.",
+      "chunk_size": "Chunk size",
+      "chunk_size_desc": "Maximum rows per INSERT when multi-row is on.",
+      "include_create": "Include CREATE TABLE",
+      "include_create_desc": "Infer column types from the first row and emit a CREATE TABLE statement."
+    },
+    "resx": {
+      "comment_key": "Comment key",
+      "comment_key_desc": "When an entry is shaped as { value, _comment }, this key supplies the <comment> element.",
+      "include_schema": "Include xsd:schema header",
+      "include_schema_desc": "Visual Studio expects this. Disable only if you're generating diffs.",
+      "sort_keys": "Sort entries alphabetically",
+      "sort_keys_desc": "Useful for stable diffs across locale files."
+    }
+  },
+  "shape": {
+    "detected": "Detected shape",
+    "scalar": "scalar",
+    "object": "object",
+    "array": "array",
+    "flat-object": "flat object",
+    "array-of-objects": "array of objects",
+    "unknown": "unknown"
+  },
+  "status": {
+    "in": "in",
+    "out": "out",
+    "time": "parse"
+  },
+  "shortcut": {
+    "clear": "Clear",
+    "download": "Download",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": "Options",
+    "description": "Adjust how this format is generated. Settings persist per format.",
+    "no_options": "No options for this format yet.",
+    "no_options_long": "This converter doesn't expose any options yet. Once Phase 2 lands, you'll find dialect, indent, and other knobs here.",
+    "reset": "Reset to defaults"
+  },
+  "toast": {
+    "copied": "Copied {{format}} to clipboard",
+    "copy_failed": "Couldn't copy to clipboard",
+    "downloaded": "Downloaded {{filename}}",
+    "file_loaded": "Loaded {{name}}",
+    "file_failed": "Failed to load file: {{message}}",
+    "options_reset": "Options reset to defaults"
+  },
+  "batch": {
+    "trigger": "Batch",
+    "title": "Batch queue",
+    "description": "Process multiple JSON files into {{format}} at once. All processing happens in your browser.",
+    "drop_idle": "Drop JSON files here",
+    "drop_active": "Release to add files",
+    "browse": "or click to browse…",
+    "empty": "No files queued yet. Drop JSON files above to begin.",
+    "stat": {
+      "queued": "queued",
+      "done": "done",
+      "failed": "failed"
+    },
+    "process": "Process",
+    "cancel": "Cancel",
+    "clear": "Clear",
+    "download_zip": "Download .zip",
+    "row": {
+      "out": "out",
+      "remove": "Remove from queue"
+    },
+    "toast": {
+      "added": "Added {{count}} file to the queue",
+      "added_other": "Added {{count}} files to the queue",
+      "skipped": "Skipped {{count}} file (limit: {{max}})",
+      "skipped_other": "Skipped {{count}} files (limit: {{max}})",
+      "started": "Processing {{count}} file…",
+      "started_other": "Processing {{count}} files…",
+      "finished": "Batch complete",
+      "cancelled": "Batch cancelled",
+      "failed": "Batch failed: {{message}}",
+      "zipped": "Packed {{count}} file into a .zip",
+      "zipped_other": "Packed {{count}} files into a .zip",
+      "zip_failed": "Could not build .zip: {{message}}",
+      "nothing_to_process": "Nothing queued to process."
+    }
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "errors": {
+    "invalid_json": "Invalid JSON: {{message}}",
+    "empty_input": "Input is empty.",
+    "converter_not_ready": "This converter is not implemented yet.",
+    "converter_not_ready_phase": "This converter lands in Phase {{phase}}. See the roadmap for status.",
+    "batch_limit": "Batch limit reached ({{max}} files). Remove some files first.",
+    "unknown": "Something went wrong. {{message}}"
+  },
+  "about": {
+    "title": "About JSONPrism",
+    "lead": "A refracting tool for developers.",
+    "p1": "JSONPrism takes a single JSON input and disperses it into many target formats — like white light through a prism. Everything runs client-side, so your data never leaves your device.",
+    "p2": "Built with React 19, Vite 6, Tailwind CSS v4, and shadcn/ui. Source on GitHub.",
+    "version": "Version {{version}}"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Error",
+    "retry": "Retry"
+  }
+}

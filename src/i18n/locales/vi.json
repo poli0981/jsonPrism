@@ -1,0 +1,209 @@
+{
+  "app": {
+    "name": "JSONPrism",
+    "tagline": "Tán sắc JSON ra nhiều định dạng",
+    "description": "Một JSON đầu vào. Tám định dạng đích. Chạy hoàn toàn trong trình duyệt."
+  },
+  "nav": {
+    "home": "Chuyển đổi",
+    "about": "Giới thiệu",
+    "github": "GitHub"
+  },
+  "home": {
+    "input_label": "JSON đầu vào",
+    "input_placeholder": "Dán JSON vào đây, thả file, hoặc nạp mẫu…",
+    "output_label": "Kết quả",
+    "output_empty": "Kết quả sẽ hiện ở đây khi bạn cung cấp JSON hợp lệ.",
+    "drop_zone": "Thả file JSON vào đây",
+    "drop_zone_active": "Thả ra để nạp",
+    "drop_zone_hint": "Tối đa 500 file. Mọi thứ chạy trong trình duyệt — không có dữ liệu nào rời khỏi máy của bạn.",
+    "load_sample": "Mẫu",
+    "open_file": "Mở",
+    "clear": "Xoá",
+    "format_picker_label": "Định dạng đích",
+    "convert": "Chuyển đổi",
+    "copy": "Sao chép",
+    "download": "Tải về",
+    "options": "Tuỳ chọn"
+  },
+  "formats": {
+    "jsonl": "JSONL",
+    "csv": "CSV",
+    "tsv": "TSV",
+    "yaml": "YAML",
+    "xml": "XML",
+    "toml": "TOML",
+    "resx": "RESX",
+    "markdown": "Bảng Markdown",
+    "sql": "SQL INSERT"
+  },
+  "format_status": {
+    "ready": "Sẵn sàng",
+    "suggested": "Gợi ý cho shape phát hiện được",
+    "planned": "Sẽ có ở Phase {{phase}}"
+  },
+  "options": {
+    "jsonl": {
+      "pretty": "Pretty-print mỗi dòng",
+      "pretty_desc": "JSONL chuẩn là một dòng một record. Bật cái này nếu muốn dạng dễ đọc nhiều dòng."
+    },
+    "csv": {
+      "header": "Bao gồm dòng header",
+      "header_desc": "Phát ra dòng đầu tiên là tên cột lấy từ key của object.",
+      "newline": "Newline",
+      "newline_lf": "LF (\\n)",
+      "newline_crlf": "CRLF (\\r\\n)",
+      "nested_strategy": "Giá trị lồng nhau",
+      "nested_strategy_desc": "Cách xử lý object/array lồng nhau trong ô.",
+      "nested_json": "JSON-stringify",
+      "nested_flatten": "Flatten key (alpha)"
+    },
+    "yaml": {
+      "indent": "Indent (số space)",
+      "quote_style": "Kiểu nháy",
+      "quote_auto": "Tự động",
+      "quote_single": "Nháy đơn",
+      "quote_double": "Nháy kép"
+    },
+    "xml": {
+      "indent": "Indent (số space)",
+      "root_name": "Tên element gốc",
+      "item_name": "Tên element cho item của mảng",
+      "item_name_desc": "Dùng cho item khi root là mảng. Object key đặt tên cho array item của chính nó.",
+      "declaration": "Bao gồm khai báo XML",
+      "declaration_desc": "Thêm <?xml version=\"1.0\" encoding=\"UTF-8\"?> ở đầu."
+    },
+    "toml": {
+      "sort_keys": "Sắp xếp key theo bảng chữ cái",
+      "sort_keys_desc": "Đệ quy — áp dụng ở mọi cấp lồng nhau. Hữu ích cho diff ổn định."
+    },
+    "markdown": {
+      "alignment": "Căn cột",
+      "align_left": "Trái",
+      "align_center": "Giữa",
+      "align_right": "Phải",
+      "align_none": "Không",
+      "escape_pipes": "Escape ký tự pipe trong ô",
+      "escape_pipes_desc": "Thay | bằng \\| trong giá trị ô để không phá bảng."
+    },
+    "sql": {
+      "table_name": "Tên bảng",
+      "dialect": "Dialect",
+      "dialect_standard": "Chuẩn",
+      "dialect_postgres": "PostgreSQL",
+      "dialect_mysql": "MySQL",
+      "dialect_sqlite": "SQLite",
+      "dialect_mssql": "MS SQL Server",
+      "multi_row": "INSERT đa dòng",
+      "multi_row_desc": "Gộp nhiều dòng vào một câu lệnh INSERT theo chunk.",
+      "chunk_size": "Kích thước chunk",
+      "chunk_size_desc": "Số dòng tối đa cho mỗi INSERT khi bật đa dòng.",
+      "include_create": "Bao gồm CREATE TABLE",
+      "include_create_desc": "Suy luận kiểu cột từ dòng đầu và phát sinh câu lệnh CREATE TABLE."
+    },
+    "resx": {
+      "comment_key": "Key của comment",
+      "comment_key_desc": "Khi entry có shape { value, _comment }, key này sẽ cung cấp element <comment>.",
+      "include_schema": "Bao gồm header xsd:schema",
+      "include_schema_desc": "Visual Studio yêu cầu. Chỉ tắt khi đang generate diff.",
+      "sort_keys": "Sắp xếp entry theo bảng chữ cái",
+      "sort_keys_desc": "Hữu ích để diff ổn định giữa các file locale."
+    }
+  },
+  "shape": {
+    "detected": "Shape phát hiện",
+    "scalar": "scalar",
+    "object": "object",
+    "array": "mảng",
+    "flat-object": "object phẳng",
+    "array-of-objects": "mảng object",
+    "unknown": "không rõ"
+  },
+  "status": {
+    "in": "vào",
+    "out": "ra",
+    "time": "parse"
+  },
+  "shortcut": {
+    "clear": "Xoá",
+    "download": "Tải về",
+    "settings": "Tuỳ chọn"
+  },
+  "settings": {
+    "title": "Tuỳ chọn",
+    "description": "Tinh chỉnh cách format này được tạo. Lưu riêng cho từng format.",
+    "no_options": "Format này chưa có tuỳ chọn.",
+    "no_options_long": "Converter này chưa expose tuỳ chọn nào. Khi Phase 2 ra mắt, bạn sẽ thấy dialect, indent và các knob khác ở đây.",
+    "reset": "Khôi phục mặc định"
+  },
+  "toast": {
+    "copied": "Đã chép {{format}} vào clipboard",
+    "copy_failed": "Không thể chép vào clipboard",
+    "downloaded": "Đã tải {{filename}}",
+    "file_loaded": "Đã nạp {{name}}",
+    "file_failed": "Không nạp được file: {{message}}",
+    "options_reset": "Đã khôi phục tuỳ chọn mặc định"
+  },
+  "batch": {
+    "trigger": "Batch",
+    "title": "Hàng đợi batch",
+    "description": "Xử lý nhiều file JSON sang {{format}} cùng lúc. Mọi thứ chạy trong trình duyệt.",
+    "drop_idle": "Thả file JSON vào đây",
+    "drop_active": "Thả ra để thêm file",
+    "browse": "hoặc click để duyệt…",
+    "empty": "Chưa có file nào trong hàng đợi. Thả file JSON ở trên để bắt đầu.",
+    "stat": {
+      "queued": "chờ",
+      "done": "xong",
+      "failed": "lỗi"
+    },
+    "process": "Xử lý",
+    "cancel": "Huỷ",
+    "clear": "Xoá",
+    "download_zip": "Tải .zip",
+    "row": {
+      "out": "ra",
+      "remove": "Bỏ khỏi hàng đợi"
+    },
+    "toast": {
+      "added": "Đã thêm {{count}} file vào hàng đợi",
+      "added_other": "Đã thêm {{count}} file vào hàng đợi",
+      "skipped": "Bỏ qua {{count}} file (giới hạn: {{max}})",
+      "skipped_other": "Bỏ qua {{count}} file (giới hạn: {{max}})",
+      "started": "Đang xử lý {{count}} file…",
+      "started_other": "Đang xử lý {{count}} file…",
+      "finished": "Batch hoàn thành",
+      "cancelled": "Đã huỷ batch",
+      "failed": "Batch thất bại: {{message}}",
+      "zipped": "Đã đóng {{count}} file vào .zip",
+      "zipped_other": "Đã đóng {{count}} file vào .zip",
+      "zip_failed": "Không tạo được .zip: {{message}}",
+      "nothing_to_process": "Không có gì trong hàng đợi để xử lý."
+    }
+  },
+  "theme": {
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Theo hệ thống"
+  },
+  "errors": {
+    "invalid_json": "JSON không hợp lệ: {{message}}",
+    "empty_input": "Đầu vào trống.",
+    "converter_not_ready": "Converter này chưa được cài đặt.",
+    "converter_not_ready_phase": "Converter này sẽ có ở Phase {{phase}}. Xem roadmap để biết trạng thái.",
+    "batch_limit": "Đã đạt giới hạn batch ({{max}} file). Hãy bỏ bớt file.",
+    "unknown": "Đã có lỗi xảy ra. {{message}}"
+  },
+  "about": {
+    "title": "Về JSONPrism",
+    "lead": "Một công cụ tán sắc cho developer.",
+    "p1": "JSONPrism nhận một JSON đầu vào và tán sắc nó ra nhiều định dạng đích — như ánh sáng trắng đi qua lăng kính. Mọi thứ chạy client-side, nên dữ liệu của bạn không bao giờ rời khỏi máy.",
+    "p2": "Xây dựng với React 19, Vite 6, Tailwind CSS v4 và shadcn/ui. Mã nguồn trên GitHub.",
+    "version": "Phiên bản {{version}}"
+  },
+  "common": {
+    "loading": "Đang tải…",
+    "error": "Lỗi",
+    "retry": "Thử lại"
+  }
+}

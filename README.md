@@ -1,0 +1,191 @@
+<div align="center">
+
+# JSONPrism
+
+**Disperse JSON into many formats.**
+
+One JSON input. Eight target formats. Fully in your browser.
+
+[![CI](https://github.com/poli0981/jsonprism/actions/workflows/ci.yml/badge.svg)](https://github.com/poli0981/jsonprism/actions/workflows/ci.yml)
+[![Deploy](https://github.com/poli0981/jsonprism/actions/workflows/deploy.yml/badge.svg)](https://github.com/poli0981/jsonprism/actions/workflows/deploy.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
+[Live demo](https://poli0981.github.io/jsonprism/) · [Tiếng Việt](README.vi.md) · [Roadmap](docs/ROADMAP.md)
+
+</div>
+
+---
+
+JSONPrism is a refracting tool for developers. It takes a single JSON input and disperses it into many target formats — like white light through a prism. **Everything runs client-side**, so your data never leaves your device.
+
+## Target formats
+
+| Format            | Extension | Status        |
+| ----------------- | --------- | ------------- |
+| JSONL             | `.jsonl`  | ✅ Phase 1     |
+| CSV               | `.csv`    | ✅ Phase 1     |
+| TSV               | `.tsv`    | ✅ Phase 1     |
+| YAML              | `.yaml`   | ✅ Phase 1     |
+| XML               | `.xml`    | ✅ Phase 2     |
+| TOML              | `.toml`   | ✅ Phase 2     |
+| Markdown table    | `.md`     | ✅ Phase 2     |
+| SQL `INSERT`      | `.sql`    | ✅ Phase 2     |
+| RESX (.NET)       | `.resx`   | ✅ Phase 3     |
+
+## Features
+
+- **Client-side only** — no server, no telemetry, no upload. Your JSON stays in your browser.
+- **Batch processing** — up to 500 files at once (Phase 2).
+- **Smart shape detection** — recognizes flat objects, arrays of objects, scalars; suggests the best target format.
+- **Per-format options** — pretty-print, indentation, dialect (for SQL), alignment (for Markdown), and more.
+- **Dark + light themes** — Prism Spectrum palette with violet / cyan / amber / rose accents.
+- **EN + VI** — bilingual interface out of the box. More languages welcome.
+- **Tauri desktop build** — drag-and-drop file workflow, offline-first (Phase 2 milestone).
+
+## Tech stack
+
+- **Vite 6** + **React 19** + **TypeScript 5.7**
+- **Tailwind CSS v4** + **shadcn/ui** (New York style, neutral base)
+- **CodeMirror 6** for the input editor (Phase 1 polish)
+- **PapaParse**, **js-yaml**, **smol-toml**, **fast-xml-parser** for parsing/serialization
+- **i18next** for translations, **Zustand** for state, **Sonner** for toasts
+- **Tauri 2** wrapper (Phase 2)
+
+## Quick start
+
+**Requirements**: Node.js **22 LTS** or newer.
+
+```bash
+git clone https://github.com/poli0981/jsonprism.git
+cd jsonprism
+npm install
+npm run dev          # http://localhost:5173
+```
+
+## Desktop app (Tauri 2)
+
+JSONPrism also ships as a native desktop app via Tauri 2. The app uses the same React UI, with native OS dialogs and drag-drop hooked into the existing batch flow.
+
+**Additional requirements**:
+
+- **Rust toolchain** (`rustup`) with the stable channel
+- **Platform build deps**:
+  - **Windows**: Visual Studio Build Tools (C++ workload) + WebView2 (preinstalled on Windows 11)
+  - **macOS**: Xcode Command Line Tools (`xcode-select --install`)
+  - **Linux**: `libwebkit2gtk-4.1-dev`, `libappindicator3-dev`, `librsvg2-dev`, `patchelf`, `libssl-dev`
+
+**Generate icons once** (uses Tauri's CLI to render the SVG to PNG/ICO/ICNS):
+
+```bash
+npm run tauri:icon
+```
+
+**Run in dev mode** (Vite + Tauri window with hot reload):
+
+```bash
+npm run tauri:dev
+```
+
+**Build native bundles**:
+
+```bash
+npm run tauri:build
+```
+
+Output:
+
+- Windows → `src-tauri/target/release/bundle/msi/*.msi` + `nsis/*-setup.exe`
+- macOS → `src-tauri/target/release/bundle/dmg/*.dmg` + `macos/*.app`
+- Linux → `src-tauri/target/release/bundle/appimage/*.AppImage` + `deb/*.deb`
+
+**Automated releases**: pushing a `v*` tag triggers `.github/workflows/release.yml`, which builds for all platforms in parallel and creates a draft GitHub release.
+
+### Scripts
+
+| Script                | What it does                                  |
+| --------------------- | --------------------------------------------- |
+| `npm run dev`         | Start Vite dev server with HMR               |
+| `npm run build`       | Production build to `dist/`                  |
+| `npm run preview`     | Preview the built site locally               |
+| `npm run lint`        | Run ESLint                                   |
+| `npm run lint:fix`    | Run ESLint with autofix                      |
+| `npm run typecheck`   | TypeScript type-check, no emit               |
+| `npm run format`      | Format with Prettier                         |
+| `npm run format:check`| Check formatting (CI uses this)              |
+
+### shadcn/ui components
+
+The `components.json` is preconfigured. Add components on demand:
+
+```bash
+npx shadcn@latest add button input textarea tabs select card dialog sheet \
+  dropdown-menu switch badge progress tooltip sonner resizable
+```
+
+## Architecture
+
+```
+src/
+├── app/                 # Router + global providers
+├── components/
+│   ├── ui/              # shadcn components (added on demand)
+│   ├── layout/          # Header, Footer, ThemeToggle
+│   ├── converter/       # Workspace, panels, format picker
+│   └── common/          # ErrorBoundary, LanguageSwitcher
+├── converters/          # One module per target format
+│   ├── types.ts         # Converter interface
+│   ├── registry.ts      # Lookup table
+│   └── *.ts             # Per-format implementations
+├── hooks/               # Custom hooks
+├── i18n/                # Translations (en, vi)
+├── lib/                 # detect, theme, utils, sample
+├── pages/               # Home, About
+├── styles/              # globals.css (Tailwind + theme tokens)
+└── main.tsx
+```
+
+### Adding a new format
+
+Each format is a self-contained module implementing the `Converter` interface:
+
+```ts
+import type { Converter } from './types';
+
+interface MyFormatOptions {
+  indent: 2 | 4;
+}
+
+export const myFormatConverter: Converter<MyFormatOptions> = {
+  meta: {
+    id: 'myformat',
+    labelKey: 'formats.myformat',
+    extension: 'myf',
+    mimeType: 'application/x-myformat',
+    phase: 1,
+    ready: true,
+  },
+  defaultOptions: { indent: 2 },
+  convert({ data }, options) {
+    try {
+      const output = serialize(data, options);
+      return { ok: true, output };
+    } catch (err) {
+      return { ok: false, error: (err as Error).message };
+    }
+  },
+};
+```
+
+Then register it in `src/converters/registry.ts` and add label keys to `src/i18n/locales/*.json`.
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the full phase plan.
+
+## Contributing
+
+Pull requests welcome — please read [`CONTRIBUTING.md`](CONTRIBUTING.md) first.
+
+For bug reports and feature requests, use [GitHub Issues](https://github.com/poli0981/jsonprism/issues).
+
+## License
+
+[Apache License 2.0](LICENSE) — © 2026 Kokone.

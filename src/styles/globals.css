@@ -1,0 +1,184 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  JSONPrism — "Prism Spectrum" theme
+  Editorial-meets-technical: deep midnight backdrop, off-white foreground,
+  three signature accents (violet / cyan / amber) inspired by light dispersion.
+*/
+
+@theme inline {
+  /* Fonts */
+  --font-display: 'Instrument Serif', ui-serif, Georgia, serif;
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Core shadcn tokens — map to CSS vars below */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Prism signature spectrum */
+  --color-prism-violet: oklch(0.74 0.18 290);
+  --color-prism-cyan: oklch(0.82 0.13 200);
+  --color-prism-amber: oklch(0.82 0.16 80);
+  --color-prism-rose: oklch(0.74 0.18 5);
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+/* ---- Light theme ---- */
+:root {
+  --background: oklch(0.99 0.005 270);
+  --foreground: oklch(0.18 0.02 270);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.02 270);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.02 270);
+
+  --primary: oklch(0.55 0.18 290);     /* violet */
+  --primary-foreground: oklch(0.99 0 0);
+
+  --secondary: oklch(0.95 0.01 270);
+  --secondary-foreground: oklch(0.22 0.02 270);
+
+  --muted: oklch(0.96 0.005 270);
+  --muted-foreground: oklch(0.48 0.02 270);
+
+  --accent: oklch(0.94 0.03 200);      /* cyan tint */
+  --accent-foreground: oklch(0.22 0.02 270);
+
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.99 0 0);
+
+  --border: oklch(0.9 0.01 270);
+  --input: oklch(0.9 0.01 270);
+  --ring: oklch(0.55 0.18 290);
+}
+
+/* ---- Dark theme (default) ---- */
+.dark {
+  --background: oklch(0.13 0.015 270);
+  --foreground: oklch(0.96 0.005 270);
+
+  --card: oklch(0.16 0.018 270);
+  --card-foreground: oklch(0.96 0.005 270);
+
+  --popover: oklch(0.16 0.018 270);
+  --popover-foreground: oklch(0.96 0.005 270);
+
+  --primary: oklch(0.78 0.16 290);     /* brighter violet on dark */
+  --primary-foreground: oklch(0.13 0.015 270);
+
+  --secondary: oklch(0.22 0.02 270);
+  --secondary-foreground: oklch(0.96 0.005 270);
+
+  --muted: oklch(0.2 0.018 270);
+  --muted-foreground: oklch(0.7 0.015 270);
+
+  --accent: oklch(0.24 0.05 210);
+  --accent-foreground: oklch(0.96 0.005 270);
+
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.96 0.005 270);
+
+  --border: oklch(0.26 0.02 270);
+  --input: oklch(0.22 0.02 270);
+  --ring: oklch(0.78 0.16 290);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body,
+  #root {
+    @apply h-full;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: 'cv11', 'ss01', 'ss02';
+  }
+
+  ::selection {
+    background: var(--color-prism-violet);
+    color: var(--background);
+  }
+
+  /* Atmospheric backdrop — barely-there mesh gradient + grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 0%, color-mix(in oklch, var(--color-prism-violet) 8%, transparent), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 100% 100%, color-mix(in oklch, var(--color-prism-cyan) 6%, transparent), transparent 60%);
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display tracking-tight;
+    font-feature-settings: 'liga', 'dlig';
+  }
+
+  code,
+  pre,
+  kbd {
+    @apply font-mono;
+  }
+}
+
+@layer utilities {
+  .text-spectrum {
+    background: linear-gradient(
+      90deg,
+      var(--color-prism-violet) 0%,
+      var(--color-prism-cyan) 40%,
+      var(--color-prism-amber) 70%,
+      var(--color-prism-rose) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .border-spectrum {
+    border-image: linear-gradient(
+        90deg,
+        var(--color-prism-violet),
+        var(--color-prism-cyan),
+        var(--color-prism-amber),
+        var(--color-prism-rose)
+      )
+      1;
+  }
+}

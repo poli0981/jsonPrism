@@ -1,0 +1,38 @@
+[package]
+name = "jsonprism"
+version = "1.0.0"
+description = "Disperse JSON into many formats."
+authors = ["Kokone <https://github.com/poli0981>"]
+license = "Apache-2.0"
+repository = "https://github.com/poli0981/jsonprism"
+edition = "2021"
+rust-version = "1.77"
+
+# Disable the default `main.rs` binary lookup; we want a library + bin.
+[lib]
+name = "jsonprism_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-os = "2"
+tauri-plugin-shell = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[features]
+# this feature is used for production builds or when `devUrl` points to the
+# filesystem and the built-in dev server is disabled.
+custom-protocol = ["tauri/custom-protocol"]
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true
