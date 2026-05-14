@@ -46,6 +46,11 @@ installed as a runtime dependency.
 | `@codemirror/view` | ^6.34.0 | MIT | [codemirror.net](https://codemirror.net/) |
 | `@codemirror/language` | ^6.10.0 | MIT | [codemirror.net](https://codemirror.net/) |
 | `@codemirror/lang-json` | ^6.0.0 | MIT | [codemirror.net](https://codemirror.net/) |
+| `@codemirror/lang-yaml` | ^6.1.3 | MIT | [codemirror.net](https://codemirror.net/) |
+| `@codemirror/lang-xml` | ^6.1.0 | MIT | [codemirror.net](https://codemirror.net/) |
+| `@codemirror/lang-markdown` | ^6.5.0 | MIT | [codemirror.net](https://codemirror.net/) |
+| `@codemirror/lang-sql` | ^6.10.0 | MIT | [codemirror.net](https://codemirror.net/) |
+| `@codemirror/legacy-modes` | ^6.5.2 | MIT | [codemirror.net](https://codemirror.net/) |
 | `@codemirror/lint` | ^6.8.0 | MIT | [codemirror.net](https://codemirror.net/) |
 | `@lezer/highlight` | ^1.2.0 | MIT | [lezer.codemirror.net](https://lezer.codemirror.net/) |
 
