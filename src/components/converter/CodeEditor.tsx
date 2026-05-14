@@ -3,13 +3,16 @@ import CodeMirror, { type ReactCodeMirrorRef, EditorView } from '@uiw/react-code
 import { json, jsonParseLinter } from '@codemirror/lang-json';
 import { yaml } from '@codemirror/lang-yaml';
 import { xml } from '@codemirror/lang-xml';
-import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { markdown } from '@codemirror/lang-markdown';
+import { sql } from '@codemirror/lang-sql';
+import { HighlightStyle, StreamLanguage, syntaxHighlighting } from '@codemirror/language';
+import { toml } from '@codemirror/legacy-modes/mode/toml';
 import { lintGutter, linter } from '@codemirror/lint';
 import { tags as t } from '@lezer/highlight';
 import { useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 
-export type EditorLanguage = 'json' | 'plain' | 'yaml' | 'xml';
+export type EditorLanguage = 'json' | 'plain' | 'yaml' | 'xml' | 'markdown' | 'sql' | 'toml';
 
 interface CodeEditorProps {
   value: string;
@@ -57,6 +60,12 @@ export function CodeEditor({
       exts.push(yaml());
     } else if (language === 'xml') {
       exts.push(xml());
+    } else if (language === 'markdown') {
+      exts.push(markdown());
+    } else if (language === 'sql') {
+      exts.push(sql());
+    } else if (language === 'toml') {
+      exts.push(StreamLanguage.define(toml));
     }
     exts.push(syntaxHighlighting(prismHighlightStyle));
     exts.push(EditorView.lineWrapping);
@@ -76,11 +85,18 @@ export function CodeEditor({
         '.cm-scroller': {
           fontFamily: 'var(--font-mono)',
           lineHeight: '1.6',
-          // Hide native scrollbar while keeping wheel/keyboard scroll.
-          scrollbarWidth: 'none',
+          overflow: 'auto',
+          // Show a thin native scrollbar — `scrollbarWidth: 'none'` made wheel
+          // scroll require a click-to-focus first on some browsers.
+          scrollbarWidth: 'thin',
         },
         '.cm-scroller::-webkit-scrollbar': {
-          display: 'none',
+          width: '8px',
+          height: '8px',
+        },
+        '.cm-scroller::-webkit-scrollbar-thumb': {
+          backgroundColor: 'color-mix(in oklch, var(--muted-foreground) 30%, transparent)',
+          borderRadius: '4px',
         },
         '.cm-content': {
           padding: '16px 0',

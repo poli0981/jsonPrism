@@ -65,6 +65,10 @@ export function InputPanel({
     if (!isReverse) return 'json';
     if (format === 'yaml') return 'yaml';
     if (format === 'xml' || format === 'resx') return 'xml';
+    if (format === 'jsonl') return 'json';
+    if (format === 'markdown') return 'markdown';
+    if (format === 'sql') return 'sql';
+    if (format === 'toml') return 'toml';
     return 'plain';
   }, [isReverse, format]);
 
