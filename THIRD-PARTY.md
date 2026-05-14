@@ -29,6 +29,7 @@ the relevant notices. This file is a starting point.
 | `@radix-ui/react-dialog` | ^1.1.0 | MIT | [radix-ui.com](https://www.radix-ui.com/) |
 | `@radix-ui/react-slot` | ^1.1.0 | MIT | [radix-ui.com](https://www.radix-ui.com/) |
 | `@radix-ui/react-switch` | ^1.1.0 | MIT | [radix-ui.com](https://www.radix-ui.com/) |
+| `@radix-ui/react-tabs` | ^1.1.0 | MIT | [radix-ui.com](https://www.radix-ui.com/) |
 | `lucide-react` | ^0.460.0 | ISC | [lucide.dev](https://lucide.dev/) |
 | `sonner` | ^1.7.0 | MIT | [sonner.emilkowal.ski](https://sonner.emilkowal.ski/) |
 | `react-dropzone` | ^14.3.0 | MIT | [react-dropzone.js.org](https://react-dropzone.js.org/) |

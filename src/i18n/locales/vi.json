@@ -14,6 +14,8 @@
     "input_label_format": "Đầu vào {{format}}",
     "input_placeholder": "Dán JSON vào đây, thả file, hoặc nạp mẫu…",
     "input_placeholder_format": "Dán {{ext}} vào đây, thả file, hoặc nạp mẫu…",
+    "tab_input": "Đầu vào",
+    "tab_output": "Kết quả",
     "output_label": "Kết quả",
     "output_empty": "Kết quả sẽ hiện ở đây khi bạn cung cấp JSON hợp lệ.",
     "output_empty_format": "Kết quả sẽ hiện ở đây khi bạn cung cấp {{ext}} hợp lệ.",

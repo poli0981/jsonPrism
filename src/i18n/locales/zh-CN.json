@@ -14,6 +14,8 @@
     "input_label_format": "{{format}} 输入",
     "input_placeholder": "在此处粘贴 JSON、拖入文件或加载示例…",
     "input_placeholder_format": "在此处粘贴 {{ext}}、拖入文件或加载示例…",
+    "tab_input": "输入",
+    "tab_output": "输出",
     "output_label": "输出",
     "output_empty": "提供有效的 JSON 后,输出将显示在此处。",
     "output_empty_format": "提供有效的 {{ext}} 后,输出将显示在此处。",

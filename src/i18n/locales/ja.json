@@ -14,6 +14,8 @@
     "input_label_format": "{{format}} 入力",
     "input_placeholder": "ここに JSON を貼り付け、ファイルをドロップ、またはサンプルを読み込み…",
     "input_placeholder_format": "ここに {{ext}} を貼り付け、ファイルをドロップ、またはサンプルを読み込み…",
+    "tab_input": "入力",
+    "tab_output": "出力",
     "output_label": "出力",
     "output_empty": "有効な JSON を入力すると、ここに出力が表示されます。",
     "output_empty_format": "有効な {{ext}} を入力すると、ここに出力が表示されます。",
