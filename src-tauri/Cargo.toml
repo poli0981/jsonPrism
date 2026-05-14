@@ -1,6 +1,6 @@
 [package]
 name = "jsonprism"
-version = "1.4.1"
+version = "1.4.2"
 description = "Disperse JSON into many formats."
 authors = ["poli0981 <https://github.com/poli0981>"]
 license = "Apache-2.0"

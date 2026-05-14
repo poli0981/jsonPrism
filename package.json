@@ -1,7 +1,7 @@
 {
   "name": "jsonprism",
   "private": true,
-  "version": "1.4.1",
+  "version": "1.4.2",
   "type": "module",
   "description": "Disperse JSON into many formats — JSONL, CSV, YAML, XML, TOML, RESX, Markdown, SQL — fully client-side.",
   "author": "poli0981 <https://github.com/poli0981>",
