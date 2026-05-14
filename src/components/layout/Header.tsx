@@ -10,15 +10,15 @@ export function Header() {
 
   return (
     <header className="border-border/60 bg-background/80 sticky top-0 z-40 border-b backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-screen-2xl items-center gap-6 px-6">
-        <Link to="/" className="group flex items-center gap-2.5">
-          <BrandMark className="h-7 w-7" />
-          <span className="font-display text-xl leading-none tracking-tight">
+      <div className="mx-auto flex h-14 max-w-screen-2xl items-center gap-2 px-3 sm:gap-6 sm:px-6">
+        <Link to="/" className="group flex items-center gap-2 sm:gap-2.5">
+          <BrandMark className="h-6 w-6 sm:h-7 sm:w-7" />
+          <span className="font-display text-base leading-none tracking-tight sm:text-xl">
             JSON<span className="text-spectrum italic">Prism</span>
           </span>
         </Link>
 
-        <nav className="ml-6 hidden gap-1 md:flex">
+        <nav className="flex gap-0.5 md:ml-6 md:gap-1">
           <NavItem to="/" end>
             {t('nav.home')}
           </NavItem>
@@ -56,7 +56,7 @@ function NavItem({ to, end, children }: NavItemProps) {
       {...(end !== undefined ? { end } : {})}
       className={({ isActive }) =>
         cn(
-          'inline-flex h-9 items-center rounded-md px-3 text-sm font-medium transition',
+          'inline-flex h-9 items-center rounded-md px-2 text-sm font-medium transition sm:px-3',
           isActive
             ? 'text-foreground bg-muted/60'
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/40',

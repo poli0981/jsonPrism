@@ -65,6 +65,10 @@ export function InputPanel({
     if (!isReverse) return 'json';
     if (format === 'yaml') return 'yaml';
     if (format === 'xml' || format === 'resx') return 'xml';
+    if (format === 'jsonl') return 'json';
+    if (format === 'markdown') return 'markdown';
+    if (format === 'sql') return 'sql';
+    if (format === 'toml') return 'toml';
     return 'plain';
   }, [isReverse, format]);
 
@@ -218,7 +222,13 @@ export function InputPanel({
           value={value}
           onChange={onChange}
           language={editorLanguage}
-          placeholder={t('home.input_placeholder')}
+          placeholder={
+            isReverse
+              ? t('home.input_placeholder_format', {
+                  ext: converter.meta.extension.toUpperCase(),
+                })
+              : t('home.input_placeholder')
+          }
         />
         {showOverlay && (
           <div className="bg-background/80 pointer-events-none absolute inset-0 z-10 flex items-center justify-center backdrop-blur-sm">
@@ -257,10 +267,12 @@ function ToolbarButton({ onClick, label, icon, disabled }: ToolbarButtonProps) {
       type="button"
       onClick={onClick}
       disabled={disabled}
+      aria-label={label}
+      title={label}
       className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs transition disabled:cursor-not-allowed disabled:opacity-40"
     >
       {icon}
-      <span>{label}</span>
+      <span className="hidden sm:inline">{label}</span>
     </button>
   );
 }

@@ -2,7 +2,7 @@
   "app": {
     "name": "JSONPrism",
     "tagline": "Disperse JSON into many formats",
-    "description": "One JSON input. Eight target formats. Fully in your browser."
+    "description": "One JSON input. Multi-target formats. Fully in your browser."
   },
   "nav": {
     "home": "Convert",
@@ -13,8 +13,10 @@
     "input_label": "Input JSON",
     "input_label_format": "Input {{format}}",
     "input_placeholder": "Paste your JSON here, drop files, or load a sample…",
+    "input_placeholder_format": "Paste your {{ext}} here, drop files, or load a sample…",
     "output_label": "Output",
     "output_empty": "Output will appear here once you provide valid JSON.",
+    "output_empty_format": "Output will appear here once you provide valid {{ext}}.",
     "drop_zone": "Drop JSON files here",
     "drop_zone_active": "Drop to load",
     "drop_zone_hint": "Up to 500 files. Everything runs in your browser — nothing leaves your device.",
@@ -244,6 +246,16 @@
       "patreon": "Patreon",
       "paypal": "PayPal"
     },
+    "community": {
+      "title": "Community & maintainer",
+      "lead": "Follow Kokone or join the JSONPrism dev community:",
+      "discord": "Discord (dev community)",
+      "x": "X (Twitter)",
+      "bluesky": "Bluesky",
+      "mastodon": "Mastodon",
+      "telegram": "Telegram",
+      "youtube": "YouTube"
+    },
     "third_party": {
       "title": "Built on open source",
       "lead": "JSONPrism stands on the shoulders of many great projects:",
@@ -281,5 +293,13 @@
   },
   "disclaimer": {
     "translation": "Non-English translations are AI-generated. Accuracy is not guaranteed."
+  },
+  "social": {
+    "discord": "Discord",
+    "x": "X (Twitter)",
+    "bluesky": "Bluesky",
+    "mastodon": "Mastodon",
+    "telegram": "Telegram",
+    "youtube": "YouTube"
   }
 }

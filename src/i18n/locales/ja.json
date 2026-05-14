@@ -2,7 +2,7 @@
   "app": {
     "name": "JSONPrism",
     "tagline": "JSON を様々な形式に分散",
-    "description": "JSON 入力ひとつ。ターゲット形式は 8 種類以上。ブラウザ内で完結。"
+    "description": "JSON 入力ひとつ。マルチターゲット形式。ブラウザ内で完結。"
   },
   "nav": {
     "home": "変換",
@@ -13,8 +13,10 @@
     "input_label": "JSON 入力",
     "input_label_format": "{{format}} 入力",
     "input_placeholder": "ここに JSON を貼り付け、ファイルをドロップ、またはサンプルを読み込み…",
+    "input_placeholder_format": "ここに {{ext}} を貼り付け、ファイルをドロップ、またはサンプルを読み込み…",
     "output_label": "出力",
     "output_empty": "有効な JSON を入力すると、ここに出力が表示されます。",
+    "output_empty_format": "有効な {{ext}} を入力すると、ここに出力が表示されます。",
     "drop_zone": "JSON ファイルをここにドロップ",
     "drop_zone_active": "ドロップして読み込み",
     "drop_zone_hint": "最大 500 ファイル。すべてブラウザ内で処理 — データは端末から外に出ません。",
@@ -244,6 +246,16 @@
       "patreon": "Patreon",
       "paypal": "PayPal"
     },
+    "community": {
+      "title": "コミュニティ & メンテナー",
+      "lead": "Kokone をフォローするか、JSONPrism の開発者コミュニティに参加:",
+      "discord": "Discord (開発者コミュニティ)",
+      "x": "X (Twitter)",
+      "bluesky": "Bluesky",
+      "mastodon": "Mastodon",
+      "telegram": "Telegram",
+      "youtube": "YouTube"
+    },
     "third_party": {
       "title": "オープンソースの上に構築",
       "lead": "JSONPrism は多くの優れたプロジェクトの上に成り立っています:",
@@ -281,5 +293,13 @@
   },
   "disclaimer": {
     "translation": "このページの翻訳は AI 生成です。100% の正確性は保証されません。"
+  },
+  "social": {
+    "discord": "Discord",
+    "x": "X (Twitter)",
+    "bluesky": "Bluesky",
+    "mastodon": "Mastodon",
+    "telegram": "Telegram",
+    "youtube": "YouTube"
   }
 }

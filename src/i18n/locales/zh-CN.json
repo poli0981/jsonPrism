@@ -2,7 +2,7 @@
   "app": {
     "name": "JSONPrism",
     "tagline": "将 JSON 分散为多种格式",
-    "description": "一份 JSON 输入,八种以上目标格式,全程在浏览器中完成。"
+    "description": "一份 JSON 输入,多目标格式,全程在浏览器中完成。"
   },
   "nav": {
     "home": "转换",
@@ -13,8 +13,10 @@
     "input_label": "JSON 输入",
     "input_label_format": "{{format}} 输入",
     "input_placeholder": "在此处粘贴 JSON、拖入文件或加载示例…",
+    "input_placeholder_format": "在此处粘贴 {{ext}}、拖入文件或加载示例…",
     "output_label": "输出",
     "output_empty": "提供有效的 JSON 后,输出将显示在此处。",
+    "output_empty_format": "提供有效的 {{ext}} 后,输出将显示在此处。",
     "drop_zone": "将 JSON 文件拖到此处",
     "drop_zone_active": "释放即可加载",
     "drop_zone_hint": "最多 500 个文件。全部在浏览器中运行 — 数据不会离开你的设备。",
@@ -244,6 +246,16 @@
       "patreon": "Patreon",
       "paypal": "PayPal"
     },
+    "community": {
+      "title": "社区与维护者",
+      "lead": "关注 Kokone 或加入 JSONPrism 开发者社区:",
+      "discord": "Discord(开发者社区)",
+      "x": "X (Twitter)",
+      "bluesky": "Bluesky",
+      "mastodon": "Mastodon",
+      "telegram": "Telegram",
+      "youtube": "YouTube"
+    },
     "third_party": {
       "title": "构建于开源之上",
       "lead": "JSONPrism 站在众多优秀项目的肩膀上:",
@@ -281,5 +293,13 @@
   },
   "disclaimer": {
     "translation": "本页面译文由 AI 生成,不保证 100% 准确。"
+  },
+  "social": {
+    "discord": "Discord",
+    "x": "X (Twitter)",
+    "bluesky": "Bluesky",
+    "mastodon": "Mastodon",
+    "telegram": "Telegram",
+    "youtube": "YouTube"
   }
 }

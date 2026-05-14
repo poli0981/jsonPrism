@@ -4,7 +4,7 @@
 
 **Disperse JSON into many formats.**
 
-One JSON input. Eight target formats. Fully in your browser.
+One JSON input. Multi-target formats. Fully in your browser.
 
 [![CI](https://github.com/poli0981/jsonPrism/actions/workflows/ci.yml/badge.svg)](https://github.com/poli0981/jsonPrism/actions/workflows/ci.yml)
 [![Deploy](https://github.com/poli0981/jsonPrism/actions/workflows/deploy.yml/badge.svg)](https://github.com/poli0981/jsonPrism/actions/workflows/deploy.yml)
@@ -47,7 +47,7 @@ JSONPrism is a refracting tool for developers. It takes a single JSON input and 
 
 ## Tech stack
 
-- **Vite 6** + **React 19** + **TypeScript 5.7**
+- **Vite 8** + **React 19** + **TypeScript 5.7**
 - **Tailwind CSS v4** + **shadcn/ui** (New York style, neutral base)
 - **CodeMirror 6** for the input editor (Phase 1 polish)
 - **PapaParse**, **js-yaml**, **smol-toml**, **fast-xml-parser** for parsing/serialization
@@ -204,6 +204,17 @@ For bug reports and feature requests, use [GitHub Issues](https://github.com/pol
 | [`docs/pc_spec.md`](docs/pc_spec.md) · [`docs/dev_env.md`](docs/dev_env.md) | Maintainer's hardware + toolchain. |
 | [`docs/TAURI-NOTES.md`](docs/TAURI-NOTES.md) | Tauri build / process notes. |
 | [`docs/RESX-MIGRATION.md`](docs/RESX-MIGRATION.md) | i18next JSON → .NET RESX tutorial. |
+
+## Community
+
+Hang out, ask questions, or follow updates:
+
+- [Discord — dev community](https://discord.gg/2aNR3aVt)
+- [X (Twitter) — @SkullMute0011](https://twitter.com/SkullMute0011)
+- [Bluesky — @skullmute0011.bsky.social](https://bsky.app/profile/skullmute0011.bsky.social)
+- [Mastodon — @skullmute1122@mastodon.social](https://mastodon.social/@skullmute1122)
+- [Telegram — @SkullMute0011](https://t.me/SkullMute0011)
+- [YouTube — @SkullMute](https://youtube.com/@SkullMute)
 
 ## Acknowledgements
 

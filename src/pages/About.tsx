@@ -1,8 +1,55 @@
 import { useTranslation } from 'react-i18next';
-import { ExternalLink, Heart } from 'lucide-react';
+import { ExternalLink, Heart, Users } from 'lucide-react';
+import {
+  BlueskyIcon,
+  DiscordIcon,
+  MastodonIcon,
+  TelegramIcon,
+  XIcon,
+  YoutubeIcon,
+} from '@/components/common/SocialIcons';
 import { cn } from '@/lib/utils';
 
 const REPO_URL = 'https://github.com/poli0981/jsonPrism';
+
+interface CommunityPlatform {
+  key: 'discord' | 'x' | 'bluesky' | 'mastodon' | 'telegram' | 'youtube';
+  url: string;
+  icon: React.ReactNode;
+}
+
+const COMMUNITY: CommunityPlatform[] = [
+  {
+    key: 'discord',
+    url: 'https://discord.gg/2aNR3aVt',
+    icon: <DiscordIcon className="h-4 w-4" />,
+  },
+  {
+    key: 'x',
+    url: 'https://twitter.com/SkullMute0011',
+    icon: <XIcon className="h-4 w-4" />,
+  },
+  {
+    key: 'bluesky',
+    url: 'https://bsky.app/profile/skullmute0011.bsky.social',
+    icon: <BlueskyIcon className="h-4 w-4" />,
+  },
+  {
+    key: 'mastodon',
+    url: 'https://mastodon.social/@skullmute1122',
+    icon: <MastodonIcon className="h-4 w-4" />,
+  },
+  {
+    key: 'telegram',
+    url: 'https://t.me/SkullMute0011',
+    icon: <TelegramIcon className="h-4 w-4" />,
+  },
+  {
+    key: 'youtube',
+    url: 'https://youtube.com/@SkullMute',
+    icon: <YoutubeIcon className="h-4 w-4" />,
+  },
+];
 
 interface DonatePlatform {
   key: 'github' | 'ko_fi' | 'buy_me_a_coffee' | 'patreon' | 'paypal';
@@ -94,7 +141,7 @@ export function About() {
     // About page has many sections, so it needs its own scroll container —
     // otherwise content overflows past the Footer at the bottom.
     <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
-      <div className="mx-auto max-w-3xl px-6 py-16">
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-16">
         <h1 className="font-display text-spectrum mb-4 text-5xl tracking-tight italic">
           {t('about.title')}
         </h1>
@@ -124,6 +171,37 @@ export function About() {
                 >
                   <span className="text-foreground font-medium">
                     {t(`about.donate.${platform.key}`)}
+                  </span>
+                  <ExternalLink className="text-muted-foreground h-3.5 w-3.5" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* Community */}
+        <section className="mt-14">
+          <h2 className="font-display mb-1 text-2xl tracking-tight">
+            <Users className="text-primary mr-2 inline-block h-5 w-5" />
+            {t('about.community.title')}
+          </h2>
+          <p className="text-muted-foreground mb-4 text-sm">{t('about.community.lead')}</p>
+          <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {COMMUNITY.map((platform) => (
+              <li key={platform.key}>
+                <a
+                  href={platform.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={cn(
+                    'border-border/60 bg-card/40 hover:border-primary/40 hover:bg-card/80 inline-flex w-full items-center justify-between gap-2 rounded-md border px-3 py-2 text-sm transition',
+                  )}
+                >
+                  <span className="text-muted-foreground inline-flex items-center gap-2">
+                    {platform.icon}
+                    <span className="text-foreground font-medium">
+                      {t(`about.community.${platform.key}`)}
+                    </span>
                   </span>
                   <ExternalLink className="text-muted-foreground h-3.5 w-3.5" />
                 </a>

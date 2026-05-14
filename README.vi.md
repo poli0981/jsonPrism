@@ -4,7 +4,7 @@
 
 **Tán sắc JSON ra nhiều định dạng.**
 
-Một JSON đầu vào. Tám định dạng đích. Chạy hoàn toàn trong trình duyệt.
+Một JSON đầu vào. Đa định dạng đích. Chạy hoàn toàn trong trình duyệt.
 
 [![CI](https://github.com/poli0981/jsonPrism/actions/workflows/ci.yml/badge.svg)](https://github.com/poli0981/jsonPrism/actions/workflows/ci.yml)
 [![Deploy](https://github.com/poli0981/jsonPrism/actions/workflows/deploy.yml/badge.svg)](https://github.com/poli0981/jsonPrism/actions/workflows/deploy.yml)
@@ -20,17 +20,20 @@ JSONPrism là công cụ "tán sắc" cho developer. Nhận một JSON đầu v�
 
 ## Định dạng hỗ trợ
 
-| Định dạng         | Phần mở rộng | Trạng thái     |
-| ----------------- | ------------ | -------------- |
-| JSONL             | `.jsonl`     | ✅ Phase 1      |
-| CSV               | `.csv`       | ✅ Phase 1      |
-| TSV               | `.tsv`       | ✅ Phase 1      |
-| YAML              | `.yaml`      | ✅ Phase 1      |
-| XML               | `.xml`       | ✅ Phase 2      |
-| TOML              | `.toml`      | ✅ Phase 2      |
-| Bảng Markdown     | `.md`        | ✅ Phase 2      |
-| SQL `INSERT`      | `.sql`       | ✅ Phase 2      |
-| RESX (.NET)       | `.resx`      | ✅ Phase 3      |
+| Định dạng         | Phần mở rộng | Trạng thái     | Đảo (→ JSON) |
+| ----------------- | ------------ | -------------- | ------------ |
+| JSONL             | `.jsonl`     | ✅ Phase 1      | ✅            |
+| CSV               | `.csv`       | ✅ Phase 1      | ✅            |
+| TSV               | `.tsv`       | ✅ Phase 1      | ✅            |
+| YAML              | `.yaml`      | ✅ Phase 1      | ✅            |
+| XML               | `.xml`       | ✅ Phase 2      | —            |
+| TOML              | `.toml`      | ✅ Phase 2      | ✅            |
+| Bảng Markdown     | `.md`        | ✅ Phase 2      | —            |
+| SQL `INSERT`      | `.sql`       | ✅ Phase 2      | —            |
+| RESX (.NET)       | `.resx`      | ✅ Phase 3      | ✅            |
+| BSON              | `.bson`      | ✅ Phase 4      | —            |
+| CBOR              | `.cbor`      | ✅ Phase 4      | —            |
+| MessagePack       | `.msgpack`   | ✅ Phase 4      | —            |
 
 ## Tính năng
 
@@ -44,7 +47,7 @@ JSONPrism là công cụ "tán sắc" cho developer. Nhận một JSON đầu v�
 
 ## Tech stack
 
-- **Vite 6** + **React 19** + **TypeScript 5.7**
+- **Vite 8** + **React 19** + **TypeScript 5.7**
 - **Tailwind CSS v4** + **shadcn/ui** (style New York, base neutral)
 - **CodeMirror 6** cho editor đầu vào (Phase 1 polish)
 - **PapaParse**, **js-yaml**, **smol-toml**, **fast-xml-parser** để parse/serialize
@@ -201,6 +204,17 @@ Báo bug hoặc đề xuất tính năng tại [GitHub Issues](https://github.co
 | [`docs/i18n/vi/pc_spec.md`](docs/i18n/vi/pc_spec.md) · [`docs/i18n/vi/dev_env.md`](docs/i18n/vi/dev_env.md) | Phần cứng + toolchain của maintainer. |
 | [`docs/TAURI-NOTES.md`](docs/TAURI-NOTES.md) | Ghi chú Tauri build / process. |
 | [`docs/RESX-MIGRATION.md`](docs/RESX-MIGRATION.md) | Hướng dẫn i18next JSON → .NET RESX. |
+
+## Cộng đồng
+
+Trò chuyện, hỏi đáp, hoặc theo dõi cập nhật:
+
+- [Discord — cộng đồng dev](https://discord.gg/2aNR3aVt)
+- [X (Twitter) — @SkullMute0011](https://twitter.com/SkullMute0011)
+- [Bluesky — @skullmute0011.bsky.social](https://bsky.app/profile/skullmute0011.bsky.social)
+- [Mastodon — @skullmute1122@mastodon.social](https://mastodon.social/@skullmute1122)
+- [Telegram — @SkullMute0011](https://t.me/SkullMute0011)
+- [YouTube — @SkullMute](https://youtube.com/@SkullMute)
 
 ## Ghi nhận
 

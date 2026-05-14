@@ -2,7 +2,7 @@
   "app": {
     "name": "JSONPrism",
     "tagline": "Tán sắc JSON ra nhiều định dạng",
-    "description": "Một JSON đầu vào. Tám định dạng đích. Chạy hoàn toàn trong trình duyệt."
+    "description": "Một JSON đầu vào. Đa định dạng đích. Chạy hoàn toàn trong trình duyệt."
   },
   "nav": {
     "home": "Chuyển đổi",
@@ -13,8 +13,10 @@
     "input_label": "JSON đầu vào",
     "input_label_format": "Đầu vào {{format}}",
     "input_placeholder": "Dán JSON vào đây, thả file, hoặc nạp mẫu…",
+    "input_placeholder_format": "Dán {{ext}} vào đây, thả file, hoặc nạp mẫu…",
     "output_label": "Kết quả",
     "output_empty": "Kết quả sẽ hiện ở đây khi bạn cung cấp JSON hợp lệ.",
+    "output_empty_format": "Kết quả sẽ hiện ở đây khi bạn cung cấp {{ext}} hợp lệ.",
     "drop_zone": "Thả file JSON vào đây",
     "drop_zone_active": "Thả ra để nạp",
     "drop_zone_hint": "Tối đa 500 file. Mọi thứ chạy trong trình duyệt — không có dữ liệu nào rời khỏi máy của bạn.",
@@ -244,6 +246,16 @@
       "patreon": "Patreon",
       "paypal": "PayPal"
     },
+    "community": {
+      "title": "Cộng đồng & maintainer",
+      "lead": "Theo dõi Kokone hoặc tham gia cộng đồng dev JSONPrism:",
+      "discord": "Discord (cộng đồng dev)",
+      "x": "X (Twitter)",
+      "bluesky": "Bluesky",
+      "mastodon": "Mastodon",
+      "telegram": "Telegram",
+      "youtube": "YouTube"
+    },
     "third_party": {
       "title": "Đứng trên vai open source",
       "lead": "JSONPrism được xây dựng trên nhiều project tuyệt vời:",
@@ -281,5 +293,13 @@
   },
   "disclaimer": {
     "translation": "Các bản dịch không phải tiếng Anh do AI tạo, không đảm bảo chính xác 100%."
+  },
+  "social": {
+    "discord": "Discord",
+    "x": "X (Twitter)",
+    "bluesky": "Bluesky",
+    "mastodon": "Mastodon",
+    "telegram": "Telegram",
+    "youtube": "YouTube"
   }
 }

@@ -216,7 +216,7 @@ export function ConverterWorkspace() {
 
       <div className="border-border bg-card/40 flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border">
         <div className="grid min-h-0 flex-1 md:grid-cols-2">
-          <div className="md:border-border/60 min-h-0 border-b md:border-r md:border-b-0">
+          <div className="md:border-border/60 min-h-[40vh] border-b md:min-h-0 md:border-r md:border-b-0">
             <InputPanel
               value={input}
               onChange={setInput}
@@ -226,7 +226,7 @@ export function ConverterWorkspace() {
               onMultiFileDrop={handleMultiFileDrop}
             />
           </div>
-          <div className="min-h-0">
+          <div className="min-h-[40vh] md:min-h-0">
             <OutputPanel
               format={format}
               content={output}

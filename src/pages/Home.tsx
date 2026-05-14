@@ -5,8 +5,8 @@ export function Home() {
   const { t } = useTranslation();
 
   return (
-    <div className="mx-auto flex min-h-0 w-full max-w-screen-2xl flex-1 flex-col gap-6 px-6 py-6">
-      <header className="flex items-end justify-between gap-6">
+    <div className="mx-auto flex min-h-0 w-full max-w-screen-2xl flex-1 flex-col gap-4 px-4 py-4 sm:gap-6 sm:px-6 sm:py-6">
+      <header className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between md:gap-6">
         <div>
           <h1 className="font-display text-4xl leading-none tracking-tight md:text-5xl">
             <span className="text-spectrum italic">Disperse</span> JSON.
