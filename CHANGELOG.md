@@ -8,6 +8,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond Phase 3".
 
+## [1.4.3] — 2026-05-14
+
+### Fixed
+
+- **Toast close button (`×`) did nothing on click/tap** on both desktop and mobile. `sonner@1.7.4`'s toast root attached `r.target.setPointerCapture(r.pointerId)` unconditionally on `pointerdown`, and combined with React 19's new container-root event delegation, the pointer-capture quirk swallowed the synthetic click event on the close button — so the bundled `dismiss()` handler never ran. The bug fired on both mouse and touch because the PointerEvent API is unified. Upgraded `sonner` `^1.7.0` → `^2.0.7`, which rewrote pointer/swipe handling and ships first-class React 19 support. `<Toaster>` props (`position`, `theme`, `richColors`, `closeButton`, `toastOptions.classNames`) and the `toast.success/warning/error/info` call sites are API-compatible — no code changes needed beyond the version bump.
+
+### Added
+
+- **`docs/tested-viewports.md`** — the maintainer's manual device test matrix (BlackBerry Z30 / Galaxy S9+ / Pixel 3/4/7 / iPhone SE/12/14 Pro/XR/Pro Max / iPad / BlackBerry PlayBook). Documents Nokia Lumia 520 (320×533) as a known limitation below the recommended `360×640` minimum. README EN + VI link to it.
+- **Touch hit-area expansion on the toast close button.** A `::after` pseudo gives an effective ~36–40px tap target (visible size stays at sonner's 20px default), plus `touch-action: manipulation` to drop the 300ms tap delay on touch devices. Defensive — sonner v2 already fixes the underlying click — but a free mobile UX win.
+
+### Dependencies
+
+- Bumped `sonner` `^1.7.0` → `^2.0.7` (MIT). THIRD-PARTY.md updated.
+
 ## [1.4.2] — 2026-05-14
 
 ### Added
