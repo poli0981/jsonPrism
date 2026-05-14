@@ -109,7 +109,11 @@ export function OutputPanel({
           </pre>
         ) : (
           <div className="text-muted-foreground/60 p-4 text-sm italic">
-            {t('home.output_empty')}
+            {isReverse
+              ? t('home.output_empty_format', {
+                  ext: converter.meta.extension.toUpperCase(),
+                })
+              : t('home.output_empty')}
           </div>
         )}
       </div>

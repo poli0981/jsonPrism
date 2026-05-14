@@ -218,7 +218,13 @@ export function InputPanel({
           value={value}
           onChange={onChange}
           language={editorLanguage}
-          placeholder={t('home.input_placeholder')}
+          placeholder={
+            isReverse
+              ? t('home.input_placeholder_format', {
+                  ext: converter.meta.extension.toUpperCase(),
+                })
+              : t('home.input_placeholder')
+          }
         />
         {showOverlay && (
           <div className="bg-background/80 pointer-events-none absolute inset-0 z-10 flex items-center justify-center backdrop-blur-sm">
