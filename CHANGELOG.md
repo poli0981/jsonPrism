@@ -8,6 +8,32 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond Phase 3".
 
+## [1.4.0] — 2026-05-14
+
+### Added — Đợt UI/UX polish: dynamic placeholders, social, reverse highlight expansion, mobile
+
+- **Dynamic input/output placeholders** in reverse mode. `Paste your JSON here…` and `Output will appear here once you provide valid JSON.` now interpolate the source/target extension: e.g. `Paste your CSV here…`, `Output will appear here once you provide valid YAML.` New i18n keys `home.input_placeholder_format` and `home.output_empty_format` carry `{{ext}}`; the panels resolve `converter.meta.extension.toUpperCase()`. Forward mode keeps the JSON-specific copy.
+- **"Multi-target formats" slogan** replaces "Eight target formats" in `app.description` across en/vi/ja/zh-CN — copy no longer hard-codes a stale count as new formats land.
+- **Reverse-mode syntax highlight** widened: Markdown, SQL, TOML, and JSONL now render with proper tokens in the input editor (previously plain text). Adds `@codemirror/lang-markdown`, `@codemirror/lang-sql`, and `@codemirror/legacy-modes` (the latter for TOML via `StreamLanguage.define`). CSV/TSV stay plain — no fitting CodeMirror grammar. All new packs flow into the existing `codemirror` manualChunk; no initial-bundle regression.
+- **Social links UI**. New `src/components/common/SocialIcons.tsx` houses six inline-SVG brand icons (Discord, X, Bluesky, Mastodon, Telegram, YouTube) since `lucide-react` has no brand glyphs. Footer surfaces the three dev-relevant ones (Discord dev community, X, Bluesky) between app meta and the maintainer credit. About page gains a `Community` section between Donate and Third-party listing all six. New i18n keys `about.community.*` and `social.*` across en/vi/ja/zh-CN.
+- **Mobile responsiveness polish**. Header's Convert/About nav links no longer hidden below `md:` — always visible, with tighter padding and a smaller brand wordmark on small viewports. Toolbar buttons in `InputPanel` / `OutputPanel` collapse to icon-only on mobile (label moves to `aria-label` / `title`). Workspace input/output panels keep a `min-h-[40vh]` floor on mobile so the stacked layout stays usable. `Home` hero stacks on mobile; `About` page shrinks outer padding; `FormatPicker` chips compact down. No hamburger menu — only two nav links, the drawer pattern wasn't worth its bundle cost.
+
+### Fixed
+
+- **Input editor mousewheel scroll requiring a click-to-focus**. `.cm-scroller` was set to `scrollbarWidth: 'none'` plus `::-webkit-scrollbar { display: none }`. On at least some Chromium builds, this disengaged the scroll target until the editor was focused — keyboard PageDown also did nothing without focus. Switched to `scrollbarWidth: 'thin'`, an explicit `overflow: 'auto'`, and a themed `::-webkit-scrollbar` thumb. Wheel and PageDown both work without a prior click.
+
+### Changed
+
+- **README EN + VI refreshed**. Sync slogan with the in-app copy ("Multi-target formats" / "Đa định dạng đích"). VI README format table catches up with EN: includes BSON / CBOR / MessagePack (Phase 4) and the `Reverse (→ JSON)` column. Tech-stack line bumped from `Vite 6` to `Vite 8` in both files (package.json has been on `^8.0.0`; the About page already reflected this). Both READMEs gain a `Community` section mirroring the in-app links.
+
+### Dependencies
+
+- Added `@codemirror/lang-markdown`, `@codemirror/lang-sql`, and `@codemirror/legacy-modes` (all MIT, all `@codemirror/*` so they auto-route into the `codemirror` manualChunk via `vite.config.ts`).
+
+### Tests
+
+- No new tests for this UI-polish round. The 193 existing unit tests still pass; the new behaviour is editor/CSS/i18n surface that's better verified manually (DevTools mobile viewport, wheel-scroll without click, per-format placeholder, reverse-mode highlight). Total tests: **193**.
+
 ## [1.3.3] — 2026-05-13
 
 ### Fixed
