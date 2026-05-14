@@ -13,7 +13,7 @@ export function Header() {
       <div className="mx-auto flex h-14 max-w-screen-2xl items-center gap-2 px-3 sm:gap-6 sm:px-6">
         <Link to="/" className="group flex items-center gap-2 sm:gap-2.5">
           <BrandMark className="h-6 w-6 sm:h-7 sm:w-7" />
-          <span className="font-display text-base leading-none tracking-tight sm:text-xl">
+          <span className="font-display hidden text-xl leading-none tracking-tight sm:inline">
             JSON<span className="text-spectrum italic">Prism</span>
           </span>
         </Link>
