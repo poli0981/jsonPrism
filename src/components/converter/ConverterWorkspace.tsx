@@ -1,6 +1,7 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from '@/components/ui/sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getConverter } from '@/converters/registry';
 import type { FormatId } from '@/converters/types';
 import { parseJsonInput } from '@/lib/detect';
@@ -36,6 +37,11 @@ export function ConverterWorkspace() {
   const actionsRef = useRef<{ copy: () => void; download: () => void } | null>(null);
   const [batchOpen, setBatchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // Mobile tab state — desktop ignores this and renders both panels side-by-side.
+  const [activeTab, setActiveTab] = useState<'input' | 'output'>('input');
+  // Badge dot on Output tab when output changes while user is on Input tab.
+  const [hasUnreadOutput, setHasUnreadOutput] = useState(false);
+  const prevOutputRef = useRef('');
   const addBatchFiles = useBatchStore((s) => s.addFiles);
 
   const handleMultiFileDrop = useCallback(
@@ -179,6 +185,21 @@ export function ConverterWorkspace() {
     { key: ',', mod: true, handler: () => setSettingsOpen((v) => !v) },
   ]);
 
+  // Flip the badge dot on the Output tab whenever output changes while the
+  // user is on the Input tab. Clearing happens once the user navigates over.
+  useEffect(() => {
+    if (output !== prevOutputRef.current) {
+      prevOutputRef.current = output;
+      if (output && activeTab !== 'output') {
+        setHasUnreadOutput(true);
+      }
+    }
+  }, [output, activeTab]);
+
+  useEffect(() => {
+    if (activeTab === 'output') setHasUnreadOutput(false);
+  }, [activeTab]);
+
   const inputBytes = useMemo(() => new TextEncoder().encode(input).length, [input]);
   const outputBytes = useMemo(() => new TextEncoder().encode(output).length, [output]);
 
@@ -215,8 +236,54 @@ export function ConverterWorkspace() {
       </div>
 
       <div className="border-border bg-card/40 flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border">
-        <div className="grid min-h-0 flex-1 grid-rows-2 md:grid-cols-2 md:grid-rows-1">
-          <div className="md:border-border/60 min-h-0 border-b md:border-r md:border-b-0">
+        {/* Mobile: Tabs UI — each tab gets the full workspace height so panels
+            never overlap on short viewports. */}
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => setActiveTab(v as 'input' | 'output')}
+          className="flex min-h-0 flex-1 flex-col md:hidden"
+        >
+          <TabsList className="border-border/60 w-full justify-start gap-0 rounded-none border-b px-2">
+            <TabsTrigger value="input">{t('home.tab_input')}</TabsTrigger>
+            <TabsTrigger value="output" className="relative">
+              {t('home.tab_output')}
+              {hasUnreadOutput && (
+                <span
+                  aria-hidden
+                  className="bg-primary absolute top-1 right-1 h-1.5 w-1.5 rounded-full"
+                />
+              )}
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="input" className="min-h-0 flex-1">
+            <InputPanel
+              value={input}
+              onChange={setInput}
+              error={inputError}
+              format={format}
+              direction={direction}
+              onMultiFileDrop={handleMultiFileDrop}
+            />
+          </TabsContent>
+          <TabsContent value="output" className="min-h-0 flex-1">
+            <OutputPanel
+              format={format}
+              content={output}
+              error={outputError}
+              options={currentOptions}
+              direction={direction}
+              registerActions={(a) => {
+                actionsRef.current = a;
+              }}
+            />
+          </TabsContent>
+        </Tabs>
+
+        {/* Desktop: side-by-side grid (≥ md). Rendered in parallel with the
+            Tabs above so neither remounts on viewport resize and CodeMirror
+            state survives the swap. */}
+        <div className="hidden min-h-0 flex-1 md:grid md:grid-cols-2">
+          <div className="border-border/60 min-h-0 border-r">
             <InputPanel
               value={input}
               onChange={setInput}
@@ -239,6 +306,7 @@ export function ConverterWorkspace() {
             />
           </div>
         </div>
+
         <StatusBar inputBytes={inputBytes} outputBytes={outputBytes} parseMs={parseMs} />
       </div>
     </div>

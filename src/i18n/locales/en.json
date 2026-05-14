@@ -14,6 +14,8 @@
     "input_label_format": "Input {{format}}",
     "input_placeholder": "Paste your JSON here, drop files, or load a sample…",
     "input_placeholder_format": "Paste your {{ext}} here, drop files, or load a sample…",
+    "tab_input": "Input",
+    "tab_output": "Output",
     "output_label": "Output",
     "output_empty": "Output will appear here once you provide valid JSON.",
     "output_empty_format": "Output will appear here once you provide valid {{ext}}.",

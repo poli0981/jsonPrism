@@ -42,6 +42,7 @@ JSONPrism là công cụ "tán sắc" cho developer. Nhận một JSON đầu v�
 - **Phát hiện shape thông minh** — nhận diện flat object, mảng object, scalar; gợi ý format đích phù hợp.
 - **Tuỳ chọn theo từng format** — pretty-print, indentation, dialect (SQL), alignment (Markdown), v.v.
 - **Theme sáng/tối** — bảng màu Prism Spectrum với violet / cyan / amber / rose.
+- **Responsive — tối ưu cho viewport ≥ 360 × 640.** Màn hình nhỏ hơn vẫn dùng được nhưng có thể chật; trên mobile, Input và Output dùng Tabs UI để mỗi panel có toàn bộ chiều cao.
 - **Đa ngôn ngữ EN + VI** — sẵn sàng từ ngày đầu. Hoan nghênh thêm ngôn ngữ khác.
 - **Bản desktop Tauri** — drag-and-drop file, hoạt động offline (mốc Phase 2).
 
