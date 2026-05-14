@@ -198,4 +198,16 @@
       )
       1;
   }
+
+  /* Expand the Sonner close-button hit-test radius for touch.
+     Visible size stays at sonner's 20px default; the ::after pseudo
+     gives an effective ~36–40px tap target without changing layout. */
+  [data-sonner-toaster] [data-close-button] {
+    touch-action: manipulation;
+  }
+  [data-sonner-toaster] [data-close-button]::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+  }
 }
