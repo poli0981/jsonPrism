@@ -246,6 +246,16 @@
       "patreon": "Patreon",
       "paypal": "PayPal"
     },
+    "community": {
+      "title": "コミュニティ & メンテナー",
+      "lead": "Kokone をフォローするか、JSONPrism の開発者コミュニティに参加:",
+      "discord": "Discord (開発者コミュニティ)",
+      "x": "X (Twitter)",
+      "bluesky": "Bluesky",
+      "mastodon": "Mastodon",
+      "telegram": "Telegram",
+      "youtube": "YouTube"
+    },
     "third_party": {
       "title": "オープンソースの上に構築",
       "lead": "JSONPrism は多くの優れたプロジェクトの上に成り立っています:",
@@ -283,5 +293,13 @@
   },
   "disclaimer": {
     "translation": "このページの翻訳は AI 生成です。100% の正確性は保証されません。"
+  },
+  "social": {
+    "discord": "Discord",
+    "x": "X (Twitter)",
+    "bluesky": "Bluesky",
+    "mastodon": "Mastodon",
+    "telegram": "Telegram",
+    "youtube": "YouTube"
   }
 }

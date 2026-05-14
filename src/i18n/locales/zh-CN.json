@@ -246,6 +246,16 @@
       "patreon": "Patreon",
       "paypal": "PayPal"
     },
+    "community": {
+      "title": "社区与维护者",
+      "lead": "关注 Kokone 或加入 JSONPrism 开发者社区:",
+      "discord": "Discord(开发者社区)",
+      "x": "X (Twitter)",
+      "bluesky": "Bluesky",
+      "mastodon": "Mastodon",
+      "telegram": "Telegram",
+      "youtube": "YouTube"
+    },
     "third_party": {
       "title": "构建于开源之上",
       "lead": "JSONPrism 站在众多优秀项目的肩膀上:",
@@ -283,5 +293,13 @@
   },
   "disclaimer": {
     "translation": "本页面译文由 AI 生成,不保证 100% 准确。"
+  },
+  "social": {
+    "discord": "Discord",
+    "x": "X (Twitter)",
+    "bluesky": "Bluesky",
+    "mastodon": "Mastodon",
+    "telegram": "Telegram",
+    "youtube": "YouTube"
   }
 }

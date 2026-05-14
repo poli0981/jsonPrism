@@ -246,6 +246,16 @@
       "patreon": "Patreon",
       "paypal": "PayPal"
     },
+    "community": {
+      "title": "Cộng đồng & maintainer",
+      "lead": "Theo dõi Kokone hoặc tham gia cộng đồng dev JSONPrism:",
+      "discord": "Discord (cộng đồng dev)",
+      "x": "X (Twitter)",
+      "bluesky": "Bluesky",
+      "mastodon": "Mastodon",
+      "telegram": "Telegram",
+      "youtube": "YouTube"
+    },
     "third_party": {
       "title": "Đứng trên vai open source",
       "lead": "JSONPrism được xây dựng trên nhiều project tuyệt vời:",
@@ -283,5 +293,13 @@
   },
   "disclaimer": {
     "translation": "Các bản dịch không phải tiếng Anh do AI tạo, không đảm bảo chính xác 100%."
+  },
+  "social": {
+    "discord": "Discord",
+    "x": "X (Twitter)",
+    "bluesky": "Bluesky",
+    "mastodon": "Mastodon",
+    "telegram": "Telegram",
+    "youtube": "YouTube"
   }
 }

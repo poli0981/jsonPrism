@@ -246,6 +246,16 @@
       "patreon": "Patreon",
       "paypal": "PayPal"
     },
+    "community": {
+      "title": "Community & maintainer",
+      "lead": "Follow Kokone or join the JSONPrism dev community:",
+      "discord": "Discord (dev community)",
+      "x": "X (Twitter)",
+      "bluesky": "Bluesky",
+      "mastodon": "Mastodon",
+      "telegram": "Telegram",
+      "youtube": "YouTube"
+    },
     "third_party": {
       "title": "Built on open source",
       "lead": "JSONPrism stands on the shoulders of many great projects:",
@@ -283,5 +293,13 @@
   },
   "disclaimer": {
     "translation": "Non-English translations are AI-generated. Accuracy is not guaranteed."
+  },
+  "social": {
+    "discord": "Discord",
+    "x": "X (Twitter)",
+    "bluesky": "Bluesky",
+    "mastodon": "Mastodon",
+    "telegram": "Telegram",
+    "youtube": "YouTube"
   }
 }
