@@ -42,7 +42,7 @@ JSONPrism is a refracting tool for developers. It takes a single JSON input and 
 - **Smart shape detection** — recognizes flat objects, arrays of objects, scalars; suggests the best target format.
 - **Per-format options** — pretty-print, indentation, dialect (for SQL), alignment (for Markdown), and more.
 - **Dark + light themes** — Prism Spectrum palette with violet / cyan / amber / rose accents.
-- **Responsive — designed for viewports ≥ 360 × 640.** Smaller screens still work but may feel cramped; on mobile, Input and Output use a Tabs UI to give each panel full height.
+- **Responsive — designed for viewports ≥ 360 × 640.** Smaller screens still work but may feel cramped; on mobile, Input and Output use a Tabs UI to give each panel full height. See [`docs/tested-viewports.md`](docs/tested-viewports.md) for the full device test matrix.
 - **EN + VI** — bilingual interface out of the box. More languages welcome.
 - **Tauri desktop build** — drag-and-drop file workflow, offline-first (Phase 2 milestone).
 
