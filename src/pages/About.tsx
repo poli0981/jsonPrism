@@ -141,7 +141,7 @@ export function About() {
     // About page has many sections, so it needs its own scroll container —
     // otherwise content overflows past the Footer at the bottom.
     <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
-      <div className="mx-auto max-w-3xl px-6 py-16">
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-16">
         <h1 className="font-display text-spectrum mb-4 text-5xl tracking-tight italic">
           {t('about.title')}
         </h1>

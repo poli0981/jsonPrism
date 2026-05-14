@@ -35,7 +35,7 @@ export function FormatPicker({ value, onChange, shape, direction = 'forward' }: 
             onClick={() => onChange(id)}
             disabled={!enabled}
             className={cn(
-              'group relative inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition',
+              'group relative inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[11px] font-medium transition sm:px-2.5 sm:py-1 sm:text-xs',
               active
                 ? 'border-primary/60 bg-primary/10 text-foreground'
                 : 'border-border bg-card/40 text-muted-foreground hover:text-foreground hover:border-border',
