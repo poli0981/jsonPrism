@@ -8,6 +8,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond Phase 3".
 
+## [1.4.2] — 2026-05-14
+
+### Added
+
+- **Tabs UI for Input/Output on mobile (`<md`).** New shadcn `Tabs` primitive (`src/components/ui/tabs.tsx`, wrapping `@radix-ui/react-tabs`). The workspace now renders Tabs on mobile so each active panel takes the full available height; desktop continues to use the side-by-side grid. Both layouts render in parallel so CodeMirror state (selection, scroll, cursor) survives a viewport resize without remounting.
+- **"Unread output" dot** on the Output tab. When `output` changes while the user is on the Input tab, a small primary-colored dot appears on the Output tab label; it clears the next time the user switches over. No auto-switch — the user controls the flow.
+- **Compact mobile FormatPicker.** On `<md`, the 12 format chips collapse into a single `Target format: <current>` trigger that opens a bottom Sheet with all chips in a 2-3 column grid (reusing the existing Sheet primitive shipped with BatchPanel / SettingsPanel). Saves ~50–80px of toolbar height that the chip flex-wrap was eating on narrow viewports — that vertical space was the underlying cause of the previous "panels overlap" regression below 600px height.
+
+### Fixed
+
+- **Workspace panels still overlapping on viewports <400×700.** v1.4.1's `grid-rows-2 md:grid-rows-1` mobile split allotted each panel half the workspace height, but when the workspace top toolbar wrapped 2–3 rows (the 12 FormatPicker chips on narrow viewports) plus header / Home hero / Footer / StatusBar chrome, each row fell below CodeMirror's minimum rendered content height and the two panels visually overlapped. The Tabs swap above resolves this by giving the active panel the full workspace height instead of half.
+
+### Changed
+
+- **README EN + VI** now disclose: *"designed for viewports ≥ 360 × 640; smaller screens still work but may feel cramped"*. Galaxy S / Pixel-class portrait is the minimum well-supported viewport.
+
+### Dependencies
+
+- Added `@radix-ui/react-tabs` (MIT). Also listed in `THIRD-PARTY.md`.
+
 ## [1.4.1] — 2026-05-14
 
 ### Fixed
