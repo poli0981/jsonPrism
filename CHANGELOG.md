@@ -8,6 +8,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond Phase 3".
 
+## [1.4.1] — 2026-05-14
+
+### Fixed
+
+- **Header overflowed the viewport on iPhone 14 Pro and other ≤sm phones**. The brand wordmark + nav links + language switcher + theme toggle + GitHub icon summed to ~460px and didn't fit the 393px iPhone viewport, forcing horizontal page scroll to reach the right-edge buttons. Hide the `JSONPrism` wordmark below `sm` (640px) — the brand SVG mark alone identifies the app on phones, and the row fits cleanly.
+- **Workspace input/output panels disappearing on short / landscape phones**. Two compounding causes:
+  - `min-h-[40vh]` on each stacked panel (introduced in 1.4.0 to make mobile heights usable) summed to 80vh, exceeding the available height after header / Home padding / workspace toolbar / status bar / footer chrome on short phones. The workspace container's `overflow-hidden` then clipped the lower (output) panel off-screen. Replaced with `grid-rows-2 md:grid-rows-1` so each panel takes exactly half the workspace height share on mobile — always visible, no overflow.
+  - `h-screen` (= `100vh`) on the Layout root didn't account for iOS Safari's dynamic toolbar — the computed height could exceed the actual visible area, especially after rotating to landscape. Swapped for `h-dvh` (Tailwind v4 dynamic viewport height).
+
+### Docs
+
+- **`THIRD-PARTY.md`** now lists the five CodeMirror language packs that landed across 1.3.0 + 1.4.0 (`@codemirror/lang-yaml`, `@codemirror/lang-xml`, `@codemirror/lang-markdown`, `@codemirror/lang-sql`, `@codemirror/legacy-modes` — all MIT). The file was lagging behind the actual install set.
+
 ## [1.4.0] — 2026-05-14
 
 ### Added — Đợt UI/UX polish: dynamic placeholders, social, reverse highlight expansion, mobile
