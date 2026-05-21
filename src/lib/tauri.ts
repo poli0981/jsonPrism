@@ -62,7 +62,7 @@ export async function nativeSaveBlob(blob: Blob, suggestedName: string): Promise
 /**
  * Read a file at the given native path as a UTF-8 string.
  */
-export async function nativeReadText(path: string): Promise<string> {
+async function nativeReadText(path: string): Promise<string> {
   if (!isTauri()) {
     throw new Error('nativeReadText is only available inside Tauri.');
   }
@@ -131,6 +131,7 @@ export async function fileFromNativePath(path: string): Promise<File> {
 /**
  * Diagnostic info from the Rust side (OS, arch, app version).
  * Not currently shown in the UI but useful for bug reports.
+ * @public
  */
 export async function tauriHostInfo(): Promise<{
   os: string;

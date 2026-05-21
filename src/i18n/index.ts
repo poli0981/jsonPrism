@@ -26,5 +26,3 @@ void i18n
       lookupLocalStorage: 'jsonprism.lang',
     },
   });
-
-export default i18n;

@@ -1,0 +1,15 @@
+{
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignore": ["src/components/ui/**"],
+  "ignoreDependencies": [
+    "@radix-ui/react-slot",
+    "tailwindcss",
+    "tw-animate-css",
+    "@tauri-apps/plugin-os",
+    "@tauri-apps/plugin-shell",
+    "@testing-library/user-event"
+  ],
+  "rules": {
+    "types": "off"
+  }
+}

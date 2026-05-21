@@ -291,7 +291,8 @@
   "common": {
     "loading": "Loading…",
     "error": "Error",
-    "retry": "Retry"
+    "retry": "Retry",
+    "scroll_to_top": "Back to top"
   },
   "disclaimer": {
     "translation": "Non-English translations are AI-generated. Accuracy is not guaranteed."

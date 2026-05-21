@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, Copy, Download } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
+import { ToolbarButton } from '@/components/common/ToolbarButton';
 import type { FormatId } from '@/converters/types';
 import { getConverter } from '@/converters/registry';
 import { decodeBytes } from '@/converters/bson';
@@ -118,28 +119,5 @@ export function OutputPanel({
         )}
       </div>
     </div>
-  );
-}
-
-interface ToolbarButtonProps {
-  onClick: () => void;
-  label: string;
-  icon: React.ReactNode;
-  disabled?: boolean;
-}
-
-function ToolbarButton({ onClick, label, icon, disabled }: ToolbarButtonProps) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={label}
-      title={label}
-      className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs transition disabled:cursor-not-allowed disabled:opacity-40"
-    >
-      {icon}
-      <span className="hidden sm:inline">{label}</span>
-    </button>
   );
 }
