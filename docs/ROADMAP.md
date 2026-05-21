@@ -219,7 +219,33 @@ Goal: ship the .NET RESX converter and integrate with existing AutoClickForge / 
 
 ---
 
-## Beyond Phase 3 — Ideas (no commitment)
+## Phase 4 — Binary formats & reverse conversion ✅
+
+**Status**: complete (shipped in v1.1.0)
+
+Post-1.0 expansion: three binary target formats and bidirectional conversion.
+
+- [x] **BSON / CBOR / MessagePack** converters — output rendered as base64 (default) or hex; downloads decode back to raw bytes. New `ConverterMeta.binary` flag.
+- [x] **Reverse conversion** — optional `Converter<T>.reverse()` interface method; JSONL, CSV/TSV, YAML, TOML, RESX → JSON. New `DirectionToggle` component, direction persisted to localStorage.
+- [x] Reverse batch processing — drop non-JSON files, get a `.zip` of `.json` outputs back.
+
+**12/12 formats production-ready.**
+
+---
+
+## Phase 5 — Maintenance & refactor ✅
+
+**Status**: complete (shipped in v1.5.0)
+
+Codebase hygiene plus a small UX addition — no converter behavior changed.
+
+- [x] Decomposed three oversized components (`BatchPanel`, `ConverterWorkspace`, `InputPanel`) into focused pure utilities, leaf components, and hooks — behavior-preserving, all 193 tests still green.
+- [x] Integrated `knip` for dead-code analysis: `knip.json` config, `npm run knip` script, and a CI step. Initial sweep removed orphaned code and a phantom dependency.
+- [x] Scroll-to-top button on the long, scrollbar-hidden About page (respects `prefers-reduced-motion`).
+
+---
+
+## Beyond — Ideas (no commitment)
 
 - **JSON → Excel (.xlsx)** via SheetJS — possible if Markdown/CSV doesn't cover the use case
 - **Reverse direction** (other format → JSON): different mental model; might warrant a sibling app
@@ -228,7 +254,7 @@ Goal: ship the .NET RESX converter and integrate with existing AutoClickForge / 
 - **VS Code extension**: surface the converters in the editor command palette
 - **Sharing**: hash-based shareable URLs (`#data=...`) for sample inputs (privacy: opt-in only)
 
-These are deliberately deferred — Phase 1–3 first.
+These are deliberately deferred — Phase 1–5 first.
 
 ---
 

@@ -6,7 +6,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
-No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond Phase 3".
+No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond".
+
+## [1.5.0] — 2026-05-21
+
+### Added
+
+- **Scroll-to-top button on the About page.** A floating up-arrow button (`src/components/common/ScrollToTop.tsx`) fades in at the bottom-right once the About page is scrolled past ~320px, and smoothly returns to the top on click. The About page hides its scrollbar (`.scrollbar-hide`), so there was previously no quick way back up. Respects `prefers-reduced-motion` (jumps instead of animating) and stays out of the keyboard tab order / accessibility tree while hidden. New i18n key `common.scroll_to_top` across all four locales (en/vi/ja/zh-CN). The button is About-only by design — the converter workspace uses a fixed `h-dvh` layout that never page-scrolls.
+
+### Changed
+
+- **Internal refactor — three oversized components decomposed (behavior-preserving).** `BatchPanel.tsx` (515 lines), `ConverterWorkspace.tsx` (314), and `InputPanel.tsx` (278) were split into focused, reusable units: pure utilities (`lib/format-bytes.ts`, `lib/editor-language.ts`, `lib/read-file.ts`), leaf components (`common/ToolbarButton.tsx` — de-duplicated from InputPanel + OutputPanel — plus `converter/BatchItemRow.tsx` and `converter/BatchSummaryChips.tsx`), and hooks (`useFileAccept`, `useBatchActions`, `useConversionResult`, `useOutputBadge`, `useBatchFileRouter`). No converter or UI behavior changed; all 193 unit tests still pass.
+
+### Tooling
+
+- **`knip` integrated for dead-code analysis.** New `knip.json` config, an `npm run knip` script, and a `Knip` step in CI (`.github/workflows/ci.yml`) — unused files and dependencies are now caught on every push. The initial sweep deleted the orphaned `src/hooks/useLocalStorage.ts` (superseded by `lib/options-storage.ts`), dropped the unused `i18n` default export and the unused `BatchPanel` prop `onAddExternalFiles`, and un-exported the internally-used `nativeReadText`. knip's export-level `types` check is disabled — the converter-contract types in `converters/types.ts` are intentional public vocabulary, not dead code.
+
+### Fixed
+
+- **`globals` was a phantom (undeclared) devDependency.** `eslint.config.js` imports `globals`, but it was never listed in `package.json` — linting only worked because ESLint pulls `globals` in transitively. Now declared explicitly so a stricter or deduped install can't break `npm run lint`. Surfaced by the new `knip` check.
+
+### Dependencies
+
+- Added `knip` `^6.14.1` (ISC, dead-code analyzer, devDep) and `globals` `^14.0.0` (MIT, explicit devDep — previously resolved transitively). `THIRD-PARTY.md` updated.
+
+### Tests
+
+- No new tests this round — the refactor is behavior-preserving and the scroll button is editor/CSS/i18n surface best verified manually. The **193** existing unit tests still pass; typecheck, lint, `knip`, and `prettier --check` are all green.
 
 ## [1.4.3] — 2026-05-14
 

@@ -1,14 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from '@/components/ui/sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useBatchFileRouter } from '@/hooks/useBatchFileRouter';
+import { useConversionResult } from '@/hooks/useConversionResult';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { useOutputBadge } from '@/hooks/useOutputBadge';
 import { getConverter } from '@/converters/registry';
 import type { FormatId } from '@/converters/types';
-import { parseJsonInput } from '@/lib/detect';
-import { filterByExtension, getAllowedExtensions } from '@/lib/file-filter';
-import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import { useTauriDragDrop } from '@/hooks/useTauriDragDrop';
-import { useBatchStore } from '@/stores/batchStore';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
 import { DirectionToggle, type Direction } from './DirectionToggle';
 import { FormatPicker } from './FormatPicker';
@@ -39,40 +38,9 @@ export function ConverterWorkspace() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   // Mobile tab state — desktop ignores this and renders both panels side-by-side.
   const [activeTab, setActiveTab] = useState<'input' | 'output'>('input');
-  // Badge dot on Output tab when output changes while user is on Input tab.
-  const [hasUnreadOutput, setHasUnreadOutput] = useState(false);
-  const prevOutputRef = useRef('');
-  const addBatchFiles = useBatchStore((s) => s.addFiles);
 
-  const handleMultiFileDrop = useCallback(
-    (files: File[]) => {
-      const allowed = getAllowedExtensions(
-        direction === 'reverse' ? 'reverse' : 'forward',
-        getConverter(format).meta.extension,
-      );
-      const { valid, wrongFormat } = filterByExtension(files, allowed);
-      if (wrongFormat > 0) {
-        toast.warning(t('batch.toast.wrong_format', { count: wrongFormat }));
-      }
-      if (valid.length === 0) return;
-      const result = addBatchFiles(valid);
-      if (result.added > 0) {
-        toast.success(t('batch.toast.added', { count: result.added }));
-        setBatchOpen(true);
-      }
-      if (result.skipped > 0) {
-        if (result.reason === 'duplicate') {
-          toast.warning(t('batch.toast.duplicate', { count: result.skipped }));
-        } else {
-          toast.warning(t('batch.toast.skipped', { count: result.skipped, max: 500 }));
-        }
-      }
-    },
-    [addBatchFiles, direction, format, t],
-  );
-
-  // Native OS drag-drop bridge (no-op outside Tauri).
-  useTauriDragDrop(handleMultiFileDrop);
+  const openBatch = useCallback(() => setBatchOpen(true), []);
+  const handleMultiFileDrop = useBatchFileRouter(format, direction, openBatch);
 
   const switchFormat = useCallback(
     (next: FormatId) => {
@@ -109,75 +77,12 @@ export function ConverterWorkspace() {
     toast.success(t('toast.options_reset'));
   }, [format, resetOptionsForFormat, t]);
 
-  const { output, inputError, outputError, shape, parseMs } = useMemo(() => {
-    const start = performance.now();
-    if (!input.trim()) {
-      return { output: '', inputError: null, outputError: null, shape: null, parseMs: null };
-    }
-    const converter = getConverter(format);
-    if (!converter.meta.ready) {
-      return {
-        output: '',
-        inputError: null,
-        outputError: t('errors.converter_not_ready_phase', { phase: converter.meta.phase }),
-        shape: null,
-        parseMs: performance.now() - start,
-      };
-    }
-
-    if (direction === 'reverse') {
-      if (typeof converter.reverse !== 'function') {
-        return {
-          output: '',
-          inputError: null,
-          outputError: t('format_status.no_reverse'),
-          shape: null,
-          parseMs: performance.now() - start,
-        };
-      }
-      const result = converter.reverse(
-        { text: input },
-        currentOptions as Parameters<typeof converter.reverse>[1],
-      );
-      const ms = performance.now() - start;
-      return result.ok
-        ? { output: result.output, inputError: null, outputError: null, shape: null, parseMs: ms }
-        : { output: '', inputError: result.error, outputError: null, shape: null, parseMs: ms };
-    }
-
-    const parsed = parseJsonInput(input);
-    if (!parsed.ok) {
-      const msg = parsed.error === 'empty' ? null : parsed.error;
-      return {
-        output: '',
-        inputError: msg,
-        outputError: null,
-        shape: null,
-        parseMs: performance.now() - start,
-      };
-    }
-    const result = converter.convert(
-      { data: parsed.value, rawText: input },
-      currentOptions as Parameters<typeof converter.convert>[1],
-    );
-    const ms = performance.now() - start;
-    if (result.ok) {
-      return {
-        output: result.output,
-        inputError: null,
-        outputError: null,
-        shape: parsed.shape,
-        parseMs: ms,
-      };
-    }
-    return {
-      output: '',
-      inputError: null,
-      outputError: result.error,
-      shape: parsed.shape,
-      parseMs: ms,
-    };
-  }, [input, format, currentOptions, direction, t]);
+  const { output, inputError, outputError, shape, parseMs } = useConversionResult(
+    input,
+    format,
+    direction,
+    currentOptions,
+  );
 
   useKeyboardShortcuts([
     { key: 'k', mod: true, handler: () => setInput('') },
@@ -185,20 +90,7 @@ export function ConverterWorkspace() {
     { key: ',', mod: true, handler: () => setSettingsOpen((v) => !v) },
   ]);
 
-  // Flip the badge dot on the Output tab whenever output changes while the
-  // user is on the Input tab. Clearing happens once the user navigates over.
-  useEffect(() => {
-    if (output !== prevOutputRef.current) {
-      prevOutputRef.current = output;
-      if (output && activeTab !== 'output') {
-        setHasUnreadOutput(true);
-      }
-    }
-  }, [output, activeTab]);
-
-  useEffect(() => {
-    if (activeTab === 'output') setHasUnreadOutput(false);
-  }, [activeTab]);
+  const hasUnreadOutput = useOutputBadge(output, activeTab);
 
   const inputBytes = useMemo(() => new TextEncoder().encode(input).length, [input]);
   const outputBytes = useMemo(() => new TextEncoder().encode(output).length, [output]);

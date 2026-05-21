@@ -291,7 +291,8 @@
   "common": {
     "loading": "読み込み中…",
     "error": "エラー",
-    "retry": "再試行"
+    "retry": "再試行",
+    "scroll_to_top": "トップへ戻る"
   },
   "disclaimer": {
     "translation": "このページの翻訳は AI 生成です。100% の正確性は保証されません。"

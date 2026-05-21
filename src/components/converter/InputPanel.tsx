@@ -1,14 +1,17 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
 import { Eraser, FileText, FolderOpen } from 'lucide-react';
+import { ToolbarButton } from '@/components/common/ToolbarButton';
 import { toast } from '@/components/ui/sonner';
-import { extOf, getAllowedExtensions } from '@/lib/file-filter';
+import { useFileAccept } from '@/hooks/useFileAccept';
+import { editorLanguageFor } from '@/lib/editor-language';
+import { extOf } from '@/lib/file-filter';
+import { readFileText } from '@/lib/read-file';
 import { SAMPLE_JSON } from '@/lib/sample';
 import { isTauri, nativeOpenFiles, fileFromNativePath } from '@/lib/tauri';
-import { getConverter } from '@/converters/registry';
 import type { FormatId } from '@/converters/types';
-import { CodeEditor, type EditorLanguage } from './CodeEditor';
+import { CodeEditor } from './CodeEditor';
 import type { Direction } from './DirectionToggle';
 
 interface InputPanelProps {
@@ -35,49 +38,16 @@ export function InputPanel({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
 
-  const isReverse = direction === 'reverse';
-  const converter = getConverter(format);
-  // In reverse mode the dropzone + file picker accept the format's native
-  // extension; in forward mode JSON is the only useful input.
-  const accept = useMemo(() => {
-    if (isReverse) {
-      const ext = converter.meta.extension;
-      return {
-        [converter.meta.mimeType]: [`.${ext}`],
-        'text/plain': ['.txt'],
-      };
-    }
-    return { 'application/json': ['.json'], 'text/plain': ['.txt'] };
-  }, [isReverse, converter.meta.mimeType, converter.meta.extension]);
-
-  const fileInputAccept = isReverse
-    ? `.${converter.meta.extension},.txt,${converter.meta.mimeType}`
-    : '.json,.txt,application/json';
+  const { converter, isReverse, accept, fileInputAccept, allowedExtensions } = useFileAccept(
+    format,
+    direction,
+  );
 
   const inputLabel = isReverse
     ? t('home.input_label_format', { format: t(converter.meta.labelKey) })
     : t('home.input_label');
 
-  // CodeMirror language pack to use for the input. In forward mode the input
-  // is always JSON. In reverse, pick the closest available pack — formats
-  // without an official CodeMirror grammar fall back to plain text.
-  const editorLanguage: EditorLanguage = useMemo(() => {
-    if (!isReverse) return 'json';
-    if (format === 'yaml') return 'yaml';
-    if (format === 'xml' || format === 'resx') return 'xml';
-    if (format === 'jsonl') return 'json';
-    if (format === 'markdown') return 'markdown';
-    if (format === 'sql') return 'sql';
-    if (format === 'toml') return 'toml';
-    return 'plain';
-  }, [isReverse, format]);
-
-  // Allowed extensions for the single-file "Open" / drag-drop path.
-  // `<input accept>` is only a hint to the OS picker — re-validate in JS.
-  const allowedExtensions = useMemo(
-    () => getAllowedExtensions(isReverse ? 'reverse' : 'forward', converter.meta.extension),
-    [isReverse, converter.meta.extension],
-  );
+  const editorLanguage = editorLanguageFor(format, direction);
 
   const hasAllowedExt = useCallback(
     (name: string) => allowedExtensions.includes(extOf(name)),
@@ -97,7 +67,7 @@ export function InputPanel({
         toast.warning(t('batch.toast.wrong_format', { count: 1 }));
         return;
       }
-      void readFile(file).then(
+      void readFileText(file).then(
         (text) => {
           onChange(text);
           toast.success(t('toast.file_loaded', { name: file.name }));
@@ -159,7 +129,7 @@ export function InputPanel({
       e.target.value = '';
       return;
     }
-    void readFile(file).then(
+    void readFileText(file).then(
       (text) => {
         onChange(text);
         toast.success(t('toast.file_loaded', { name: file.name }));
@@ -242,37 +212,5 @@ export function InputPanel({
         )}
       </div>
     </div>
-  );
-}
-
-async function readFile(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result ?? ''));
-    reader.onerror = () => reject(new Error(`Cannot read file: ${file.name}`));
-    reader.readAsText(file);
-  });
-}
-
-interface ToolbarButtonProps {
-  onClick: () => void;
-  label: string;
-  icon: React.ReactNode;
-  disabled?: boolean;
-}
-
-function ToolbarButton({ onClick, label, icon, disabled }: ToolbarButtonProps) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={label}
-      title={label}
-      className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs transition disabled:cursor-not-allowed disabled:opacity-40"
-    >
-      {icon}
-      <span className="hidden sm:inline">{label}</span>
-    </button>
   );
 }

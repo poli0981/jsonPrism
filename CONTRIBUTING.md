@@ -20,11 +20,12 @@ Open <http://localhost:5173>.
    ```bash
    npm run format
    npm run lint
+   npm run knip
    npm run typecheck
    npm run build
    ```
 
-   CI runs all four. If any fails, your PR can't be merged.
+   CI runs all of these. If any fails, your PR can't be merged.
 
 2. **Match the project style.** Read [`CLAUDE.md`](CLAUDE.md) for non-negotiable conventions (converter shape, error handling, i18n requirements).
 

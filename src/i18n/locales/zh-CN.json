@@ -291,7 +291,8 @@
   "common": {
     "loading": "加载中…",
     "error": "错误",
-    "retry": "重试"
+    "retry": "重试",
+    "scroll_to_top": "回到顶部"
   },
   "disclaimer": {
     "translation": "本页面译文由 AI 生成,不保证 100% 准确。"

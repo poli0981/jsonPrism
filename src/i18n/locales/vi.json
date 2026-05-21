@@ -291,7 +291,8 @@
   "common": {
     "loading": "Đang tải…",
     "error": "Lỗi",
-    "retry": "Thử lại"
+    "retry": "Thử lại",
+    "scroll_to_top": "Về đầu trang"
   },
   "disclaimer": {
     "translation": "Các bản dịch không phải tiếng Anh do AI tạo, không đảm bảo chính xác 100%."

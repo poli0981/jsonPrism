@@ -122,6 +122,8 @@ installed as a runtime dependency.
 | `@testing-library/jest-dom` | ^6.6.0 | MIT | [testing-library.com](https://testing-library.com/) |
 | `@testing-library/user-event` | ^14.5.0 | MIT | [testing-library.com](https://testing-library.com/) |
 | `jsdom` | ^29.0.0 | MIT | [github.com/jsdom/jsdom](https://github.com/jsdom/jsdom) |
+| `knip` | ^6.14.1 | ISC | [knip.dev](https://knip.dev/) |
+| `globals` | ^14.0.0 | MIT | [github.com/sindresorhus/globals](https://github.com/sindresorhus/globals) |
 
 ## Fonts
 

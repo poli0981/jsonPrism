@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
-import { Download, FileStack, FolderOpen, Loader2, Play, StopCircle, Trash2 } from 'lucide-react';
+import { Download, FileStack, FolderOpen, Play, StopCircle, Trash2 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -11,14 +11,16 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
-import { useBatchStore, BATCH_MAX_FILES, type BatchItem } from '@/stores/batchStore';
-import { processBatch, zipOutputs, downloadBlob } from '@/lib/batch-processor';
-import { filterByExtension, getAllowedExtensions } from '@/lib/file-filter';
-import { isTauri, nativeOpenFiles, nativeSaveBlob, fileFromNativePath } from '@/lib/tauri';
-import { getConverter } from '@/converters/registry';
-import type { FormatId } from '@/converters/types';
+import { useBatchActions } from '@/hooks/useBatchActions';
+import { useFileAccept } from '@/hooks/useFileAccept';
+import { filterByExtension } from '@/lib/file-filter';
+import { isTauri, nativeOpenFiles, fileFromNativePath } from '@/lib/tauri';
 import { cn } from '@/lib/utils';
+import { useBatchStore, BATCH_MAX_FILES } from '@/stores/batchStore';
+import type { FormatId } from '@/converters/types';
 import type { Direction } from './DirectionToggle';
+import { BatchItemRow } from './BatchItemRow';
+import { BatchSummaryChips } from './BatchSummaryChips';
 
 interface BatchPanelProps {
   format: FormatId;
@@ -26,8 +28,6 @@ interface BatchPanelProps {
   options: Record<string, unknown>;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Filenames added via this trigger button are also routed into the queue. */
-  onAddExternalFiles?: (files: File[]) => void;
 }
 
 export function BatchPanel({ format, direction, options, open, onOpenChange }: BatchPanelProps) {
@@ -38,9 +38,6 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
   const addFiles = useBatchStore((s) => s.addFiles);
   const removeItem = useBatchStore((s) => s.removeItem);
   const clear = useBatchStore((s) => s.clear);
-  const setProcessing = useBatchStore((s) => s.setProcessing);
-  const setAbortController = useBatchStore((s) => s.setAbortController);
-  const updateItem = useBatchStore((s) => s.updateItem);
   const resetStatuses = useBatchStore((s) => s.resetStatuses);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -50,29 +47,11 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
   const errorCount = itemOrder.filter((id) => items[id]?.status === 'error').length;
   const queuedCount = itemOrder.filter((id) => items[id]?.status === 'queued').length;
 
-  const isReverse = direction === 'reverse';
-  const converter = getConverter(format);
-  const accept = useMemo(() => {
-    if (isReverse) {
-      return {
-        [converter.meta.mimeType]: [`.${converter.meta.extension}`],
-        'text/plain': ['.txt'],
-      };
-    }
-    return { 'application/json': ['.json'], 'text/plain': ['.txt'] };
-  }, [isReverse, converter.meta.mimeType, converter.meta.extension]);
-
-  const fileInputAccept = isReverse
-    ? `.${converter.meta.extension},.txt,${converter.meta.mimeType}`
-    : '.json,.txt,application/json';
-
-  // Whitelist of file extensions that match the current direction × format.
-  // The browser's native `<input accept>` is only a hint, so we re-validate
-  // in JS to reject files chosen via "Browse" with "All files" filter.
-  const allowedExtensions = useMemo(
-    () => getAllowedExtensions(isReverse ? 'reverse' : 'forward', converter.meta.extension),
-    [isReverse, converter.meta.extension],
+  const { converter, isReverse, accept, fileInputAccept, allowedExtensions } = useFileAccept(
+    format,
+    direction,
   );
+  const { start, cancel, downloadZip } = useBatchActions(format, direction, options);
 
   const handleAddFiles = useCallback(
     (files: File[]) => {
@@ -123,78 +102,6 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
     noClick: true,
     noKeyboard: true,
   });
-
-  const handleStart = useCallback(async () => {
-    const queued = itemOrder
-      .map((id) => items[id])
-      .filter((it): it is BatchItem => !!it && it.status !== 'done' && it.status !== 'processing');
-
-    if (queued.length === 0) {
-      toast.info(t('batch.toast.nothing_to_process'));
-      return;
-    }
-
-    const controller = new AbortController();
-    setAbortController(controller);
-    setProcessing(true);
-    toast.success(t('batch.toast.started', { count: queued.length }));
-
-    try {
-      await processBatch(
-        queued,
-        format,
-        options,
-        {
-          onUpdate: (id, patch) => updateItem(id, patch),
-        },
-        controller.signal,
-        direction,
-      );
-      if (!controller.signal.aborted) {
-        toast.success(t('batch.toast.finished'));
-      }
-    } catch (err) {
-      toast.error(t('batch.toast.failed', { message: (err as Error).message }));
-    } finally {
-      setProcessing(false);
-      setAbortController(null);
-    }
-  }, [
-    direction,
-    format,
-    items,
-    itemOrder,
-    options,
-    setAbortController,
-    setProcessing,
-    t,
-    updateItem,
-  ]);
-
-  const handleCancel = useCallback(() => {
-    useBatchStore.getState().abortController?.abort();
-    toast.info(t('batch.toast.cancelled'));
-  }, [t]);
-
-  const handleDownloadZip = useCallback(async () => {
-    const done = itemOrder.map((id) => items[id]).filter((it): it is BatchItem => !!it);
-    try {
-      const { blob, fileCount } = await zipOutputs(done, format, direction);
-      const ts = new Date().toISOString().slice(0, 10);
-      const filename = `jsonprism-batch-${ts}.zip`;
-      if (isTauri()) {
-        const saved = await nativeSaveBlob(blob, filename);
-        if (saved) {
-          toast.success(t('batch.toast.zipped', { count: fileCount }));
-        }
-      } else {
-        downloadBlob(blob, filename);
-        toast.success(t('batch.toast.zipped', { count: fileCount }));
-      }
-    } catch (err) {
-      toast.error(t('batch.toast.zip_failed', { message: (err as Error).message }));
-    }
-  }, [direction, format, items, itemOrder, t]);
 
   const handleOpenFiles = async () => {
     if (isTauri()) {
@@ -296,13 +203,11 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
 
         {/* Summary chips */}
         {totalCount > 0 && (
-          <div className="text-muted-foreground flex flex-wrap items-center gap-2 px-6 pb-3 font-mono text-[11px]">
-            <Chip label={t('batch.stat.queued')} value={queuedCount} />
-            <Chip label={t('batch.stat.done')} value={doneCount} tone="ok" />
-            {errorCount > 0 && (
-              <Chip label={t('batch.stat.failed')} value={errorCount} tone="err" />
-            )}
-          </div>
+          <BatchSummaryChips
+            queuedCount={queuedCount}
+            doneCount={doneCount}
+            errorCount={errorCount}
+          />
         )}
 
         {/* Queue list */}
@@ -346,7 +251,7 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
             {processing ? (
               <button
                 type="button"
-                onClick={handleCancel}
+                onClick={cancel}
                 className="bg-destructive/10 text-destructive hover:bg-destructive/20 inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition"
               >
                 <StopCircle className="h-3.5 w-3.5" />
@@ -357,7 +262,7 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
                 type="button"
                 onClick={() => {
                   resetStatuses();
-                  void handleStart();
+                  void start();
                 }}
                 disabled={totalCount === 0}
                 className="bg-primary/15 text-primary hover:bg-primary/25 inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-40"
@@ -369,7 +274,7 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
 
             <button
               type="button"
-              onClick={() => void handleDownloadZip()}
+              onClick={() => void downloadZip()}
               disabled={doneCount === 0 || processing}
               className="bg-foreground/90 text-background hover:bg-foreground inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-40"
             >
@@ -381,135 +286,4 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
       </SheetContent>
     </Sheet>
   );
-}
-
-function Chip({ label, value, tone }: { label: string; value: number; tone?: 'ok' | 'err' }) {
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1 rounded px-1.5 py-0.5',
-        tone === 'ok' && 'bg-primary/10 text-primary',
-        tone === 'err' && 'bg-destructive/10 text-destructive',
-        !tone && 'bg-muted/40',
-      )}
-    >
-      <span className="opacity-70">{label}:</span>
-      <span>{value}</span>
-    </span>
-  );
-}
-
-interface BatchItemRowProps {
-  item: BatchItem;
-  outputExt: string;
-  onRemove: () => void;
-  disabled: boolean;
-}
-
-function BatchItemRow({ item, outputExt, onRemove, disabled }: BatchItemRowProps) {
-  const { t } = useTranslation();
-  const Icon = statusIcon(item.status);
-  const tone = statusTone(item.status);
-
-  return (
-    <li className="flex items-start gap-2 py-2.5">
-      <Icon className={cn('mt-0.5 h-4 w-4 shrink-0', tone)} />
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <span className="text-foreground truncate font-mono text-xs">{item.filename}</span>
-          <span className="text-muted-foreground/60 font-mono text-[10px]">→ .{outputExt}</span>
-        </div>
-        <div className="text-muted-foreground mt-0.5 flex items-center gap-2 font-mono text-[10px]">
-          <span>{formatBytes(item.size)}</span>
-          {item.outputSize !== undefined && (
-            <>
-              <span>·</span>
-              <span>
-                {t('batch.row.out')}: {formatBytes(item.outputSize)}
-              </span>
-            </>
-          )}
-        </div>
-        {item.error && (
-          <p className="text-destructive mt-1 font-mono text-[10px] break-words">{item.error}</p>
-        )}
-      </div>
-      <button
-        type="button"
-        onClick={onRemove}
-        disabled={disabled}
-        aria-label={t('batch.row.remove')}
-        className="text-muted-foreground hover:bg-muted hover:text-foreground rounded p-1 transition disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        <Trash2 className="h-3 w-3" />
-      </button>
-    </li>
-  );
-}
-
-function statusIcon(status: BatchItem['status']) {
-  switch (status) {
-    case 'queued':
-      return CircleIcon;
-    case 'processing':
-      return ProcessingIcon;
-    case 'done':
-      return CheckIcon;
-    case 'error':
-      return ErrorIcon;
-  }
-}
-
-function statusTone(status: BatchItem['status']): string {
-  switch (status) {
-    case 'done':
-      return 'text-primary';
-    case 'error':
-      return 'text-destructive';
-    case 'processing':
-      return 'text-foreground';
-    case 'queued':
-    default:
-      return 'text-muted-foreground/60';
-  }
-}
-
-function CircleIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className={className} aria-hidden>
-      <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
-  );
-}
-
-function ProcessingIcon({ className }: { className?: string }) {
-  return <Loader2 className={cn(className, 'animate-spin')} />;
-}
-
-function CheckIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className={className} aria-hidden>
-      <path
-        d="M3 8.5L6.5 12L13 5"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function ErrorIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" className={className} aria-hidden>
-      <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
