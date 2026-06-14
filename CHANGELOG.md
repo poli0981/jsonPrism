@@ -6,7 +6,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
-No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond".
+### Changed
+
+- **Split the CodeMirror core chunk to clear the 500 kB build warning.** The `cm-core` chunk was ~614 kB raw (210 kB gzip) and tripped Vite's `chunkSizeWarningLimit` on every build, even though it is already lazy-loaded behind the editor. Vite 8 / Rolldown deprecates the `manualChunks` function form (its optimizer silently merged sub-chunks back together), so `vite.config.ts` now uses `advancedChunks.groups` with explicit `priority`-ordered, honored boundaries. The CodeMirror core splits into `cm-view` (~245 kB, the `@codemirror/view` DOM engine) + `cm-core` (~362 kB, state/language/lezer/`@uiw` wrapper); `cm-langs` is unchanged (~60 kB). No chunk now exceeds 500 kB. Total bytes and gzip size are unchanged — the editor still loads all three pieces together behind its existing `React.lazy` boundary, so this is purely finer file granularity (better cache reuse across deploys). No converter or UI behavior changed; verified in a production preview build (editor renders, highlights, and converts; all `cm-*` chunks 200 OK, no console errors).
 
 ## [1.6.0] — 2026-06-14
 
