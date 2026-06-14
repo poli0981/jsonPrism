@@ -10,8 +10,42 @@ permissions:
   contents: write
 
 jobs:
+  # Create the draft release ONCE, up front, so every platform in the matrix
+  # below uploads into the same release. Previously each matrix job ran
+  # tauri-action's "find or create release" concurrently; with no release yet,
+  # they raced to create it and produced duplicate drafts that split the assets
+  # (Linux bundles in one draft, macOS/Windows in another). A single
+  # pre-created release referenced by `releaseId` removes the race.
+  create-release:
+    name: Create draft release
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create-release.outputs.result }}
+    steps:
+      - name: Create draft release
+        id: create-release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = context.ref.replace('refs/tags/', '').replace('refs/heads/', '');
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              name: `JSONPrism ${tag}`,
+              body: [
+                'Native desktop builds for Windows, macOS, and Linux.',
+                '',
+                'See the [CHANGELOG](https://github.com/poli0981/jsonPrism/blob/main/CHANGELOG.md) for details.',
+              ].join('\n'),
+              draft: true,
+              prerelease: false,
+            });
+            return data.id;
+
   build:
     name: Build · ${{ matrix.platform.name }}
+    needs: create-release
     runs-on: ${{ matrix.platform.runner }}
     timeout-minutes: 40
 
@@ -74,17 +108,13 @@ jobs:
         run: npm run tauri:icon
         shell: pwsh
 
-      - name: Build, sign, and create release
+      - name: Build, sign, and upload to release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: 'JSONPrism ${{ github.ref_name }}'
-          releaseBody: |
-            Native desktop builds for Windows, macOS, and Linux.
-
-            See the [CHANGELOG](https://github.com/poli0981/jsonPrism/blob/main/CHANGELOG.md) for what's new.
-          releaseDraft: true
-          prerelease: false
+          # Upload into the single draft created by the create-release job above
+          # instead of finding/creating one per matrix job (which caused
+          # duplicate drafts + split assets). The maintainer un-drafts manually.
+          releaseId: ${{ needs.create-release.outputs.release_id }}
           args: ${{ matrix.platform.args }}
