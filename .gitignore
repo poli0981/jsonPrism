@@ -32,7 +32,6 @@ dist-ssr
 
 # Tauri (Phase 2C)
 src-tauri/target
-src-tauri/Cargo.lock
 src-tauri/gen
 src-tauri/icons/*.png
 src-tauri/icons/*.ico
