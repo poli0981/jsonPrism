@@ -38,6 +38,7 @@ JSONPrism là công cụ "tán sắc" cho developer. Nhận một JSON đầu v�
 ## Tính năng
 
 - **Chạy hoàn toàn client-side** — không server, không telemetry, không upload. JSON của bạn ở lại trong trình duyệt.
+- **Khởi động nhanh** — route và editor CodeMirror được lazy-load, mã vendor/parser tách thành nhiều chunk nhỏ theo tính năng, nên trình duyệt chỉ tải đúng phần bạn dùng.
 - **Xử lý batch** — tới 500 file cùng lúc (Phase 2).
 - **Phát hiện shape thông minh** — nhận diện flat object, mảng object, scalar; gợi ý format đích phù hợp.
 - **Tuỳ chọn theo từng format** — pretty-print, indentation, dialect (SQL), alignment (Markdown), v.v.

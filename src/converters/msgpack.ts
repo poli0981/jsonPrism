@@ -1,8 +1,6 @@
 import { encode } from '@msgpack/msgpack';
 import type { Converter } from './types';
-import { encodeBytes } from './bson';
-
-type Encoding = 'base64' | 'hex';
+import { encodeBytes, type Encoding } from '@/lib/bytes';
 
 interface MsgpackOptions {
   encoding: Encoding;

@@ -5,7 +5,7 @@ import { toast } from '@/components/ui/sonner';
 import { ToolbarButton } from '@/components/common/ToolbarButton';
 import type { FormatId } from '@/converters/types';
 import { getConverter } from '@/converters/registry';
-import { decodeBytes } from '@/converters/bson';
+import { decodeBytes } from '@/lib/bytes';
 import type { Direction } from './DirectionToggle';
 
 interface OutputPanelProps {

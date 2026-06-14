@@ -38,6 +38,7 @@ JSONPrism is a refracting tool for developers. It takes a single JSON input and 
 ## Features
 
 - **Client-side only** — no server, no telemetry, no upload. Your JSON stays in your browser.
+- **Fast first paint** — routes and the CodeMirror editor are lazy-loaded, and vendor/parser code is split into small per-feature chunks, so the browser only downloads what you actually use.
 - **Batch processing** — up to 500 files at once (Phase 2).
 - **Smart shape detection** — recognizes flat objects, arrays of objects, scalars; suggests the best target format.
 - **Per-format options** — pretty-print, indentation, dialect (for SQL), alignment (for Markdown), and more.

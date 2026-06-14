@@ -55,31 +55,42 @@ export default defineConfig(({ mode }) => ({
     minify: 'oxc',
     rollupOptions: {
       output: {
-        // Vite 8 / Rolldown only accepts the function form here.
+        // Vite 8 / Rolldown only accepts the function form here. Split into the
+        // smallest sensible vendor chunks so a stale deploy only re-downloads
+        // the pieces that actually changed, and so heavy parsers/lang-packs are
+        // their own files (loaded lazily once their format/editor is needed).
+        // Clause order matters: react must win before react-router/react-i18next.
         manualChunks(id) {
+          if (!id.includes('node_modules')) return undefined;
+          // React core (react, react-dom, scheduler) — exclude react-router /
+          // react-i18next / @uiw/react-codemirror which match their own clauses.
+          if (id.includes('/react-dom/') || /\/react\//.test(id) || id.includes('/scheduler/')) {
+            return 'react';
+          }
+          if (id.includes('react-router')) return 'router';
+          if (id.includes('i18next')) return 'i18n';
+          // CodeMirror: language packs split from the core editor.
+          if (id.includes('@codemirror/lang-') || id.includes('@codemirror/legacy-modes')) {
+            return 'cm-langs';
+          }
           if (
             id.includes('@codemirror/') ||
             id.includes('@uiw/react-codemirror') ||
             id.includes('@lezer/')
           ) {
-            return 'codemirror';
+            return 'cm-core';
           }
-          if (
-            id.includes('js-yaml') ||
-            id.includes('smol-toml') ||
-            id.includes('fast-xml-parser') ||
-            id.includes('papaparse')
-          ) {
-            return 'parsers';
-          }
-          if (
-            id.includes('node_modules/bson/') ||
-            id.includes('node_modules/cbor-x/') ||
-            id.includes('node_modules/@msgpack/')
-          ) {
-            return 'binary-parsers';
-          }
+          // One chunk per parser library.
+          if (id.includes('js-yaml')) return 'p-yaml';
+          if (id.includes('papaparse')) return 'p-csv';
+          if (id.includes('fast-xml-parser')) return 'p-xml';
+          if (id.includes('smol-toml')) return 'p-toml';
+          if (id.includes('node_modules/bson/')) return 'p-bson';
+          if (id.includes('node_modules/cbor-x/')) return 'p-cbor';
+          if (id.includes('node_modules/@msgpack/')) return 'p-msgpack';
           if (id.includes('fflate')) return 'fflate';
+          // Radix primitives + icon set.
+          if (id.includes('@radix-ui') || id.includes('lucide-react')) return 'ui';
           return undefined;
         },
       },

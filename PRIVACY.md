@@ -31,6 +31,7 @@ These keys are written by JSONPrism:
 | `jsonprism.selected_format` | The target format chip you last selected |
 | `jsonprism.direction` | Conversion direction (`forward` / `reverse`) |
 | `jsonprism.options.<format>` | Per-format options (e.g. CSV header on/off) |
+| `jsonprism.consent` | That you accepted the License / Terms / Privacy / Disclaimer (acceptance flag + version + timestamp). Web only — the desktop app gates this in its installer. |
 
 That is the entire on-disk footprint. Clearing your browser's site data
 removes everything. Nothing leaves your device.

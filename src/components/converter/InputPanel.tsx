@@ -11,7 +11,7 @@ import { readFileText } from '@/lib/read-file';
 import { SAMPLE_JSON } from '@/lib/sample';
 import { isTauri, nativeOpenFiles, fileFromNativePath } from '@/lib/tauri';
 import type { FormatId } from '@/converters/types';
-import { CodeEditor } from './CodeEditor';
+import { CodeEditorLazy } from './CodeEditorLazy';
 import type { Direction } from './DirectionToggle';
 
 interface InputPanelProps {
@@ -188,7 +188,7 @@ export function InputPanel({
       </div>
 
       <div className="relative min-h-0 flex-1">
-        <CodeEditor
+        <CodeEditorLazy
           value={value}
           onChange={onChange}
           language={editorLanguage}

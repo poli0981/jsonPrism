@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { ErrorState, errorActionPrimary } from '@/components/common/ErrorState';
 
 interface Props {
   children: ReactNode;
@@ -24,22 +25,23 @@ export class ErrorBoundary extends Component<Props, State> {
   override render(): ReactNode {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
+      // Last-resort crash screen. Intentionally hardcoded English (no i18n) so
+      // it still renders even when the crash originated inside i18n itself.
       return (
-        <div className="bg-background text-foreground flex min-h-screen items-center justify-center p-8">
-          <div className="border-border bg-card max-w-md rounded-lg border p-6">
-            <h1 className="font-display mb-2 text-2xl">Something refracted unexpectedly.</h1>
-            <p className="text-muted-foreground mb-4 text-sm">
-              {this.state.error?.message ?? 'Unknown error.'}
-            </p>
+        <ErrorState
+          className="min-h-dvh"
+          title="Something refracted unexpectedly."
+          message={this.state.error?.message ?? 'Unknown error.'}
+          actions={
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-medium transition hover:opacity-90"
+              className={errorActionPrimary}
             >
               Reload
             </button>
-          </div>
-        </div>
+          }
+        />
       );
     }
     return this.props.children;
