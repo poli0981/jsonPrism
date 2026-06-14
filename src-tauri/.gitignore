@@ -1,6 +1,5 @@
 /target/
 /gen/schemas/
-Cargo.lock
 
 # Icon binaries are generated from icon.svg via `npm run tauri:icon`.
 # Comment these out and commit the binaries if your CI doesn't run the generation step.
