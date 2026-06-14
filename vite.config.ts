@@ -49,7 +49,11 @@ export default defineConfig(({ mode }) => ({
 
   build: {
     target: 'es2022',
-    sourcemap: !isTauriContext,
+    // Source maps would expose full original source on the public GH Pages
+    // deploy (the whole dist/ is uploaded), and nothing consumes them
+    // (PRIVACY.md: no remote error reporting). Emit them only for local,
+    // non-production web builds; never for the prod web deploy or Tauri.
+    sourcemap: !isTauriContext && mode !== 'production',
     // Vite 8 uses Rolldown + Oxc minifier by default; legacy `esbuild` requires
     // installing esbuild separately.
     minify: 'oxc',
