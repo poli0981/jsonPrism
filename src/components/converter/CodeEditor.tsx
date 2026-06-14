@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 
 export type EditorLanguage = 'json' | 'plain' | 'yaml' | 'xml' | 'markdown' | 'sql' | 'toml';
 
-interface CodeEditorProps {
+export interface CodeEditorProps {
   value: string;
   onChange?: (v: string) => void;
   readOnly?: boolean;

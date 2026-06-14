@@ -1,8 +1,6 @@
 import { encode } from 'cbor-x';
 import type { Converter } from './types';
-import { encodeBytes } from './bson';
-
-type Encoding = 'base64' | 'hex';
+import { encodeBytes, type Encoding } from '@/lib/bytes';
 
 interface CborOptions {
   encoding: Encoding;

@@ -7,6 +7,27 @@
     <meta name="color-scheme" content="dark light" />
     <meta name="theme-color" content="#0a0b14" />
 
+    <!--
+      Restores a deep-link path that public/404.html encoded into the query
+      string on GitHub Pages (see that file). Must run before the SPA router
+      reads the URL. No-op everywhere else (including Tauri) since `?/` is only
+      ever present right after the 404 redirect.
+    -->
+    <script type="text/javascript">
+      (function (l) {
+        if (l.search[1] === '/') {
+          var decoded = l.search
+            .slice(1)
+            .split('&')
+            .map(function (s) {
+              return s.replace(/~and~/g, '&');
+            })
+            .join('?');
+          window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash);
+        }
+      })(window.location);
+    </script>
+
     <meta name="description" content="JSONPrism — disperse JSON into many formats. Convert to JSONL, CSV, YAML, XML, TOML, RESX, Markdown, SQL. Fully client-side, batch up to 500 files." />
     <meta name="keywords" content="JSON, converter, JSONL, YAML, CSV, XML, TOML, RESX, Markdown, SQL, batch, offline" />
 

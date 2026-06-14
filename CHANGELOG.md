@@ -8,6 +8,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond".
 
+## [1.6.0] — 2026-06-14
+
+### Added
+
+- **Custom error pages.** A reusable presentational `ErrorState` component (`src/components/common/ErrorState.tsx`) backs a 404 catch-all route (`src/pages/errors/NotFound.tsx`) and a generic `/error/:code` route (`src/pages/errors/ErrorRoute.tsx`) with dedicated copy for 403 / 404 / 419 / 500 and a fallback for anything else. JSONPrism is a static client-side SPA and never emits these from a server itself — the route exists so any code (a future backend, a Tauri IPC failure) can render a polished, consistent page. New `error_page.*` i18n group in EN + VI.
+- **First-launch legal consent gate (web only).** A non-dismissible modal (`src/components/common/ConsentGate.tsx`, built on a new `src/components/ui/dialog.tsx` Radix wrapper) blocks the app on first launch / incognito until the user ticks agreement to the License, Terms (EULA), Privacy Policy, and Disclaimer (linked to GitHub). Acceptance persists to `localStorage` (`jsonprism.consent` — flag + version + timestamp) via `src/lib/consent-storage.ts` and a Zustand store (`src/stores/consentStore.ts`); bump `CONSENT_VERSION` to re-prompt when terms change. Skipped in desktop builds (gated by the installer instead) with zero runtime branching, via the build-time `__IS_TAURI_BUILD__` flag. New `consent.*` i18n group in EN + VI; `PRIVACY.md` documents the new key.
+- **Windows installer license-acceptance page.** `bundle.licenseFile` in `tauri.conf.json` now points at `src-tauri/license.rtf` (a short EULA referencing Apache-2.0 + TERMS / PRIVACY / DISCLAIMER). Both the NSIS `.exe` and the WiX `.msi` show an accept-to-continue license page — RTF satisfies both, so `targets: "all"` is preserved.
+- **Offline indicator.** `useOnlineStatus` hook + a non-blocking `OfflineBanner` strip between the header and content. Informational only — JSONPrism keeps working offline.
+- **GitHub Pages deep-link support.** `public/404.html` (spa-github-pages redirect, `pathSegmentsToKeep = 1` for the `/jsonPrism/` base) plus a tiny decoder in `index.html` make refreshing a deep link (e.g. `/jsonPrism/about`) resolve to the right route instead of GitHub's 404. No-op under Tauri.
+
+### Changed
+
+- **Lazy-loading + finer code-splitting (web).** Routes (`Home`, `About`, error pages) and the CodeMirror editor are now `React.lazy` + `Suspense` (the editor degrades to a real `<textarea>` while its chunk loads, so input stays usable). A `ChunkErrorBoundary` catches a failed dynamic import (e.g. stale deploy) and offers reload without crashing the page; non-chunk errors rethrow to the existing crash `ErrorBoundary`, which now shares the `ErrorState` visual. `manualChunks` in `vite.config.ts` was refined to split `react` / `router` / `i18n` / `cm-core` / `cm-langs` / one chunk per parser / `ui` — the heavy CodeMirror core is no longer in the initial paint graph.
+- **Removed a hidden `bson` leak.** `decodeBytes` / `encodeBytes` moved from `src/converters/bson.ts` to a parser-free `src/lib/bytes.ts`; `OutputPanel` and the CBOR / MessagePack converters import from there, so the `bson` library no longer enters the initial bundle graph just because the output panel renders.
+
+### Tests
+
+- **+16 unit tests (209 total).** New coverage for `consent-storage`, `consentStore`, `bytes` codec, `isChunkLoadError`, the `ErrorState` component, and the `useOnlineStatus` hook. Typecheck, lint, `knip`, `prettier --check`, and `npm audit` (0 vulnerabilities) all green; consent gate / 404 / `/error/:code` verified in a running dev build.
+
 ## [1.5.0] — 2026-05-21
 
 ### Added

@@ -233,6 +233,41 @@
     "batch_limit": "Batch limit reached ({{max}} files). Remove some files first.",
     "unknown": "Something went wrong. {{message}}"
   },
+  "error_page": {
+    "generic": {
+      "title": "Something went wrong",
+      "message": "An unexpected error occurred. Try reloading the page."
+    },
+    "404": {
+      "title": "Page not found",
+      "message": "The prism only refracts what's here — this route doesn't exist."
+    },
+    "403": {
+      "title": "Forbidden",
+      "message": "You don't have permission to view this."
+    },
+    "419": {
+      "title": "Session expired",
+      "message": "Your session timed out. Reload to start fresh."
+    },
+    "500": {
+      "title": "Server error",
+      "message": "Something broke on the way back. Try again in a moment."
+    },
+    "offline": {
+      "title": "You're offline",
+      "message": "You're offline — JSONPrism keeps working; only web fonts may not load."
+    },
+    "chunk": {
+      "title": "Couldn't load part of the app",
+      "message": "A resource failed to load — usually a new version was just deployed. Reload to get the latest."
+    },
+    "actions": {
+      "home": "Back to Convert",
+      "reload": "Reload",
+      "retry": "Retry"
+    }
+  },
   "about": {
     "title": "About JSONPrism",
     "lead": "A refracting tool for developers.",
@@ -293,6 +328,18 @@
     "error": "Error",
     "retry": "Retry",
     "scroll_to_top": "Back to top"
+  },
+  "consent": {
+    "title": "Before you start",
+    "intro": "JSONPrism runs entirely in your browser — your data never leaves your device. Please review and accept the terms:",
+    "agree": "I have read and agree to the License, Terms (EULA), Privacy Policy, and Disclaimer.",
+    "continue": "Continue",
+    "links": {
+      "license": "License",
+      "terms": "Terms (EULA)",
+      "privacy": "Privacy Policy",
+      "disclaimer": "Disclaimer"
+    }
   },
   "disclaimer": {
     "translation": "Non-English translations are AI-generated. Accuracy is not guaranteed."

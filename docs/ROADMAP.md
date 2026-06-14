@@ -245,6 +245,20 @@ Codebase hygiene plus a small UX addition — no converter behavior changed.
 
 ---
 
+## Phase 6 — Legal gates, error pages & load performance ✅
+
+**Status**: complete (shipped in v1.6.0)
+
+Compliance + reliability + first-paint performance. No converter behavior changed.
+
+- [x] Custom error pages: reusable `ErrorState`, 404 catch-all, generic `/error/:code` (403/419/5xx variants), offline banner, and a chunk-load error boundary folded into the existing crash boundary's look.
+- [x] GitHub Pages SPA deep-link fix (`public/404.html` + `index.html` decoder for the `/jsonPrism/` base).
+- [x] First-launch legal consent gate (web only) — accept License/Terms/Privacy/Disclaimer, persisted to `localStorage` with a version for re-prompting; skipped on desktop.
+- [x] Windows installer license-acceptance page via Tauri `bundle.licenseFile` (`src-tauri/license.rtf`), covering both NSIS `.exe` and WiX `.msi`.
+- [x] Lazy-load routes + the CodeMirror editor; refined `manualChunks` (react/router/i18n/cm-core/cm-langs/per-parser/ui); removed the `bson` initial-graph leak via `lib/bytes.ts`. +16 tests (209 total).
+
+---
+
 ## Beyond — Ideas (no commitment)
 
 - **JSON → Excel (.xlsx)** via SheetJS — possible if Markdown/CSV doesn't cover the use case

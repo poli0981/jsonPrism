@@ -1,7 +1,9 @@
 import { serialize } from 'bson';
 import type { Converter } from './types';
+import { encodeBytes, type Encoding } from '@/lib/bytes';
 
-type Encoding = 'base64' | 'hex';
+// Re-exported for existing test imports (`../bson`) and any legacy callers.
+export { encodeBytes, decodeBytes } from '@/lib/bytes';
 
 interface BsonOptions {
   encoding: Encoding;
@@ -45,35 +47,3 @@ export const bsonConverter: Converter<BsonOptions> = {
     }
   },
 };
-
-export function encodeBytes(bytes: Uint8Array, encoding: Encoding): string {
-  if (encoding === 'hex') {
-    let out = '';
-    for (let i = 0; i < bytes.length; i++) {
-      out += bytes[i]!.toString(16).padStart(2, '0');
-    }
-    return out;
-  }
-  // base64 — encode 3 bytes at a time without using a giant String.fromCharCode call.
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]!);
-  }
-  return btoa(binary);
-}
-
-export function decodeBytes(encoded: string, encoding: Encoding): Uint8Array {
-  if (encoding === 'hex') {
-    const clean = encoded.replace(/\s+/g, '');
-    if (clean.length % 2 !== 0) throw new Error('Hex string has odd length');
-    const out = new Uint8Array(clean.length / 2);
-    for (let i = 0; i < out.length; i++) {
-      out[i] = parseInt(clean.slice(i * 2, i * 2 + 2), 16);
-    }
-    return out;
-  }
-  const binary = atob(encoded);
-  const out = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i);
-  return out;
-}

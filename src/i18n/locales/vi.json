@@ -233,6 +233,41 @@
     "batch_limit": "Đã đạt giới hạn batch ({{max}} file). Hãy bỏ bớt file.",
     "unknown": "Đã có lỗi xảy ra. {{message}}"
   },
+  "error_page": {
+    "generic": {
+      "title": "Đã có lỗi xảy ra",
+      "message": "Một lỗi không mong muốn đã xảy ra. Hãy thử tải lại trang."
+    },
+    "404": {
+      "title": "Không tìm thấy trang",
+      "message": "Lăng kính chỉ tán sắc những gì đang có — đường dẫn này không tồn tại."
+    },
+    "403": {
+      "title": "Bị cấm truy cập",
+      "message": "Bạn không có quyền xem nội dung này."
+    },
+    "419": {
+      "title": "Phiên đã hết hạn",
+      "message": "Phiên làm việc đã hết hạn. Hãy tải lại để bắt đầu lại."
+    },
+    "500": {
+      "title": "Lỗi máy chủ",
+      "message": "Có gì đó hỏng trên đường về. Hãy thử lại sau giây lát."
+    },
+    "offline": {
+      "title": "Bạn đang ngoại tuyến",
+      "message": "Bạn đang ngoại tuyến — JSONPrism vẫn chạy bình thường; chỉ font web có thể không tải được."
+    },
+    "chunk": {
+      "title": "Không tải được một phần ứng dụng",
+      "message": "Một tài nguyên không tải được — thường do vừa có phiên bản mới. Hãy tải lại để cập nhật."
+    },
+    "actions": {
+      "home": "Về trang Chuyển đổi",
+      "reload": "Tải lại",
+      "retry": "Thử lại"
+    }
+  },
   "about": {
     "title": "Về JSONPrism",
     "lead": "Một công cụ tán sắc cho developer.",
@@ -293,6 +328,18 @@
     "error": "Lỗi",
     "retry": "Thử lại",
     "scroll_to_top": "Về đầu trang"
+  },
+  "consent": {
+    "title": "Trước khi bắt đầu",
+    "intro": "JSONPrism chạy hoàn toàn trong trình duyệt của bạn — dữ liệu không bao giờ rời khỏi thiết bị. Vui lòng đọc và chấp nhận các điều khoản:",
+    "agree": "Tôi đã đọc và đồng ý với Giấy phép, Điều khoản (EULA), Chính sách bảo mật và Tuyên bố miễn trừ trách nhiệm.",
+    "continue": "Tiếp tục",
+    "links": {
+      "license": "Giấy phép",
+      "terms": "Điều khoản (EULA)",
+      "privacy": "Chính sách bảo mật",
+      "disclaimer": "Miễn trừ trách nhiệm"
+    }
   },
   "disclaimer": {
     "translation": "Các bản dịch không phải tiếng Anh do AI tạo, không đảm bảo chính xác 100%."
