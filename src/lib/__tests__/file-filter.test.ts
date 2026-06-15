@@ -51,4 +51,21 @@ describe('filterByExtension', () => {
   it('returns empty result for empty input', () => {
     expect(filterByExtension([], ['json'])).toEqual({ valid: [], wrongFormat: 0 });
   });
+
+  it('rejects extensionless names by default', () => {
+    const opaque = f('1000000123');
+    const result = filterByExtension([opaque], ['json', 'txt']);
+    expect(result.valid).toEqual([]);
+    expect(result.wrongFormat).toBe(1);
+  });
+
+  it('accepts extensionless names when lenient (Android content URIs)', () => {
+    const opaque = f('1000000123');
+    const json = f('b.json');
+    const png = f('c.png');
+    const result = filterByExtension([opaque, json, png], ['json', 'txt'], true);
+    // opaque (no ext) + json pass; png has a recognizable, disallowed ext.
+    expect(result.valid).toEqual([opaque, json]);
+    expect(result.wrongFormat).toBe(1);
+  });
 });

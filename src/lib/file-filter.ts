@@ -29,12 +29,25 @@ export interface FilterByExtensionResult {
   wrongFormat: number;
 }
 
-/** Split files into (accepted, wrong-format count) by extension whitelist. */
-export function filterByExtension(files: File[], allowed: string[]): FilterByExtensionResult {
+/**
+ * Split files into (accepted, wrong-format count) by extension whitelist.
+ *
+ * `treatUnknownExtAsValid` accepts files whose name has no detectable
+ * extension. Android's native picker returns opaque `content://` document ids
+ * (e.g. `…/document/msf:1000000123`) that carry no filename, so re-filtering a
+ * file the user already chose through the native dialog would wrongly reject
+ * it. Use it only on the native-open path — web drag-drop stays strict.
+ */
+export function filterByExtension(
+  files: File[],
+  allowed: string[],
+  treatUnknownExtAsValid = false,
+): FilterByExtensionResult {
   const valid: File[] = [];
   let wrongFormat = 0;
   for (const f of files) {
-    if (allowed.includes(extOf(f.name))) valid.push(f);
+    const ext = extOf(f.name);
+    if (allowed.includes(ext) || (treatUnknownExtAsValid && ext === '')) valid.push(f);
     else wrongFormat += 1;
   }
   return { valid, wrongFormat };

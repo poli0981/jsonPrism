@@ -106,7 +106,11 @@ export function InputPanel({
       if (!paths || paths.length === 0) return;
       try {
         const file = await fileFromNativePath(paths[0]!);
-        if (!hasAllowedExt(file.name)) {
+        // The native dialog already filtered; reject only when the name carries
+        // a recognizable, disallowed extension. Android content URIs often have
+        // no extension at all (opaque document ids) — don't reject those.
+        const pickedExt = extOf(file.name);
+        if (pickedExt && !allowedExtensions.includes(pickedExt)) {
           toast.warning(t('batch.toast.wrong_format', { count: 1 }));
           return;
         }

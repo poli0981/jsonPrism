@@ -10,10 +10,13 @@
 */
 
 @theme inline {
-  /* Fonts */
+  /* Fonts — self-hosted via @fontsource (imported in src/main.tsx).
+     Family names match the @fontsource packages: variable fonts expose the
+     "… Variable" family; the static Instrument Serif keeps its plain name. */
   --font-display: 'Instrument Serif', ui-serif, Georgia, serif;
-  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-sans: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   /* Core shadcn tokens — map to CSS vars below */
   --color-background: var(--background);

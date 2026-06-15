@@ -100,17 +100,41 @@ export function pathHashAsMillis(path: string): number {
 }
 
 /**
+ * Derive a clean basename from a native path or an Android content URI.
+ *
+ * Desktop paths (`C:\…\data.json`, `/home/…/data.json`) pass through
+ * unchanged. Android's dialog returns a percent-encoded `content://` URI
+ * whose document id usually embeds the real path
+ * (e.g. `…/document/raw%3A%2Fstorage%2Femulated%2F0%2FDownload%2Fdata.json`).
+ * Decode it, then strip everything up to the last `/` or `:` so the editor,
+ * the format-extension filter, and toasts see `data.json` instead of the raw
+ * URI. Providers that hand back an opaque id (e.g. `msf:1000000123`) still
+ * collapse to a short, stable token.
+ */
+export function basenameFromPath(path: string): string {
+  let decoded = path;
+  try {
+    decoded = decodeURIComponent(path);
+  } catch {
+    // malformed %-escape — fall back to the raw string
+  }
+  const afterSlash = decoded.replace(/^.*[\\/]/, '');
+  return afterSlash.replace(/^.*:/, '') || afterSlash;
+}
+
+/**
  * Convert a native file path to a browser-style File so the
  * existing batch store and editor flows can consume it unchanged.
  *
  * `lastModified` is read from the file's real mtime via `stat()` so that
  * re-dropping the same file dedups correctly (batchStore keys on
  * name|size|lastModified). Falling back to `Date.now()` would break dedup
- * because every drop produces a fresh timestamp.
+ * because every drop produces a fresh timestamp. On Android `stat()` on a
+ * content URI is unreliable, so the hash fallback covers it.
  */
 export async function fileFromNativePath(path: string): Promise<File> {
   const text = await nativeReadText(path);
-  const name = path.replace(/^.*[\\/]/, ''); // basename
+  const name = basenameFromPath(path);
   const ext = (name.split('.').pop() ?? '').toLowerCase();
   const type = TYPE_BY_EXT[ext] ?? 'application/octet-stream';
 
