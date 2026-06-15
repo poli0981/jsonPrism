@@ -259,6 +259,34 @@ Compliance + reliability + first-paint performance. No converter behavior change
 
 ---
 
+## Phase 7 — Android (sideload APK) 🔜
+
+**Status**: in progress
+
+Goal: ship JSONPrism as an Android app users sideload from a `.apk`. Same React UI, no behavior change to the converters. **Minimum Android 12 (API 31)** — older devices are blocked by the OS.
+
+### Tasks
+
+- [x] `bundle.android` in `tauri.conf.json`: `minSdkVersion: 31`, deterministic `versionCode` (`MAJOR*10000+MINOR*100+PATCH`)
+- [x] `tauri android init` → Android Gradle project at `src-tauri/gen/android/`, **committed** (source only; build outputs + secrets gitignored via nested + root `.gitignore`)
+- [x] Verified `minSdk = 31` propagated to `app/build.gradle.kts`; Rust compiles for all 4 ABIs (validated against NDK r27/r30)
+- [x] Release signing wired in `app/build.gradle.kts` from a gitignored `keystore.properties` (graceful unsigned fallback when absent)
+- [x] Self-hosted fonts via `@fontsource` (Geist / Instrument Serif / JetBrains Mono) — removed Google Fonts `<link>`, tightened CSP, app renders correctly **offline**
+- [x] Local scripts: `tauri:android:init` / `tauri:android:dev` / `tauri:android:build` (universal APK; chains `tauri:icon`)
+- [x] CI: `android` job in `release.yml` builds + signs (keystore from secrets) + uploads the universal APK to the same draft release
+- [x] Docs: README / README.vi "Android" sections + maintainer notes in `docs/TAURI-NOTES.md`
+- [x] Emulator-validated: signed APK installs on Android 12+, **blocked on API < 31** (`INSTALL_FAILED_OLDER_SDK`), launches, renders (CodeMirror + self-hosted fonts), runs converters, fully offline
+- [x] Native file open works — `plugin-dialog` fires the SAF picker, `plugin-fs` reads the `content://` URI; `basenameFromPath()` recovers a clean filename (unit-tested)
+- [x] Found: layout needs WebView **Chromium ≥ 111** (Tailwind v4); fine on updated Android 12+ devices, broken on the API 31 emulator's stock Chromium 91 — see `docs/TAURI-NOTES.md`
+- [ ] Add CI signing secrets (`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, …) — maintainer action
+- [ ] Remaining manual checks: save `.zip` via SAF, all 12 converters end-to-end, theme + 4 locales, upgrade-in-place on a real device
+
+### Deliverable
+
+A signed universal `.apk` attached to each GitHub release, installable on Android 12+. Same converter feature set as web/desktop, fully offline.
+
+---
+
 ## Beyond — Ideas (no commitment)
 
 - **JSON → Excel (.xlsx)** via SheetJS — possible if Markdown/CSV doesn't cover the use case

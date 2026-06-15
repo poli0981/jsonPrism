@@ -32,12 +32,18 @@ dist-ssr
 
 # Tauri (Phase 2C)
 src-tauri/target
-src-tauri/gen
+# gen/android is committed (source). Build outputs inside it are ignored by its own
+# nested .gitignore files. Only the generated JSON schemas are ignored here.
+src-tauri/gen/schemas
 src-tauri/icons/*.png
 src-tauri/icons/*.ico
 src-tauri/icons/*.icns
 src-tauri/icons/android/
 src-tauri/icons/ios/
+
+# Android signing keystore — never commit the keystore binary.
+*.jks
+*.keystore
 
 # Test artifacts
 coverage

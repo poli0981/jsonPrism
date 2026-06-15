@@ -105,6 +105,43 @@ Output:
 
 **Release tự động**: push tag `v*` sẽ trigger `.github/workflows/release.yml`, build cho tất cả platform song song và tạo draft GitHub release.
 
+## Bản Android (Tauri 2)
+
+JSONPrism còn có bản Android để bạn sideload từ file `.apk`. Cùng React UI; chọn file qua dialog native. **Yêu cầu Android 12 (API 31) trở lên** — máy cũ hơn sẽ bị hệ điều hành chặn cài.
+
+### Cài đặt (người dùng)
+
+1. Tải `JSONPrism-<version>-android-universal.apk` từ trang [Releases](https://github.com/poli0981/jsonPrism/releases).
+2. Mở file; Android sẽ hỏi cho phép "cài app không rõ nguồn" cho trình duyệt/trình quản lý file — bật lên rồi cài.
+3. Cần Android 12+. App chạy hoàn toàn offline.
+
+### Build (lập trình viên)
+
+**Yêu cầu thêm** (ngoài Rust toolchain của bản desktop):
+
+- **Android Studio** với SDK Platform **31+**, Build-Tools, Platform-Tools, Command-line Tools và một bản **NDK**
+- **JDK** — dùng JBR đi kèm Android Studio là được
+- Biến môi trường: `JAVA_HOME`, `ANDROID_HOME`, `NDK_HOME` (xem [`docs/TAURI-NOTES.md`](docs/TAURI-NOTES.md))
+- Rust Android targets: `rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android`
+
+Project Gradle nằm ở `src-tauri/gen/android/` và đã được commit. Bạn **không** cần chạy `tauri android init` cho build thường.
+
+**Chạy trên thiết bị/emulator** (Android 12+):
+
+```bash
+npm run tauri:android:dev
+```
+
+**Build APK release universal**:
+
+```bash
+npm run tauri:android:build
+```
+
+Output: `src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release.apk`. Thông tin ký lấy từ `src-tauri/gen/android/keystore.properties` (gitignored); thiếu file này thì APK build ra chưa ký. Xem [`docs/TAURI-NOTES.md`](docs/TAURI-NOTES.md) để biết cách tạo keystore và các secret ký trong CI.
+
+**Release tự động**: cùng tag `v*` cũng chạy job `android` trong `release.yml`, ký APK bằng keystore từ repository secrets và đính vào draft release.
+
 ### Các script
 
 | Script                | Chức năng                                |

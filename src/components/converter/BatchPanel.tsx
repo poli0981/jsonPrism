@@ -54,8 +54,8 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
   const { start, cancel, downloadZip } = useBatchActions(format, direction, options);
 
   const handleAddFiles = useCallback(
-    (files: File[]) => {
-      const { valid, wrongFormat } = filterByExtension(files, allowedExtensions);
+    (files: File[], lenientExt = false) => {
+      const { valid, wrongFormat } = filterByExtension(files, allowedExtensions, lenientExt);
       if (wrongFormat > 0) {
         toast.warning(t('batch.toast.wrong_format', { count: wrongFormat }));
       }
@@ -108,7 +108,9 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
       const paths = await nativeOpenFiles({ multiple: true });
       if (!paths || paths.length === 0) return;
       const files = await Promise.all(paths.map(fileFromNativePath));
-      handleAddFiles(files);
+      // The native dialog already filtered; Android content URIs may carry no
+      // extension, so don't re-reject them here.
+      handleAddFiles(files, true);
       return;
     }
     fileInputRef.current?.click();

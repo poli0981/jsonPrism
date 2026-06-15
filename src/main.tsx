@@ -1,6 +1,13 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+// Self-hosted fonts (bundled into the build) so the app renders correctly
+// offline — required for the desktop/Android sideload builds and a privacy win
+// for web. Replaces the former Google Fonts <link> tags in index.html.
+import '@fontsource-variable/geist/index.css';
+import '@fontsource-variable/jetbrains-mono/index.css';
+import '@fontsource/instrument-serif/400.css';
+import '@fontsource/instrument-serif/400-italic.css';
 import './styles/globals.css';
 import './i18n';
 import { App } from './app/App';

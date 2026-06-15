@@ -105,6 +105,43 @@ Output:
 
 **Automated releases**: pushing a `v*` tag triggers `.github/workflows/release.yml`, which builds for all platforms in parallel and creates a draft GitHub release.
 
+## Android app (Tauri 2)
+
+JSONPrism also ships as an Android app you sideload from a `.apk`. Same React UI; native file picker via the dialog plugin. **Requires Android 12 (API 31) or newer** — the OS refuses to install it on older versions.
+
+### Install (users)
+
+1. Download `JSONPrism-<version>-android-universal.apk` from the [Releases](https://github.com/poli0981/jsonPrism/releases) page.
+2. Open it; Android will ask you to allow "install unknown apps" for your browser/file manager — enable it, then install.
+3. Needs Android 12+. The app runs fully offline.
+
+### Build (developers)
+
+**Additional requirements** (on top of the desktop Rust toolchain):
+
+- **Android Studio** with SDK Platform **31+**, Build-Tools, Platform-Tools, Command-line Tools, and an **NDK**
+- **JDK** — the JBR bundled with Android Studio is fine
+- Environment variables: `JAVA_HOME`, `ANDROID_HOME`, `NDK_HOME` (see [`docs/TAURI-NOTES.md`](docs/TAURI-NOTES.md))
+- Rust Android targets: `rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android`
+
+The Android Gradle project lives in `src-tauri/gen/android/` and is committed. You do **not** need to run `tauri android init` for a normal build.
+
+**Run on a device/emulator** (Android 12+):
+
+```bash
+npm run tauri:android:dev
+```
+
+**Build a universal release APK**:
+
+```bash
+npm run tauri:android:build
+```
+
+Output: `src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release.apk`. Release signing is read from `src-tauri/gen/android/keystore.properties` (gitignored); without it the APK builds unsigned. See [`docs/TAURI-NOTES.md`](docs/TAURI-NOTES.md) for keystore setup and the CI signing secrets.
+
+**Automated releases**: the same `v*` tag also runs the `android` job in `release.yml`, which signs the APK with the keystore from repository secrets and attaches it to the draft release.
+
 ### Scripts
 
 | Script                | What it does                                  |
