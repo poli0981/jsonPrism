@@ -25,8 +25,12 @@ Dùng để kiểm tra bản web (chủ yếu là deploy lên GitHub Pages) trê
 - iPhone 14 Pro — iOS 26.x — Chrome, Brave
 - iPhone 13 Pro Max — iOS 26.x — Chrome, Brave
 
-Test Android là cơ hội (không có thiết bị chuyên dụng); bản web vẫn nên
-chạy được với các phiên bản WebView phổ thông.
+Android: app được build và smoke-test trên emulator (API 31 cho cổng chặn
+cài / min-SDK, API 36 với WebView Chromium 134 cho phần render) — chưa có
+thiết bị thật chuyên dụng. **Yêu cầu hệ thống cho người dùng cuối** (Android
+12+, WebView Chromium 111+, RAM, dung lượng) nằm ở mục "Yêu cầu hệ thống"
+trong README; chi tiết build / ký nằm ở
+[docs/TAURI-NOTES.md](../../TAURI-NOTES.md).
 
 ## Tài liệu liên quan
 
