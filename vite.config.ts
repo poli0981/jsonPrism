@@ -138,8 +138,8 @@ export default defineConfig(({ mode }) => ({
           '@tauri-apps/api',
           '@tauri-apps/plugin-dialog',
           '@tauri-apps/plugin-fs',
+          '@tauri-apps/plugin-opener',
           '@tauri-apps/plugin-os',
-          '@tauri-apps/plugin-shell',
         ],
   },
 }));

@@ -5,8 +5,8 @@
     "@radix-ui/react-slot",
     "tailwindcss",
     "tw-animate-css",
+    "@tauri-apps/plugin-opener",
     "@tauri-apps/plugin-os",
-    "@tauri-apps/plugin-shell",
     "@testing-library/user-event"
   ],
   "rules": {
