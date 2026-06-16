@@ -9,7 +9,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useConsentStore } from '@/stores/consentStore';
-import { isTauri, openExternal } from '@/lib/tauri';
 
 const REPO_URL = 'https://github.com/poli0981/jsonPrism';
 
@@ -57,14 +56,6 @@ export function ConsentGate({ children }: { children: ReactNode }) {
                   href={l.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={(e) => {
-                    // Tauri webviews (notably Android) ignore target="_blank";
-                    // hand the URL to the system browser instead.
-                    if (isTauri()) {
-                      e.preventDefault();
-                      void openExternal(l.href);
-                    }
-                  }}
                   className="text-primary inline-flex items-center gap-1 underline-offset-4 hover:underline"
                 >
                   {t(`consent.links.${l.key}`)}

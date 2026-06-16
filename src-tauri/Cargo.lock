@@ -1867,7 +1867,7 @@ dependencies = [
 
 [[package]]
 name = "jsonprism"
-version = "1.7.1"
+version = "1.7.2"
 dependencies = [
  "serde",
  "serde_json",
