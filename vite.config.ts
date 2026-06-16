@@ -7,6 +7,9 @@ import pkg from './package.json';
 
 // Tauri exposes env vars during dev/build; presence indicates a Tauri context.
 const isTauriContext = !!process.env.TAURI_ENV_PLATFORM;
+// `android` during `tauri android build`. The Android sideload APK has no
+// installer license page, so it must show the in-app consent gate (web does).
+const isAndroidBuild = process.env.TAURI_ENV_PLATFORM === 'android';
 const tauriHost = process.env.TAURI_DEV_HOST;
 
 // Resolve commit SHA + build date once per Vite config load. The About page
@@ -32,6 +35,7 @@ export default defineConfig(({ mode }) => ({
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
     __IS_TAURI_BUILD__: JSON.stringify(isTauriContext),
+    __IS_ANDROID_BUILD__: JSON.stringify(isAndroidBuild),
     __APP_COMMIT__: JSON.stringify(appCommit),
     __APP_BUILD_DATE__: JSON.stringify(appBuildDate),
   },

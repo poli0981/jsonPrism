@@ -174,6 +174,8 @@
     "copy_failed": "Không thể chép vào clipboard",
     "downloaded": "Đã tải {{filename}}",
     "file_loaded": "Đã nạp {{name}}",
+    "files_loaded": "Đã nạp {{count}} file",
+    "files_loaded_other": "Đã nạp {{count}} file",
     "file_failed": "Không nạp được file: {{message}}",
     "options_reset": "Đã khôi phục tuỳ chọn mặc định"
   },
@@ -331,7 +333,7 @@
   },
   "consent": {
     "title": "Trước khi bắt đầu",
-    "intro": "JSONPrism chạy hoàn toàn trong trình duyệt của bạn — dữ liệu không bao giờ rời khỏi thiết bị. Vui lòng đọc và chấp nhận các điều khoản:",
+    "intro": "JSONPrism chạy hoàn toàn trên thiết bị của bạn — dữ liệu không bao giờ rời khỏi máy. Vui lòng đọc và chấp nhận các điều khoản:",
     "agree": "Tôi đã đọc và đồng ý với Giấy phép, Điều khoản (EULA), Chính sách bảo mật và Tuyên bố miễn trừ trách nhiệm.",
     "continue": "Tiếp tục",
     "links": {

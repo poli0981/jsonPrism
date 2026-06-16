@@ -116,7 +116,14 @@ export function InputPanel({
         }
         const text = await file.text();
         onChange(text);
-        toast.success(t('toast.file_loaded', { name: file.name }));
+        // Android content URIs sometimes yield an opaque document id with no
+        // real filename (e.g. `msf:1000000123`). When there's no usable
+        // extension to show a clean name, fall back to a count-based message.
+        toast.success(
+          pickedExt
+            ? t('toast.file_loaded', { name: file.name })
+            : t('toast.files_loaded', { count: 1 }),
+        );
       } catch (err) {
         toast.error(t('toast.file_failed', { message: (err as Error).message }));
       }
