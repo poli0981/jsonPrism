@@ -109,6 +109,17 @@ Output:
 
 JSONPrism also ships as an Android app you sideload from a `.apk`. Same React UI; native file picker via the dialog plugin. **Requires Android 12 (API 31) or newer** — the OS refuses to install it on older versions.
 
+### System requirements
+
+| Requirement | Detail |
+| --- | --- |
+| **Android version** | **12 (API 31)** or newer — older versions are blocked at install time (`INSTALL_FAILED_OLDER_SDK`) |
+| **System WebView** | **Chromium 111+** (Android System WebView / Chrome). Kept current by the Play Store on most devices; a much older WebView renders the layout incorrectly — update "Android System WebView" and Chrome from the Play Store if the UI looks broken. |
+| **CPU / ABI** | arm64-v8a, armeabi-v7a, x86, or x86_64 — the single universal APK runs on all of them (modern phones are arm64-v8a) |
+| **RAM** | 2 GB minimum; 4 GB recommended for large or batch (up to 500 files) conversions |
+| **Storage** | ~27 MB to download; ~100 MB free recommended (install + temporary working files) |
+| **Network** | None — the app runs fully offline and sends nothing off the device |
+
 ### Install (users)
 
 1. Download `JSONPrism-<version>-android-universal.apk` from the [Releases](https://github.com/poli0981/jsonPrism/releases) page.

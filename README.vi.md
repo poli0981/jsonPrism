@@ -109,6 +109,17 @@ Output:
 
 JSONPrism còn có bản Android để bạn sideload từ file `.apk`. Cùng React UI; chọn file qua dialog native. **Yêu cầu Android 12 (API 31) trở lên** — máy cũ hơn sẽ bị hệ điều hành chặn cài.
 
+### Yêu cầu hệ thống
+
+| Yêu cầu | Chi tiết |
+| --- | --- |
+| **Phiên bản Android** | **12 (API 31)** trở lên — máy cũ hơn bị chặn ngay khi cài (`INSTALL_FAILED_OLDER_SDK`) |
+| **System WebView** | **Chromium 111+** (Android System WebView / Chrome). Đa số máy được Play Store cập nhật sẵn; WebView quá cũ sẽ render giao diện sai — nếu UI bị vỡ, hãy cập nhật "Android System WebView" và Chrome trong Play Store. |
+| **CPU / ABI** | arm64-v8a, armeabi-v7a, x86 hoặc x86_64 — một file APK universal chạy được trên tất cả (máy hiện đại là arm64-v8a) |
+| **RAM** | Tối thiểu 2 GB; khuyến nghị 4 GB cho file lớn hoặc xử lý hàng loạt (tối đa 500 file) |
+| **Dung lượng** | ~27 MB để tải; nên có ~100 MB trống (cài đặt + file tạm khi làm việc) |
+| **Mạng** | Không cần — app chạy hoàn toàn offline, không gửi gì ra ngoài |
+
 ### Cài đặt (người dùng)
 
 1. Tải `JSONPrism-<version>-android-universal.apk` từ trang [Releases](https://github.com/poli0981/jsonPrism/releases).

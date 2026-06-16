@@ -26,8 +26,12 @@ form factors:
 - iPhone 14 Pro — iOS 26.x — Chrome, Brave
 - iPhone 13 Pro Max — iOS 26.x — Chrome, Brave
 
-Android testing is opportunistic (no dedicated device); the web build
-should still work given mainstream WebView versions.
+Android: the app is built and smoke-tested on emulators (API 31 for the
+install / min-SDK gate, API 36 with a Chromium 134 WebView for rendering) —
+no dedicated physical device yet. **End-user system requirements** (Android
+12+, WebView Chromium 111+, RAM, storage) live in the README "System
+requirements" section; build / signing details are in
+[docs/TAURI-NOTES.md](TAURI-NOTES.md).
 
 ## Related docs
 
