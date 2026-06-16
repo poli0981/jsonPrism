@@ -5,6 +5,7 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ConsentGate } from '@/components/common/ConsentGate';
 import { Layout } from '@/components/layout/Layout';
 import { Toaster } from '@/components/ui/sonner';
+import { useExternalLinkInterceptor } from '@/hooks/useExternalLinkInterceptor';
 
 // Routes are code-split so the entry chunk stays small and the consent gate +
 // app shell paint before any page's heavy graph (editor, parsers) loads.
@@ -14,6 +15,8 @@ const NotFound = lazy(() => import('@/pages/errors/NotFound'));
 const ErrorRoute = lazy(() => import('@/pages/errors/ErrorRoute'));
 
 export function App() {
+  useExternalLinkInterceptor();
+
   return (
     <ThemeProvider defaultTheme="system">
       <ErrorBoundary>
