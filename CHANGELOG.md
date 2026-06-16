@@ -8,6 +8,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond".
 
+## [1.7.0] — 2026-06-16
+
+### Added
+
+- **Android app (sideload APK).** JSONPrism now ships as an Android app built with Tauri 2 — download a signed **universal `.apk`** from Releases and sideload it. **Requires Android 12 (API 31) or newer**; the OS refuses to install on older versions (`bundle.android.minSdkVersion = 31`, verified: `INSTALL_FAILED_OLDER_SDK` on API 24). The same React UI runs in the Android System WebView, with the native Storage Access Framework file picker wired into the existing open/batch flows via `plugin-dialog` + `plugin-fs` (no behavior change to the converters). The generated Gradle project lives in `src-tauri/gen/android/` (committed — source only; build outputs + signing material gitignored); release signing reads a gitignored `keystore.properties` with a graceful unsigned fallback. New `npm run tauri:android:{init,dev,build}` scripts, and an `android` job in `.github/workflows/release.yml` builds + signs the APK and attaches it to the same draft release as the desktop bundles. `bundle.android.versionCode` is derived from the version as `MAJOR*10000 + MINOR*100 + PATCH` (1.7.0 → 10700). **Note:** the layout needs a WebView of **Chromium ≥ 111** (an existing Tailwind v4 requirement) — current Android 12+ devices satisfy this via the Play-updated System WebView; see `docs/TAURI-NOTES.md`.
+
+### Changed
+
+- **Self-hosted fonts (offline-ready).** Geist, Instrument Serif, and JetBrains Mono are now bundled via `@fontsource` (imported in `src/main.tsx`) instead of fetched from Google Fonts. The `<link>` tags are gone and the CSP no longer allows `fonts.googleapis.com` / `fonts.gstatic.com`, so the app renders with the correct fonts **fully offline** — required for the sideloaded Android build and a privacy win for the web build. CJK still falls back to system fonts as before.
+- **Robust native file open on Android.** `fileFromNativePath()` recovers a usable filename from Android `content://` URIs via a new `basenameFromPath()` helper, and the native-open path filters extensions leniently so opaque MediaStore document URIs — which carry no filename — that the user explicitly picked through the native dialog are no longer wrongly rejected. Desktop and web drag-drop behavior is unchanged.
+
+### Tests
+
+- **+6 unit tests (215 total).** New coverage for `basenameFromPath` (desktop paths, `content://` `raw:` + `msf:` URIs, malformed escapes) and the lenient `filterByExtension` mode. Format / typecheck / lint / `knip` / tests all green. The signed APK was validated on emulators: installs on Android 12+, blocked on API < 31, launches, renders (CodeMirror + self-hosted fonts), runs converters, reads files via the SAF picker, fully offline.
+
 ## [1.6.1] — 2026-06-14
 
 ### Changed
