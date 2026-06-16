@@ -8,6 +8,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond".
 
+## [1.7.1] — 2026-06-16
+
+### Fixed
+
+- **First-launch legal gate now appears on the Android app.** The consent gate (added in 1.6.0) was skipped on *every* Tauri build — correct for desktop, where the installer's license page already gates acceptance, but the Android sideload APK has no installer step, so Android users never saw or accepted the License / Terms / Privacy / Disclaimer. A new build-time `__IS_ANDROID_BUILD__` define (`TAURI_ENV_PLATFORM === 'android'`, mirrored as `false` in `vitest.config.ts` so tests still run) makes the gate skip **only** on desktop (`__IS_TAURI_BUILD__ && !__IS_ANDROID_BUILD__`); Android and web both show it. Acceptance persists in the WebView's `localStorage` like the web build, so it asks once. The gate's links also gained an `openExternal()` helper (`src/lib/tauri.ts`) that routes through `@tauri-apps/plugin-shell` inside Tauri — the Android WebView swallows plain `target="_blank"`, so the legal links were previously unreachable there. The intro copy now reads "runs entirely on your device" (was "in your browser", inaccurate on the native app).
+- **File-load toast no longer shows opaque Android document ids.** Android's Storage Access Framework often returns a `content://` URI whose document id carries no real filename (e.g. `msf:1000000123`), so the native-open success toast read "Loaded 1000000123". It now falls back to a count-based "N file(s) loaded" message (new `toast.files_loaded` keys, EN + VI) when the picked name has no usable extension, and keeps the clean "Loaded <name>" when a real filename is available. Desktop and web are unchanged. `bundle.android.versionCode` bumps to 10701 (`1.7.1` → `MAJOR*10000 + MINOR*100 + PATCH`).
+
 ## [1.7.0] — 2026-06-16
 
 ### Added
