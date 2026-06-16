@@ -15,8 +15,8 @@ process from outliving the main webview:
   any spawned shell children (none today, but the hook is in place) are
   signaled before the process exits.
 
-If you ever add long-running spawned commands (e.g. via `tauri_plugin_shell`),
-remember to track their handles and kill them in the same hook.
+If you ever add long-running spawned commands (e.g. via a shell/command
+plugin), remember to track their handles and kill them in the same hook.
 
 ## WebView2 GDI leak (Windows, upstream)
 
@@ -45,8 +45,9 @@ See `src-tauri/capabilities/default.json`. Scope is intentionally narrow:
 - Filesystem reads/writes only inside `$HOME`, `$DOCUMENT`, `$DOWNLOAD`,
   `$DESKTOP`.
 - Dialog plugin for open/save.
-- Shell plugin restricted to `shell:allow-open` (URL opening only — no
-  arbitrary command spawn).
+- Opener plugin (`opener:default`) for handing external URLs to the system
+  browser — `shell:open` has no native Android URL handler, so the opener
+  plugin's `openUrl` is used instead.
 
 Widening the scope requires both a capability edit and a CSP review in
 `tauri.conf.json`.

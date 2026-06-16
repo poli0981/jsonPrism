@@ -84,8 +84,8 @@ installed as a runtime dependency.
 | `@tauri-apps/api` | ^2.0.0 | Apache-2.0 OR MIT | [tauri.app](https://tauri.app/) |
 | `@tauri-apps/plugin-dialog` | ^2.0.0 | Apache-2.0 OR MIT | [tauri.app](https://tauri.app/) |
 | `@tauri-apps/plugin-fs` | ^2.0.0 | Apache-2.0 OR MIT | [tauri.app](https://tauri.app/) |
+| `@tauri-apps/plugin-opener` | ^2.0.0 | Apache-2.0 OR MIT | [tauri.app](https://tauri.app/) |
 | `@tauri-apps/plugin-os` | ^2.0.0 | Apache-2.0 OR MIT | [tauri.app](https://tauri.app/) |
-| `@tauri-apps/plugin-shell` | ^2.0.0 | Apache-2.0 OR MIT | [tauri.app](https://tauri.app/) |
 | `@tauri-apps/cli` (devDep) | ^2.0.0 | Apache-2.0 OR MIT | [tauri.app](https://tauri.app/) |
 
 ### Rust crates (`src-tauri/Cargo.toml`)
@@ -96,8 +96,8 @@ installed as a runtime dependency.
 | `tauri-build` | 2 | Apache-2.0 OR MIT | [crates.io/crates/tauri-build](https://crates.io/crates/tauri-build) |
 | `tauri-plugin-dialog` | 2 | Apache-2.0 OR MIT | [crates.io/crates/tauri-plugin-dialog](https://crates.io/crates/tauri-plugin-dialog) |
 | `tauri-plugin-fs` | 2 | Apache-2.0 OR MIT | [crates.io/crates/tauri-plugin-fs](https://crates.io/crates/tauri-plugin-fs) |
+| `tauri-plugin-opener` | 2 | Apache-2.0 OR MIT | [crates.io/crates/tauri-plugin-opener](https://crates.io/crates/tauri-plugin-opener) |
 | `tauri-plugin-os` | 2 | Apache-2.0 OR MIT | [crates.io/crates/tauri-plugin-os](https://crates.io/crates/tauri-plugin-os) |
-| `tauri-plugin-shell` | 2 | Apache-2.0 OR MIT | [crates.io/crates/tauri-plugin-shell](https://crates.io/crates/tauri-plugin-shell) |
 | `tauri-plugin-single-instance` | 2 | Apache-2.0 OR MIT | [crates.io/crates/tauri-plugin-single-instance](https://crates.io/crates/tauri-plugin-single-instance) |
 | `serde` | 1 | Apache-2.0 OR MIT | [serde.rs](https://serde.rs/) |
 | `serde_json` | 1 | Apache-2.0 OR MIT | [github.com/serde-rs/json](https://github.com/serde-rs/json) |

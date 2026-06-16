@@ -154,16 +154,20 @@ export async function fileFromNativePath(path: string): Promise<File> {
 
 /**
  * Open an external URL. In Tauri the webview won't honour `target="_blank"`
- * (Android in particular swallows it), so route through the shell plugin to
- * hand the URL to the system browser. On the web, open a new tab as usual.
+ * (Android in particular swallows it), so hand the URL to the system browser
+ * via the opener plugin's `openUrl`. On the web, open a new tab as usual.
+ *
+ * NB: the shell plugin's `open()` throws "Scoped shell IO error: No such file
+ * or directory (os error 2)" on Android — it has no native URL handler there.
+ * The opener plugin routes through the platform's Intent/openURL API instead.
  */
 export async function openExternal(url: string): Promise<void> {
   if (!isTauri()) {
     window.open(url, '_blank', 'noopener,noreferrer');
     return;
   }
-  const { open } = await import('@tauri-apps/plugin-shell');
-  await open(url);
+  const { openUrl } = await import('@tauri-apps/plugin-opener');
+  await openUrl(url);
 }
 
 /**

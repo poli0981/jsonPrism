@@ -10,7 +10,7 @@
     "core:webview:default",
     "core:window:default",
     "core:window:allow-set-title",
-    "shell:allow-open",
+    "opener:default",
     "os:default",
     "dialog:default",
     "dialog:allow-open",
