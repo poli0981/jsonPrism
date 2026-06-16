@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useConsentStore } from '@/stores/consentStore';
+import { isTauri, openExternal } from '@/lib/tauri';
 
 const REPO_URL = 'https://github.com/poli0981/jsonPrism';
 
@@ -20,10 +21,11 @@ const LEGAL_LINKS = [
 ] as const;
 
 /**
- * First-launch legal gate (web only). Blocks the app behind a non-dismissible
- * modal until the user accepts. On desktop the store seeds `accepted = true`
- * (the installer's license page already gated acceptance), so this renders its
- * children straight through.
+ * First-launch legal gate (web + Android). Blocks the app behind a
+ * non-dismissible modal until the user accepts. On desktop the store seeds
+ * `accepted = true` (the installer's license page already gated acceptance), so
+ * this renders its children straight through; the Android sideload APK has no
+ * such installer step, so it shows the gate like the web build.
  */
 export function ConsentGate({ children }: { children: ReactNode }) {
   const accepted = useConsentStore((s) => s.accepted);
@@ -55,6 +57,14 @@ export function ConsentGate({ children }: { children: ReactNode }) {
                   href={l.href}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={(e) => {
+                    // Tauri webviews (notably Android) ignore target="_blank";
+                    // hand the URL to the system browser instead.
+                    if (isTauri()) {
+                      e.preventDefault();
+                      void openExternal(l.href);
+                    }
+                  }}
                   className="text-primary inline-flex items-center gap-1 underline-offset-4 hover:underline"
                 >
                   {t(`consent.links.${l.key}`)}

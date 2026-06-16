@@ -153,6 +153,20 @@ export async function fileFromNativePath(path: string): Promise<File> {
 }
 
 /**
+ * Open an external URL. In Tauri the webview won't honour `target="_blank"`
+ * (Android in particular swallows it), so route through the shell plugin to
+ * hand the URL to the system browser. On the web, open a new tab as usual.
+ */
+export async function openExternal(url: string): Promise<void> {
+  if (!isTauri()) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    return;
+  }
+  const { open } = await import('@tauri-apps/plugin-shell');
+  await open(url);
+}
+
+/**
  * Diagnostic info from the Rust side (OS, arch, app version).
  * Not currently shown in the UI but useful for bug reports.
  * @public

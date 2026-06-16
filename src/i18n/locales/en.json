@@ -174,6 +174,8 @@
     "copy_failed": "Couldn't copy to clipboard",
     "downloaded": "Downloaded {{filename}}",
     "file_loaded": "Loaded {{name}}",
+    "files_loaded": "{{count}} file loaded",
+    "files_loaded_other": "{{count}} files loaded",
     "file_failed": "Failed to load file: {{message}}",
     "options_reset": "Options reset to defaults"
   },
@@ -331,7 +333,7 @@
   },
   "consent": {
     "title": "Before you start",
-    "intro": "JSONPrism runs entirely in your browser — your data never leaves your device. Please review and accept the terms:",
+    "intro": "JSONPrism runs entirely on your device — your data never leaves it. Please review and accept the terms:",
     "agree": "I have read and agree to the License, Terms (EULA), Privacy Policy, and Disclaimer.",
     "continue": "Continue",
     "links": {

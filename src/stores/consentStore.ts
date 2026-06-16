@@ -7,9 +7,10 @@ interface ConsentState {
 }
 
 function initialAccepted(): boolean {
-  // Desktop builds gate acceptance through the installer's license page, so the
-  // in-app web gate is a no-op there.
-  if (__IS_TAURI_BUILD__) return true;
+  // Desktop installers gate acceptance through their license page, so the in-app
+  // gate is a no-op there. The Android sideload APK has no installer license
+  // step, so it must show the gate just like the web build.
+  if (__IS_TAURI_BUILD__ && !__IS_ANDROID_BUILD__) return true;
   return isConsentValid(loadConsent());
 }
 
