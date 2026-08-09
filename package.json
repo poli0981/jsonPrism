@@ -70,7 +70,7 @@
     "fflate": "^0.8.3",
     "i18next": "^23.0.0",
     "i18next-browser-languagedetector": "^8.0.0",
-    "js-yaml": "^4.2.0",
+    "js-yaml": "^4.3.1",
     "lucide-react": "^0.460.0",
     "papaparse": "^5.4.0",
     "react": "^19.2.7",
