@@ -1,19 +1,21 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import CodeMirror, { EditorState, EditorView, type BasicSetupOptions } from '@uiw/react-codemirror';
-import { json, jsonParseLinter } from '@codemirror/lang-json';
+import { json } from '@codemirror/lang-json';
 import { yaml } from '@codemirror/lang-yaml';
 import { xml } from '@codemirror/lang-xml';
 import { markdown } from '@codemirror/lang-markdown';
 import { sql } from '@codemirror/lang-sql';
 import { HighlightStyle, StreamLanguage, syntaxHighlighting } from '@codemirror/language';
 import { toml } from '@codemirror/legacy-modes/mode/toml';
-import { lintGutter, linter } from '@codemirror/lint';
+import { lintGutter, linter, type Diagnostic } from '@codemirror/lint';
 import { tags as t } from '@lezer/highlight';
+import { parseJsonInput } from '@/lib/detect';
 import { useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 
-export type EditorLanguage = 'json' | 'plain' | 'yaml' | 'xml' | 'markdown' | 'sql' | 'toml';
+export type EditorLanguage =
+  'json' | 'jsonl' | 'plain' | 'yaml' | 'xml' | 'markdown' | 'sql' | 'toml';
 
 export interface CodeEditorProps {
   value: string;
@@ -65,21 +67,53 @@ const yieldFileDrops = EditorView.domEventHandlers({
   drop: (event) => (event.dataTransfer?.files.length ?? 0) > 0,
 });
 
-const parseJson = jsonParseLinter();
+/** Linting re-parses the whole document; beyond this the conversion reports errors alone. */
+const LINT_LIMIT_CHARS = 2_000_000;
+const MAX_JSONL_DIAGNOSTICS = 100;
 
-function isBlank(view: EditorView): boolean {
-  const iter = view.state.doc.iter();
-  while (!iter.next().done) if (/\S/.test(iter.value)) return false;
-  return true;
+/**
+ * Lints `text` (starting at document offset `start`) with the converter's own
+ * parser, so the editor and the conversion agree — a leading byte-order mark
+ * is fine, and error positions match on every engine. Blank text is a
+ * prompt, not an error.
+ */
+function parseDiagnostic(view: EditorView, text: string, start: number): Diagnostic | null {
+  const result = parseJsonInput(text);
+  if (result.ok || result.error === 'empty') return null;
+  const { doc } = view.state;
+  let from = start;
+  if (result.line !== undefined && result.column !== undefined) {
+    const line = doc.line(Math.min(doc.lineAt(start).number + result.line - 1, doc.lines));
+    from = Math.min(line.from + result.column - 1, line.to);
+  }
+  return { from, to: from, severity: 'error', message: result.error };
 }
 
-// An empty editor is a prompt, not a syntax error.
-const jsonLint = linter((view) => (isBlank(view) ? [] : parseJson(view)));
+const jsonLint = linter((view) => {
+  if (view.state.doc.length > LINT_LIMIT_CHARS) return [];
+  const diagnostic = parseDiagnostic(view, view.state.doc.toString(), 0);
+  return diagnostic ? [diagnostic] : [];
+});
+
+// JSONL: every non-blank line is its own JSON document.
+const jsonlLint = linter((view) => {
+  const { doc } = view.state;
+  if (doc.length > LINT_LIMIT_CHARS) return [];
+  const diagnostics: Diagnostic[] = [];
+  for (let n = 1; n <= doc.lines && diagnostics.length < MAX_JSONL_DIAGNOSTICS; n++) {
+    const line = doc.line(n);
+    const diagnostic = parseDiagnostic(view, line.text, line.from);
+    if (diagnostic) diagnostics.push(diagnostic);
+  }
+  return diagnostics;
+});
 
 function languageExtensions(language: EditorLanguage, readOnly: boolean) {
   switch (language) {
     case 'json':
       return readOnly ? [json()] : [json(), lintGutter(), jsonLint];
+    case 'jsonl':
+      return readOnly ? [json()] : [json(), lintGutter(), jsonlLint];
     case 'yaml':
       return [yaml()];
     case 'xml':

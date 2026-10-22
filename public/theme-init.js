@@ -15,11 +15,12 @@
   } catch (e) {
     // Blocked storage: fall back to the system theme.
   }
+  // Same default as systemTheme() in src/lib/theme-dom.ts: dark when the
+  // browser cannot report a preference.
   var dark =
     theme === 'dark' ||
     (theme === 'system' &&
-      !!window.matchMedia &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches);
+      (!window.matchMedia || window.matchMedia('(prefers-color-scheme: dark)').matches));
   root.classList.toggle('dark', dark);
   root.style.colorScheme = dark ? 'dark' : 'light';
   if (hideScrollbars) root.setAttribute('data-scrollbars', 'hidden');

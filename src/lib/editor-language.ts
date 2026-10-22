@@ -10,7 +10,7 @@ function languageOfFormat(format: FormatId): EditorLanguage {
     case 'resx':
       return 'xml';
     case 'jsonl':
-      return 'json';
+      return 'jsonl';
     case 'markdown':
       return 'markdown';
     case 'sql':
