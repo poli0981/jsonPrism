@@ -27,12 +27,14 @@ interface DialogContentProps
   extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
   /** Render the top-right close (X) button. Disable for non-dismissible modals. */
   showCloseButton?: boolean;
+  /** Screen-reader label for the close button (pass a translated string). */
+  closeLabel?: string;
 }
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
->(({ className, children, showCloseButton = true, ...props }, ref) => (
+>(({ className, children, showCloseButton = true, closeLabel = 'Close', ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -45,9 +47,9 @@ const DialogContent = React.forwardRef<
     >
       {children}
       {showCloseButton && (
-        <DialogClose className="ring-offset-background focus:ring-ring data-[state=open]:bg-muted absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">
+        <DialogClose className="ring-offset-background focus:ring-ring data-[state=open]:bg-muted absolute top-3 right-3 rounded-sm p-1.5 opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">
           <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
+          <span className="sr-only">{closeLabel}</span>
         </DialogClose>
       )}
     </DialogPrimitive.Content>

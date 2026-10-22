@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDropzone } from 'react-dropzone';
-import { Download, FileStack, FolderOpen, Play, StopCircle, Trash2 } from 'lucide-react';
+import { useDropzone, type FileRejection } from 'react-dropzone';
+import { useShallow } from 'zustand/react/shallow';
+import { CircleStop, Download, FileStack, FolderOpen, Play, Trash2 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -11,14 +12,15 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
+import { extensionsFor } from '@/converters/registry';
+import type { Direction, FormatId } from '@/converters/types';
 import { useBatchActions } from '@/hooks/useBatchActions';
 import { useFileAccept } from '@/hooks/useFileAccept';
+import { errorMessage } from '@/lib/errors';
 import { filterByExtension } from '@/lib/file-filter';
-import { isTauri, nativeOpenFiles, fileFromNativePath } from '@/lib/tauri';
+import { fileFromNativePath, isTauri, nativeOpenFiles } from '@/lib/tauri';
 import { cn } from '@/lib/utils';
 import { useBatchStore, BATCH_MAX_FILES } from '@/stores/batchStore';
-import type { FormatId } from '@/converters/types';
-import type { Direction } from './DirectionToggle';
 import { BatchItemRow } from './BatchItemRow';
 import { BatchSummaryChips } from './BatchSummaryChips';
 
@@ -32,20 +34,30 @@ interface BatchPanelProps {
 
 export function BatchPanel({ format, direction, options, open, onOpenChange }: BatchPanelProps) {
   const { t } = useTranslation();
-  const items = useBatchStore((s) => s.items);
+  // Counts and order only — each row subscribes to its own item, so a status
+  // change re-renders one row instead of the whole 500-row list.
   const itemOrder = useBatchStore((s) => s.itemOrder);
+  const counts = useBatchStore(
+    useShallow((s) => {
+      let done = 0;
+      let failed = 0;
+      let queued = 0;
+      for (const id of s.itemOrder) {
+        const status = s.items[id]?.status;
+        if (status === 'done') done += 1;
+        else if (status === 'error') failed += 1;
+        else if (status === 'queued') queued += 1;
+      }
+      return { done, failed, queued };
+    }),
+  );
   const processing = useBatchStore((s) => s.processing);
   const addFiles = useBatchStore((s) => s.addFiles);
   const removeItem = useBatchStore((s) => s.removeItem);
   const clear = useBatchStore((s) => s.clear);
-  const resetStatuses = useBatchStore((s) => s.resetStatuses);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const totalCount = itemOrder.length;
-  const doneCount = itemOrder.filter((id) => items[id]?.status === 'done').length;
-  const errorCount = itemOrder.filter((id) => items[id]?.status === 'error').length;
-  const queuedCount = itemOrder.filter((id) => items[id]?.status === 'queued').length;
 
   const { converter, isReverse, accept, fileInputAccept, allowedExtensions } = useFileAccept(
     format,
@@ -77,14 +89,13 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
 
   const onDrop = useCallback(
     (accepted: File[]) => {
-      if (accepted.length === 0) return;
-      handleAddFiles(accepted);
+      if (accepted.length > 0) handleAddFiles(accepted);
     },
     [handleAddFiles],
   );
 
   const onDropRejected = useCallback(
-    (rejections: { file: File }[]) => {
+    (rejections: FileRejection[]) => {
       // react-dropzone rejects via MIME mismatch; surface as wrong-format toast
       // so the user sees something, not a silent drop.
       if (rejections.length > 0) {
@@ -103,23 +114,40 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
     noKeyboard: true,
   });
 
+  const formatLabel = t(converter.meta.labelKey);
+
   const handleOpenFiles = async () => {
-    if (isTauri()) {
-      const paths = await nativeOpenFiles({ multiple: true });
+    if (!isTauri()) {
+      fileInputRef.current?.click();
+      return;
+    }
+    try {
+      const paths = await nativeOpenFiles({
+        multiple: true,
+        filters: isReverse
+          ? [
+              { name: formatLabel, extensions: extensionsFor(format) },
+              { name: t('file_dialog.text'), extensions: ['txt'] },
+            ]
+          : [
+              { name: t('file_dialog.json'), extensions: ['json'] },
+              { name: t('file_dialog.text'), extensions: ['txt'] },
+            ],
+      });
       if (!paths || paths.length === 0) return;
       const files = await Promise.all(paths.map(fileFromNativePath));
       // The native dialog already filtered; Android content URIs may carry no
       // extension, so don't re-reject them here.
       handleAddFiles(files, true);
-      return;
+    } catch (err) {
+      toast.error(t('toast.file_failed', { message: errorMessage(err) }));
     }
-    fileInputRef.current?.click();
   };
 
   const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
-    if (files.length > 0) handleAddFiles(files);
     e.target.value = '';
+    if (files.length > 0) handleAddFiles(files);
   };
 
   // Cancel processing if the user clears the queue while it's running.
@@ -129,11 +157,12 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
     }
   }, [totalCount, processing]);
 
-  const formatLabel = t(converter.meta.labelKey);
-  // Direction-aware labels for the SheetDescription and dropzone text.
-  // In reverse mode the user supplies `<format>` files and gets JSON back.
+  const removeRow = useCallback((id: string) => removeItem(id), [removeItem]);
+  // Direction-aware labels: in reverse mode the user supplies `<format>` files
+  // and gets JSON back.
   const fromLabel = isReverse ? formatLabel : 'JSON';
   const toLabel = isReverse ? 'JSON' : formatLabel;
+  const outputExt = isReverse ? 'json' : converter.meta.extension;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -141,11 +170,11 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
         <button
           type="button"
           className={cn(
-            'text-muted-foreground hover:bg-muted hover:text-foreground border-border/60 inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition',
+            'group text-muted-foreground hover:bg-muted hover:text-foreground border-border bg-card/60 inline-flex min-h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs transition',
             totalCount > 0 && 'border-primary/40 text-foreground',
           )}
         >
-          <FileStack className="h-3.5 w-3.5" />
+          <FileStack className="motion-safe:group-hover:animate-bob h-3.5 w-3.5" aria-hidden />
           <span>{t('batch.trigger')}</span>
           {totalCount > 0 && (
             <span className="bg-primary/15 text-primary rounded px-1 py-px font-mono text-[10px] leading-none">
@@ -155,12 +184,15 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
         </button>
       </SheetTrigger>
 
-      <SheetContent className="flex w-full flex-col gap-0 p-0 sm:max-w-lg">
+      <SheetContent
+        closeLabel={t('common.close')}
+        className="flex w-full flex-col gap-0 p-0 sm:max-w-lg"
+      >
         <SheetHeader>
           <SheetTitle>
-            <span className="text-spectrum italic">{t('batch.title')}</span>{' '}
-            <span className="text-muted-foreground font-sans text-base font-normal not-italic">
-              · {totalCount} / {BATCH_MAX_FILES}
+            <span className="text-spectrum">{t('batch.title')}</span>{' '}
+            <span className="text-muted-foreground font-mono text-sm font-normal">
+              {totalCount} / {BATCH_MAX_FILES}
             </span>
           </SheetTitle>
           <SheetDescription>
@@ -178,16 +210,21 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
             multiple
             className="hidden"
             onChange={onFileInputChange}
+            tabIndex={-1}
+            aria-hidden
           />
           <div
             className={cn(
-              'flex flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed py-6 transition',
+              'corner-ticks flex flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed py-6 transition',
               isDragActive
                 ? 'border-primary/60 bg-primary/5 text-foreground'
-                : 'border-border bg-card/30 text-muted-foreground',
+                : 'border-border bg-card/40 text-muted-foreground',
             )}
           >
-            <FolderOpen className="h-5 w-5" />
+            <FolderOpen
+              className={cn('h-5 w-5', isDragActive && 'motion-safe:animate-bob')}
+              aria-hidden
+            />
             <p className="text-xs">
               {isDragActive
                 ? t('batch.drop_active')
@@ -195,57 +232,56 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
             </p>
             <button
               type="button"
-              onClick={handleOpenFiles}
-              className="text-primary text-xs hover:underline"
+              onClick={() => void handleOpenFiles()}
+              className="text-primary min-h-8 px-2 text-xs hover:underline"
             >
               {t('batch.browse')}
             </button>
           </div>
         </div>
 
-        {/* Summary chips */}
         {totalCount > 0 && (
           <BatchSummaryChips
-            queuedCount={queuedCount}
-            doneCount={doneCount}
-            errorCount={errorCount}
+            queuedCount={counts.queued}
+            doneCount={counts.done}
+            errorCount={counts.failed}
           />
         )}
 
         {/* Queue list */}
-        <div className="flex-1 overflow-y-auto px-6 pb-3">
+        <div
+          className="flex-1 [scrollbar-gutter:stable] overflow-y-auto px-6 pb-3"
+          tabIndex={0}
+          aria-label={t('batch.queue_label')}
+        >
           {totalCount === 0 ? (
-            <p className="text-muted-foreground py-12 text-center text-sm italic">
+            <p className="text-muted-foreground py-12 text-center text-sm">
               {t('batch.empty_format', { format: fromLabel })}
             </p>
           ) : (
-            <ul className="divide-border/40 flex flex-col divide-y">
-              {itemOrder.map((id) => {
-                const item = items[id];
-                if (!item) return null;
-                return (
-                  <BatchItemRow
-                    key={id}
-                    item={item}
-                    outputExt={isReverse ? 'json' : converter.meta.extension}
-                    onRemove={() => removeItem(id)}
-                    disabled={processing}
-                  />
-                );
-              })}
+            <ul className="divide-border/50 flex flex-col divide-y">
+              {itemOrder.map((id) => (
+                <BatchItemRow
+                  key={id}
+                  id={id}
+                  outputExt={outputExt}
+                  onRemove={removeRow}
+                  disabled={processing}
+                />
+              ))}
             </ul>
           )}
         </div>
 
         {/* Footer controls */}
-        <div className="border-border/60 flex items-center justify-between gap-2 border-t px-6 py-3">
+        <div className="border-border/70 flex items-center justify-between gap-2 border-t px-6 py-3">
           <button
             type="button"
             onClick={() => clear()}
             disabled={totalCount === 0 || processing}
-            className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs transition disabled:cursor-not-allowed disabled:opacity-40"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex min-h-8 items-center gap-1.5 rounded-md px-2.5 text-xs transition disabled:cursor-not-allowed disabled:opacity-40"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <Trash2 className="h-3.5 w-3.5" aria-hidden />
             {t('batch.clear')}
           </button>
 
@@ -254,22 +290,19 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
               <button
                 type="button"
                 onClick={cancel}
-                className="bg-destructive/10 text-destructive hover:bg-destructive/20 inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition"
+                className="bg-destructive/10 text-destructive hover:bg-destructive/20 inline-flex min-h-8 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition"
               >
-                <StopCircle className="h-3.5 w-3.5" />
+                <CircleStop className="h-3.5 w-3.5" aria-hidden />
                 {t('batch.cancel')}
               </button>
             ) : (
               <button
                 type="button"
-                onClick={() => {
-                  resetStatuses();
-                  void start();
-                }}
+                onClick={() => void start()}
                 disabled={totalCount === 0}
-                className="bg-primary/15 text-primary hover:bg-primary/25 inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-40"
+                className="group bg-primary/15 text-primary hover:bg-primary/25 inline-flex min-h-8 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-40"
               >
-                <Play className="h-3.5 w-3.5" />
+                <Play className="motion-safe:group-hover:animate-nudge h-3.5 w-3.5" aria-hidden />
                 {t('batch.process')}
               </button>
             )}
@@ -277,10 +310,10 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
             <button
               type="button"
               onClick={() => void downloadZip()}
-              disabled={doneCount === 0 || processing}
-              className="bg-foreground/90 text-background hover:bg-foreground inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-40"
+              disabled={counts.done === 0 || processing}
+              className="group bg-foreground/90 text-background hover:bg-foreground inline-flex min-h-8 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <Download className="h-3.5 w-3.5" />
+              <Download className="motion-safe:group-hover:animate-bob h-3.5 w-3.5" aria-hidden />
               {t('batch.download_zip')}
             </button>
           </div>

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import CodeMirror, { type ReactCodeMirrorRef, EditorView } from '@uiw/react-codemirror';
+import { useTranslation } from 'react-i18next';
+import CodeMirror, { EditorState, EditorView, type BasicSetupOptions } from '@uiw/react-codemirror';
 import { json, jsonParseLinter } from '@codemirror/lang-json';
 import { yaml } from '@codemirror/lang-yaml';
 import { xml } from '@codemirror/lang-xml';
@@ -21,7 +22,8 @@ export interface CodeEditorProps {
   language?: EditorLanguage;
   className?: string;
   placeholder?: string;
-  editorRef?: React.RefObject<ReactCodeMirrorRef | null>;
+  /** Accessible name for the editable region (screen readers). */
+  ariaLabel?: string;
 }
 
 /**
@@ -38,6 +40,84 @@ const prismHighlightStyle = HighlightStyle.define([
   { tag: t.comment, color: 'var(--muted-foreground)', fontStyle: 'italic' },
 ]);
 
+// Stable references: a new basicSetup object or extensions array on every
+// render makes @uiw/react-codemirror reconfigure the whole editor per keystroke.
+const EDITABLE_SETUP: BasicSetupOptions = {
+  lineNumbers: true,
+  highlightActiveLine: true,
+  highlightActiveLineGutter: true,
+  foldGutter: true,
+  autocompletion: false,
+  searchKeymap: true,
+};
+const READ_ONLY_SETUP: BasicSetupOptions = {
+  ...EDITABLE_SETUP,
+  highlightActiveLine: false,
+  highlightActiveLineGutter: false,
+};
+
+/** Wrapping a multi-megabyte single line (minified JSON, base64) is very slow. */
+const WRAP_LIMIT_CHARS = 1_000_000;
+
+// File drops belong to the panel's dropzone (load into the editor or route to
+// the batch queue). Without this, CodeMirror inserts the files' text itself.
+const yieldFileDrops = EditorView.domEventHandlers({
+  drop: (event) => (event.dataTransfer?.files.length ?? 0) > 0,
+});
+
+const parseJson = jsonParseLinter();
+
+function isBlank(view: EditorView): boolean {
+  const iter = view.state.doc.iter();
+  while (!iter.next().done) if (/\S/.test(iter.value)) return false;
+  return true;
+}
+
+// An empty editor is a prompt, not a syntax error.
+const jsonLint = linter((view) => (isBlank(view) ? [] : parseJson(view)));
+
+function languageExtensions(language: EditorLanguage, readOnly: boolean) {
+  switch (language) {
+    case 'json':
+      return readOnly ? [json()] : [json(), lintGutter(), jsonLint];
+    case 'yaml':
+      return [yaml()];
+    case 'xml':
+      return [xml()];
+    case 'markdown':
+      return [markdown()];
+    case 'sql':
+      return [sql()];
+    case 'toml':
+      return [StreamLanguage.define(toml)];
+    case 'plain':
+      return [];
+  }
+}
+
+// English phrases used by CodeMirror's search panel, folding and lint UI.
+const PHRASE_KEYS: Record<string, string> = {
+  Find: 'find',
+  Replace: 'replace',
+  next: 'next',
+  previous: 'previous',
+  all: 'all',
+  'match case': 'match_case',
+  regexp: 'regexp',
+  'by word': 'by_word',
+  replace: 'replace_one',
+  'replace all': 'replace_all',
+  close: 'close',
+  'Go to line': 'go_to_line',
+  go: 'go',
+  'Fold line': 'fold_line',
+  'Unfold line': 'unfold_line',
+  'folded code': 'folded_code',
+  unfold: 'unfold',
+  Diagnostics: 'diagnostics',
+  'No diagnostics': 'no_diagnostics',
+};
+
 export function CodeEditor({
   value,
   onChange,
@@ -45,36 +125,25 @@ export function CodeEditor({
   language = 'json',
   className,
   placeholder,
-  editorRef,
+  ariaLabel,
 }: CodeEditorProps) {
   const { resolvedTheme } = useTheme();
+  const { t: translate, i18n } = useTranslation();
+  const wrap = value.length < WRAP_LIMIT_CHARS;
+
+  const phrases = useMemo(() => {
+    const entries = Object.entries(PHRASE_KEYS).map(([phrase, key]) => [
+      phrase,
+      translate(`editor.phrases.${key}`, { defaultValue: phrase }),
+    ]);
+    return EditorState.phrases.of(Object.fromEntries(entries));
+    // i18n.language drives re-translation; translate is stable per language.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.language]);
 
   const extensions = useMemo(() => {
-    const exts = [];
-    if (language === 'json') {
-      exts.push(json());
-      if (!readOnly) {
-        exts.push(lintGutter(), linter(jsonParseLinter()));
-      }
-    } else if (language === 'yaml') {
-      exts.push(yaml());
-    } else if (language === 'xml') {
-      exts.push(xml());
-    } else if (language === 'markdown') {
-      exts.push(markdown());
-    } else if (language === 'sql') {
-      exts.push(sql());
-    } else if (language === 'toml') {
-      exts.push(StreamLanguage.define(toml));
-    }
-    exts.push(syntaxHighlighting(prismHighlightStyle));
-    exts.push(EditorView.lineWrapping);
-    return exts;
-  }, [language, readOnly]);
-
-  const themeExt = useMemo(() => {
     const isDark = resolvedTheme === 'dark';
-    return EditorView.theme(
+    const theme = EditorView.theme(
       {
         '&': {
           backgroundColor: 'transparent',
@@ -82,41 +151,30 @@ export function CodeEditor({
           height: '100%',
           fontSize: '13px',
         },
+        // Scrollbar styling comes from globals.css so the "hide scrollbars"
+        // preference applies here too.
         '.cm-scroller': {
           fontFamily: 'var(--font-mono)',
           lineHeight: '1.6',
           overflow: 'auto',
-          // Show a thin native scrollbar — `scrollbarWidth: 'none'` made wheel
-          // scroll require a click-to-focus first on some browsers.
-          scrollbarWidth: 'thin',
-        },
-        '.cm-scroller::-webkit-scrollbar': {
-          width: '8px',
-          height: '8px',
-        },
-        '.cm-scroller::-webkit-scrollbar-thumb': {
-          backgroundColor: 'color-mix(in oklch, var(--muted-foreground) 30%, transparent)',
-          borderRadius: '4px',
         },
         '.cm-content': {
-          padding: '16px 0',
+          padding: '12px 0',
           caretColor: 'var(--color-prism-violet)',
         },
         '.cm-gutters': {
           backgroundColor: 'transparent',
           border: 'none',
           color: 'var(--muted-foreground)',
-          opacity: '0.5',
         },
         '.cm-activeLine': {
           backgroundColor: isDark
-            ? 'color-mix(in oklch, var(--color-prism-violet) 6%, transparent)'
-            : 'color-mix(in oklch, var(--color-prism-violet) 4%, transparent)',
+            ? 'color-mix(in oklch, var(--color-prism-violet) 7%, transparent)'
+            : 'color-mix(in oklch, var(--color-prism-violet) 5%, transparent)',
         },
         '.cm-activeLineGutter': {
           backgroundColor: 'transparent',
           color: 'var(--foreground)',
-          opacity: '0.9',
         },
         '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection': {
           backgroundColor:
@@ -128,31 +186,37 @@ export function CodeEditor({
         },
         '.cm-placeholder': {
           color: 'var(--muted-foreground)',
-          opacity: '0.5',
+        },
+        '&.cm-focused': {
+          outline: 'none',
         },
       },
       { dark: isDark },
     );
-  }, [resolvedTheme]);
+    return [
+      ...languageExtensions(language, readOnly),
+      syntaxHighlighting(prismHighlightStyle),
+      ...(wrap ? [EditorView.lineWrapping] : []),
+      yieldFileDrops,
+      phrases,
+      EditorView.contentAttributes.of({
+        ...(ariaLabel ? { 'aria-label': ariaLabel } : {}),
+        ...(readOnly ? { 'aria-readonly': 'true' } : {}),
+      }),
+      theme,
+    ];
+  }, [ariaLabel, language, phrases, readOnly, resolvedTheme, wrap]);
 
   return (
     <div className={cn('h-full overflow-hidden', className)}>
       <CodeMirror
-        ref={editorRef}
         value={value}
         readOnly={readOnly}
         editable={!readOnly}
         {...(onChange !== undefined ? { onChange } : {})}
         {...(placeholder !== undefined ? { placeholder } : {})}
-        extensions={[...extensions, themeExt]}
-        basicSetup={{
-          lineNumbers: true,
-          highlightActiveLine: !readOnly,
-          highlightActiveLineGutter: !readOnly,
-          foldGutter: true,
-          autocompletion: false,
-          searchKeymap: true,
-        }}
+        extensions={extensions}
+        basicSetup={readOnly ? READ_ONLY_SETUP : EDITABLE_SETUP}
         height="100%"
         theme="none"
       />

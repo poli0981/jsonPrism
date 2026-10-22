@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { House } from 'lucide-react';
 import { ErrorState, errorActionPrimary } from '@/components/common/ErrorState';
 

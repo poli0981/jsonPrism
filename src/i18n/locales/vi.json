@@ -1,13 +1,13 @@
 {
   "app": {
-    "name": "JSONPrism",
-    "tagline": "Tán sắc JSON ra nhiều định dạng",
-    "description": "Một JSON đầu vào. Đa định dạng đích. Chạy hoàn toàn trong trình duyệt."
+    "description": "Một đầu vào JSON, mười hai định dạng — và chiều ngược lại. Mọi chuyển đổi chạy ngay trên thiết bị của bạn."
   },
   "nav": {
     "home": "Chuyển đổi",
     "about": "Giới thiệu",
-    "github": "GitHub"
+    "github": "GitHub",
+    "label": "Điều hướng chính",
+    "home_brand": "Trang chủ JSONPrism"
   },
   "home": {
     "input_label": "JSON đầu vào",
@@ -19,17 +19,21 @@
     "output_label": "Kết quả",
     "output_empty": "Kết quả sẽ hiện ở đây khi bạn cung cấp JSON hợp lệ.",
     "output_empty_format": "Kết quả sẽ hiện ở đây khi bạn cung cấp {{ext}} hợp lệ.",
-    "drop_zone": "Thả file JSON vào đây",
     "drop_zone_active": "Thả ra để nạp",
-    "drop_zone_hint": "Tối đa 500 file. Mọi thứ chạy trong trình duyệt — không có dữ liệu nào rời khỏi máy của bạn.",
+    "drop_zone_hint": "Tối đa 500 tệp mỗi lần. Tệp và văn bản được chuyển đổi trên thiết bị của bạn, không bao giờ tải lên.",
     "load_sample": "Mẫu",
     "open_file": "Mở",
     "clear": "Xoá",
     "format_picker_label": "Định dạng đích",
-    "convert": "Chuyển đổi",
     "copy": "Sao chép",
     "download": "Tải về",
-    "options": "Tuỳ chọn"
+    "options": "Tuỳ chọn",
+    "kicker": "JSON → 12 định dạng · và ngược lại",
+    "title_accent": "Tán sắc",
+    "title_rest": "JSON.",
+    "copied": "Đã chép",
+    "error_position": "Dòng {{line}}, Cột {{column}}",
+    "output_aria": "Kết quả {{format}} (chỉ đọc)"
   },
   "formats": {
     "jsonl": "JSONL",
@@ -48,7 +52,7 @@
   "format_status": {
     "ready": "Sẵn sàng",
     "suggested": "Gợi ý cho shape phát hiện được",
-    "planned": "Sẽ có ở Phase {{phase}}",
+    "not_suggested": "Không gợi ý cho shape phát hiện được",
     "no_reverse": "Format này không hỗ trợ parse ngược"
   },
   "direction": {
@@ -71,7 +75,9 @@
       "nested_strategy": "Giá trị lồng nhau",
       "nested_strategy_desc": "Cách xử lý object/array lồng nhau trong ô.",
       "nested_json": "JSON-stringify",
-      "nested_flatten": "Flatten key (alpha)"
+      "nested_flatten": "Flatten key (alpha)",
+      "escape_formulae": "Chống chèn công thức (CSV injection)",
+      "escape_formulae_desc": "Thêm ' trước các ô bắt đầu bằng = + - @ để Excel/Sheets không chạy chúng như công thức. Việc này làm thay đổi dữ liệu nên mặc định tắt."
     },
     "yaml": {
       "indent": "Indent (số space)",
@@ -90,7 +96,11 @@
     },
     "toml": {
       "sort_keys": "Sắp xếp key theo bảng chữ cái",
-      "sort_keys_desc": "Đệ quy — áp dụng ở mọi cấp lồng nhau. Hữu ích cho diff ổn định."
+      "sort_keys_desc": "Đệ quy — áp dụng ở mọi cấp lồng nhau. Hữu ích cho diff ổn định.",
+      "null_handling": "Giá trị null",
+      "null_handling_desc": "TOML không có null. Bỏ qua sẽ loại khoá và phần tử mảng null; Báo lỗi sẽ dừng và chỉ ra vị trí null.",
+      "null_omit": "Bỏ qua",
+      "null_error": "Báo lỗi"
     },
     "markdown": {
       "alignment": "Căn cột",
@@ -114,13 +124,14 @@
       "chunk_size": "Kích thước chunk",
       "chunk_size_desc": "Số dòng tối đa cho mỗi INSERT khi bật đa dòng.",
       "include_create": "Bao gồm CREATE TABLE",
-      "include_create_desc": "Suy luận kiểu cột từ dòng đầu và phát sinh câu lệnh CREATE TABLE."
+      "include_create_desc": "Suy ra kiểu cột từ tất cả các dòng và tạo câu lệnh CREATE TABLE.",
+      "table_name_desc": "Dùng schema.table cho tên đầy đủ (vd. dbo.Users)."
     },
     "resx": {
       "comment_key": "Key của comment",
       "comment_key_desc": "Khi entry có shape { value, _comment }, key này sẽ cung cấp element <comment>.",
       "include_schema": "Bao gồm header xsd:schema",
-      "include_schema_desc": "Visual Studio yêu cầu. Chỉ tắt khi đang generate diff.",
+      "include_schema_desc": "Visual Studio cần phần này. Các mục resheader bắt buộc luôn được ghi.",
       "sort_keys": "Sắp xếp entry theo bảng chữ cái",
       "sort_keys_desc": "Hữu ích để diff ổn định giữa các file locale."
     },
@@ -150,15 +161,23 @@
     "array": "mảng",
     "flat-object": "object phẳng",
     "array-of-objects": "mảng object",
-    "unknown": "không rõ"
+    "unknown": "không rõ",
+    "detected_value": "Nhận diện: {{shape}}"
   },
   "status": {
     "in": "vào",
     "out": "ra",
-    "time": "parse"
+    "state": {
+      "idle": "chờ",
+      "working": "đang xử lý",
+      "ok": "xong",
+      "error": "lỗi"
+    },
+    "time_value": "{{ms}} ms",
+    "precision": "mất độ chính xác",
+    "precision_hint": "Số nguyên vượt ±2^53 không biểu diễn chính xác được và đã bị làm tròn. Đặt chúng trong dấu nháy (chuỗi) để giữ đủ chữ số."
   },
   "shortcut": {
-    "clear": "Xoá",
     "download": "Tải về",
     "settings": "Tuỳ chọn"
   },
@@ -166,7 +185,7 @@
     "title": "Tuỳ chọn",
     "description": "Tinh chỉnh cách format này được tạo. Lưu riêng cho từng format.",
     "no_options": "Format này chưa có tuỳ chọn.",
-    "no_options_long": "Converter này chưa expose tuỳ chọn nào. Khi Phase 2 ra mắt, bạn sẽ thấy dialect, indent và các knob khác ở đây.",
+    "no_options_long": "Bộ chuyển đổi này không có tuỳ chọn nào.",
     "reset": "Khôi phục mặc định"
   },
   "toast": {
@@ -177,30 +196,31 @@
     "files_loaded": "Đã nạp {{count}} file",
     "files_loaded_other": "Đã nạp {{count}} file",
     "file_failed": "Không nạp được file: {{message}}",
-    "options_reset": "Đã khôi phục tuỳ chọn mặc định"
+    "options_reset": "Đã khôi phục tuỳ chọn mặc định",
+    "download_failed": "Tải xuống thất bại: {{message}}"
   },
   "batch": {
     "trigger": "Batch",
     "title": "Hàng đợi batch",
-    "description": "Xử lý nhiều file {{from}} sang {{to}} cùng lúc. Mọi thứ chạy trong trình duyệt.",
-    "drop_idle": "Thả file JSON vào đây",
+    "description": "Xử lý nhiều tệp {{from}} sang {{to}} cùng lúc. Mọi xử lý diễn ra trên thiết bị của bạn.",
     "drop_idle_format": "Thả file {{format}} vào đây",
     "drop_active": "Thả ra để thêm file",
     "browse": "hoặc click để duyệt…",
-    "empty": "Chưa có file nào trong hàng đợi. Thả file JSON ở trên để bắt đầu.",
     "empty_format": "Chưa có file nào trong hàng đợi. Thả file {{format}} ở trên để bắt đầu.",
     "stat": {
       "queued": "chờ",
       "done": "xong",
-      "failed": "lỗi"
+      "failed": "lỗi",
+      "processing": "đang xử lý",
+      "error": "lỗi"
     },
     "process": "Xử lý",
     "cancel": "Huỷ",
     "clear": "Xoá",
     "download_zip": "Tải .zip",
     "row": {
-      "out": "ra",
-      "remove": "Bỏ khỏi hàng đợi"
+      "remove": "Xoá {{name}} khỏi hàng đợi",
+      "out_value": "ra: {{size}}"
     },
     "toast": {
       "added": "Đã thêm {{count}} file vào hàng đợi",
@@ -220,6 +240,12 @@
       "zipped_other": "Đã đóng {{count}} file vào .zip",
       "zip_failed": "Không tạo được .zip: {{message}}",
       "nothing_to_process": "Không có gì trong hàng đợi để xử lý."
+    },
+    "queue_label": "Hàng đợi xử lý",
+    "error": {
+      "empty_file": "Tệp rỗng.",
+      "no_reverse": "Định dạng này không chuyển ngược về JSON được.",
+      "read_failed": "Không đọc hoặc chuyển đổi được tệp này."
     }
   },
   "theme": {
@@ -228,25 +254,16 @@
     "system": "Theo hệ thống"
   },
   "errors": {
-    "invalid_json": "JSON không hợp lệ: {{message}}",
-    "empty_input": "Đầu vào trống.",
-    "converter_not_ready": "Converter này chưa được cài đặt.",
-    "converter_not_ready_phase": "Converter này sẽ có ở Phase {{phase}}. Xem roadmap để biết trạng thái.",
-    "batch_limit": "Đã đạt giới hạn batch ({{max}} file). Hãy bỏ bớt file.",
-    "unknown": "Đã có lỗi xảy ra. {{message}}"
+    "conversion_failed": "Chuyển đổi thất bại: {{message}}"
   },
   "error_page": {
-    "generic": {
-      "title": "Đã có lỗi xảy ra",
-      "message": "Một lỗi không mong muốn đã xảy ra. Hãy thử tải lại trang."
+    "403": {
+      "title": "Bị cấm truy cập",
+      "message": "Bạn không có quyền xem nội dung này."
     },
     "404": {
       "title": "Không tìm thấy trang",
       "message": "Lăng kính chỉ tán sắc những gì đang có — đường dẫn này không tồn tại."
-    },
-    "403": {
-      "title": "Bị cấm truy cập",
-      "message": "Bạn không có quyền xem nội dung này."
     },
     "419": {
       "title": "Phiên đã hết hạn",
@@ -256,9 +273,12 @@
       "title": "Lỗi máy chủ",
       "message": "Có gì đó hỏng trên đường về. Hãy thử lại sau giây lát."
     },
+    "generic": {
+      "title": "Đã có lỗi xảy ra",
+      "message": "Một lỗi không mong muốn đã xảy ra. Hãy thử tải lại trang."
+    },
     "offline": {
-      "title": "Bạn đang ngoại tuyến",
-      "message": "Bạn đang ngoại tuyến — JSONPrism vẫn chạy bình thường; chỉ font web có thể không tải được."
+      "message": "Bạn đang offline — JSONPrism vẫn hoạt động bình thường; chuyển đổi không cần mạng."
     },
     "chunk": {
       "title": "Không tải được một phần ứng dụng",
@@ -266,15 +286,14 @@
     },
     "actions": {
       "home": "Về trang Chuyển đổi",
-      "reload": "Tải lại",
-      "retry": "Thử lại"
+      "reload": "Tải lại"
     }
   },
   "about": {
     "title": "Về JSONPrism",
     "lead": "Một công cụ tán sắc cho developer.",
-    "p1": "JSONPrism nhận một JSON đầu vào và tán sắc nó ra nhiều định dạng đích — như ánh sáng trắng đi qua lăng kính. Mọi thứ chạy client-side, nên dữ liệu của bạn không bao giờ rời khỏi máy.",
-    "p2": "Xây dựng với React 19, Vite 8, Tailwind CSS v4 và shadcn/ui. Mã nguồn trên GitHub.",
+    "p1": "JSONPrism nhận một đầu vào JSON và tán nó ra nhiều định dạng đích — như ánh sáng trắng đi qua lăng kính — và đọc ngược được phần lớn các định dạng đó. Mọi chuyển đổi chạy hoàn toàn trên thiết bị của bạn, nên dữ liệu bạn dán hoặc thả vào không bao giờ rời khỏi máy.",
+    "p2": "Xây dựng với React 19, TypeScript 7, Vite 8, Tailwind CSS v4 và shadcn/ui. Bản web chạy trên Cloudflare Workers; ứng dụng desktop và Android được xây dựng bằng Tauri 2. Mã nguồn trên GitHub.",
     "version": "Phiên bản {{version}}",
     "donate": {
       "title": "Ủng hộ project",
@@ -304,36 +323,61 @@
       "build": "Build & tooling",
       "tauri": "Desktop (Tauri)",
       "i18n": "Đa ngôn ngữ",
-      "see_full_list": "Xem danh sách đầy đủ →"
+      "see_full_list": "Xem danh sách đầy đủ →",
+      "web": "Web (Cloudflare)"
     },
     "build": {
       "title": "Thông tin build",
       "version": "Phiên bản",
       "commit": "Commit",
-      "date": "Build ngày"
+      "date": "Build ngày",
+      "platform": "Nền tảng",
+      "platform_web": "Web",
+      "platform_desktop": "Ứng dụng desktop",
+      "platform_android": "Ứng dụng Android",
+      "copy_diagnostics": "Sao chép thông tin chẩn đoán",
+      "diagnostics_copied": "Đã sao chép — hãy dán vào báo cáo lỗi của bạn."
     },
     "links": {
       "title": "Liên kết",
       "repo": "Mã nguồn",
       "issues": "Báo bug",
       "discussions": "Thảo luận",
-      "demo": "Demo trực tuyến",
-      "license": "Giấy phép (Apache 2.0)"
+      "demo": "Ứng dụng web",
+      "license": "Giấy phép (Apache 2.0)",
+      "releases": "Bản phát hành & tải về"
     },
     "disclaimer": {
       "title": "Lưu ý",
       "body": "JSONPrism là project 1 người, có AI-assisted. Không bảo hành. Bản dịch do AI sinh ra. Xem DISCLAIMER.md để biết thêm chi tiết."
+    },
+    "kicker": "Giới thiệu",
+    "privacy": {
+      "title": "Dữ liệu của bạn",
+      "web": "Việc chuyển đổi diễn ra trong trình duyệt; tệp và văn bản bạn dán không bao giờ được tải lên. Trang web này được lưu trữ trên Cloudflare, dùng Turnstile để xác minh nhanh và đếm lượt xem trang ẩn danh bằng Cloudflare Web Analytics (không cookie), trừ khi bạn tắt trong mục Giao diện.",
+      "desktop": "Ứng dụng desktop này hoạt động hoàn toàn offline: không thống kê, không xác minh, không có yêu cầu mạng nào ngoài các liên kết bạn tự mở.",
+      "android": "Ứng dụng Android này hoạt động hoàn toàn offline: không thống kê, không xác minh, không có yêu cầu mạng nào ngoài các liên kết bạn tự mở.",
+      "read_policy": "Đọc toàn văn Chính sách quyền riêng tư →"
+    },
+    "contact": {
+      "title": "Liên hệ",
+      "lead": "Với lỗi và ý tưởng tính năng, GitHub Issues là nhanh nhất. Với việc riêng tư, hãy gửi email tới:",
+      "code": "Dự án & quy tắc ứng xử",
+      "security": "Báo cáo bảo mật",
+      "privacy": "Yêu cầu về quyền riêng tư",
+      "legal": "Pháp lý & giấy phép",
+      "sponsor": "Tài trợ"
     }
   },
   "common": {
     "loading": "Đang tải…",
-    "error": "Lỗi",
-    "retry": "Thử lại",
-    "scroll_to_top": "Về đầu trang"
+    "scroll_to_top": "Về đầu trang",
+    "close": "Đóng",
+    "notifications": "Thông báo"
   },
   "consent": {
     "title": "Trước khi bắt đầu",
-    "intro": "JSONPrism chạy hoàn toàn trên thiết bị của bạn — dữ liệu không bao giờ rời khỏi máy. Vui lòng đọc và chấp nhận các điều khoản:",
+    "intro": "JSONPrism chuyển đổi mọi thứ ngay trên thiết bị của bạn — tệp và văn bản bạn làm việc không bao giờ rời khỏi máy. Vui lòng xem và chấp nhận các điều khoản:",
     "agree": "Tôi đã đọc và đồng ý với Giấy phép, Điều khoản (EULA), Chính sách bảo mật và Tuyên bố miễn trừ trách nhiệm.",
     "continue": "Tiếp tục",
     "links": {
@@ -341,17 +385,65 @@
       "terms": "Điều khoản (EULA)",
       "privacy": "Chính sách bảo mật",
       "disclaimer": "Miễn trừ trách nhiệm"
-    }
-  },
-  "disclaimer": {
-    "translation": "Các bản dịch không phải tiếng Anh do AI tạo, không đảm bảo chính xác 100%."
+    },
+    "web_services": "Trên trang web này, Cloudflare lưu trữ ứng dụng, chạy một bước xác minh nhanh (Turnstile) và — trừ khi bạn tắt trong mục Giao diện — đếm lượt xem trang ẩn danh (Web Analytics, không cookie). Ứng dụng desktop và Android không dùng các dịch vụ này."
   },
   "social": {
     "discord": "Discord",
     "x": "X (Twitter)",
-    "bluesky": "Bluesky",
-    "mastodon": "Mastodon",
-    "telegram": "Telegram",
-    "youtube": "YouTube"
+    "bluesky": "Bluesky"
+  },
+  "file_dialog": {
+    "json": "JSON",
+    "text": "Văn bản",
+    "zip": "Tệp nén Zip"
+  },
+  "footer": {
+    "built_by": "Phát triển bởi"
+  },
+  "language": {
+    "label": "Ngôn ngữ"
+  },
+  "appearance": {
+    "title": "Giao diện",
+    "theme": "Chủ đề",
+    "display": "Hiển thị & quyền riêng tư",
+    "hide_scrollbars": "Ẩn thanh cuộn",
+    "analytics": "Thống kê truy cập ẩn danh",
+    "analytics_hint": "Cloudflare Web Analytics, không dùng cookie. Tắt sẽ có hiệu lực từ lần truy cập sau."
+  },
+  "human_check": {
+    "title": "Xác minh nhanh",
+    "recheck_intro": "Cloudflare Turnstile xác nhận bạn là người khoảng mỗi tuần một lần, thường chỉ mất một giây.",
+    "loading": "Đang kiểm tra bạn là người…",
+    "verifying": "Đang xác minh…",
+    "verified": "Đã xác minh — cảm ơn bạn!",
+    "rejected": "Xác minh thất bại. Vui lòng thử lại.",
+    "unavailable": "Bước xác minh hiện không khả dụng.",
+    "unavailable_hint": "Điều này xảy ra khi offline hoặc khi trình chặn chặn Cloudflare. JSONPrism chuyển đổi ngay trên thiết bị của bạn nên bạn vẫn có thể tiếp tục.",
+    "continue_anyway": "Tiếp tục không xác minh"
+  },
+  "editor": {
+    "phrases": {
+      "find": "Tìm",
+      "replace": "Thay thế",
+      "next": "tiếp",
+      "previous": "trước",
+      "all": "tất cả",
+      "match_case": "khớp hoa/thường",
+      "regexp": "biểu thức chính quy",
+      "by_word": "nguyên từ",
+      "replace_one": "thay",
+      "replace_all": "thay tất cả",
+      "close": "đóng",
+      "go_to_line": "Đến dòng",
+      "go": "đi",
+      "fold_line": "Thu gọn dòng",
+      "unfold_line": "Mở rộng dòng",
+      "folded_code": "mã đã thu gọn",
+      "unfold": "mở rộng",
+      "diagnostics": "Chẩn đoán",
+      "no_diagnostics": "Không có chẩn đoán"
+    }
   }
 }

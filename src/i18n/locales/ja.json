@@ -1,13 +1,13 @@
 {
   "app": {
-    "name": "JSONPrism",
-    "tagline": "JSON を様々な形式に分散",
-    "description": "JSON 入力ひとつ。マルチターゲット形式。ブラウザ内で完結。"
+    "description": "JSON ひとつから 12 形式へ、そして逆変換も。変換はすべて端末上で行われます。"
   },
   "nav": {
     "home": "変換",
     "about": "概要",
-    "github": "GitHub"
+    "github": "GitHub",
+    "label": "メインナビゲーション",
+    "home_brand": "JSONPrism ホーム"
   },
   "home": {
     "input_label": "JSON 入力",
@@ -19,17 +19,21 @@
     "output_label": "出力",
     "output_empty": "有効な JSON を入力すると、ここに出力が表示されます。",
     "output_empty_format": "有効な {{ext}} を入力すると、ここに出力が表示されます。",
-    "drop_zone": "JSON ファイルをここにドロップ",
     "drop_zone_active": "ドロップして読み込み",
-    "drop_zone_hint": "最大 500 ファイル。すべてブラウザ内で処理 — データは端末から外に出ません。",
+    "drop_zone_hint": "一度に最大 500 ファイル。ファイルとテキストは端末上で変換され、アップロードされません。",
     "load_sample": "サンプル",
     "open_file": "開く",
     "clear": "クリア",
     "format_picker_label": "ターゲット形式",
-    "convert": "変換",
     "copy": "コピー",
     "download": "ダウンロード",
-    "options": "オプション"
+    "options": "オプション",
+    "kicker": "JSON → 12 形式 · 逆変換も",
+    "title_accent": "分光",
+    "title_rest": "JSON。",
+    "copied": "コピー済み",
+    "error_position": "{{line}} 行 {{column}} 列",
+    "output_aria": "{{format}} の出力（読み取り専用）"
   },
   "formats": {
     "jsonl": "JSONL",
@@ -48,7 +52,7 @@
   "format_status": {
     "ready": "利用可能",
     "suggested": "検出されたデータ形状に適しています",
-    "planned": "Phase {{phase}} で対応予定",
+    "not_suggested": "検出されたデータ形状には推奨されません",
     "no_reverse": "この形式は逆方向のパースに対応していません"
   },
   "direction": {
@@ -71,7 +75,9 @@
       "nested_strategy": "ネストされた値",
       "nested_strategy_desc": "セル内のオブジェクト/配列の扱いを指定します。",
       "nested_json": "JSON 文字列化",
-      "nested_flatten": "キーをフラット化 (アルファ版)"
+      "nested_flatten": "キーをフラット化 (アルファ版)",
+      "escape_formulae": "数式インジェクション対策",
+      "escape_formulae_desc": "= + - @ で始まるセルの先頭に ' を付け、表計算ソフトで数式として実行されないようにします。データが変わるため既定ではオフです。"
     },
     "yaml": {
       "indent": "インデント (スペース数)",
@@ -90,7 +96,11 @@
     },
     "toml": {
       "sort_keys": "キーをアルファベット順に並べ替え",
-      "sort_keys_desc": "ネストの全階層に再帰的に適用。安定した diff に有用。"
+      "sort_keys_desc": "ネストの全階層に再帰的に適用。安定した diff に有用。",
+      "null_handling": "null 値",
+      "null_handling_desc": "TOML には null がありません。「省略」は null のキーと配列要素を除外し、「エラー」は停止して null の位置を示します。",
+      "null_omit": "省略",
+      "null_error": "エラー"
     },
     "markdown": {
       "alignment": "列の配置",
@@ -114,13 +124,14 @@
       "chunk_size": "チャンクサイズ",
       "chunk_size_desc": "複数行モード時、INSERT あたりの最大行数。",
       "include_create": "CREATE TABLE を含める",
-      "include_create_desc": "最初の行から列の型を推定し、CREATE TABLE 文を出力します。"
+      "include_create_desc": "すべての行から列の型を推定し、CREATE TABLE 文を出力します。",
+      "table_name_desc": "スキーマ付きの名前は schema.table と書きます（例: dbo.Users）。"
     },
     "resx": {
       "comment_key": "コメントキー",
       "comment_key_desc": "エントリが { value, _comment } の形を持つ場合、このキーが <comment> 要素になります。",
       "include_schema": "xsd:schema ヘッダーを含める",
-      "include_schema_desc": "Visual Studio はこれを期待します。diff 生成時のみ無効化してください。",
+      "include_schema_desc": "Visual Studio はこれを想定しています。必須の resheader は常に出力されます。",
       "sort_keys": "エントリをアルファベット順に並べ替え",
       "sort_keys_desc": "ロケールファイル間で安定した diff を取りたい時に有用。"
     },
@@ -150,15 +161,23 @@
     "array": "配列",
     "flat-object": "フラットオブジェクト",
     "array-of-objects": "オブジェクトの配列",
-    "unknown": "不明"
+    "unknown": "不明",
+    "detected_value": "検出: {{shape}}"
   },
   "status": {
     "in": "入力",
     "out": "出力",
-    "time": "parse"
+    "state": {
+      "idle": "待機",
+      "working": "処理中",
+      "ok": "OK",
+      "error": "エラー"
+    },
+    "time_value": "{{ms}} ms",
+    "precision": "精度低下",
+    "precision_hint": "±2^53 を超える整数は正確に表現できず丸められました。すべての桁を保持するには文字列として引用してください。"
   },
   "shortcut": {
-    "clear": "クリア",
     "download": "ダウンロード",
     "settings": "設定"
   },
@@ -166,7 +185,7 @@
     "title": "オプション",
     "description": "この形式の生成方法を調整します。設定は形式ごとに保存されます。",
     "no_options": "この形式には現在オプションがありません。",
-    "no_options_long": "このコンバーターはまだオプションを公開していません。Phase 2 で方言、インデントなどが追加される予定です。",
+    "no_options_long": "このコンバーターには設定項目がありません。",
     "reset": "デフォルトに戻す"
   },
   "toast": {
@@ -175,30 +194,33 @@
     "downloaded": "{{filename}} をダウンロードしました",
     "file_loaded": "{{name}} を読み込みました",
     "file_failed": "ファイルの読み込みに失敗: {{message}}",
-    "options_reset": "オプションをデフォルトに戻しました"
+    "options_reset": "オプションをデフォルトに戻しました",
+    "download_failed": "ダウンロードに失敗しました: {{message}}",
+    "files_loaded": "{{count}} 件のファイルを読み込みました",
+    "files_loaded_other": "{{count}} 件のファイルを読み込みました"
   },
   "batch": {
     "trigger": "バッチ",
     "title": "バッチキュー",
-    "description": "複数の {{from}} ファイルを {{to}} に一括変換します。すべてブラウザ内で処理されます。",
-    "drop_idle": "JSON ファイルをここにドロップ",
+    "description": "複数の {{from}} ファイルをまとめて {{to}} に変換します。処理はすべて端末上で行われます。",
     "drop_idle_format": "{{format}} ファイルをここにドロップ",
     "drop_active": "離してファイルを追加",
     "browse": "またはクリックして選択…",
-    "empty": "キューにファイルがありません。上に JSON ファイルをドロップして開始してください。",
     "empty_format": "キューにファイルがありません。上に {{format}} ファイルをドロップして開始してください。",
     "stat": {
       "queued": "待機中",
       "done": "完了",
-      "failed": "失敗"
+      "failed": "失敗",
+      "processing": "処理中",
+      "error": "失敗"
     },
     "process": "処理開始",
     "cancel": "キャンセル",
     "clear": "クリア",
     "download_zip": ".zip をダウンロード",
     "row": {
-      "out": "出力",
-      "remove": "キューから削除"
+      "remove": "{{name}} をキューから削除",
+      "out_value": "出力: {{size}}"
     },
     "toast": {
       "added": "{{count}} ファイルをキューに追加しました",
@@ -218,6 +240,12 @@
       "zipped_other": "{{count}} ファイルを .zip にまとめました",
       "zip_failed": ".zip の作成に失敗: {{message}}",
       "nothing_to_process": "処理するキューがありません。"
+    },
+    "queue_label": "バッチキュー",
+    "error": {
+      "empty_file": "ファイルが空です。",
+      "no_reverse": "この形式は JSON に逆変換できません。",
+      "read_failed": "このファイルを読み込みまたは変換できませんでした。"
     }
   },
   "theme": {
@@ -226,18 +254,13 @@
     "system": "システム"
   },
   "errors": {
-    "invalid_json": "無効な JSON: {{message}}",
-    "empty_input": "入力が空です。",
-    "converter_not_ready": "このコンバーターはまだ実装されていません。",
-    "converter_not_ready_phase": "このコンバーターは Phase {{phase}} で対応予定です。ロードマップを参照してください。",
-    "batch_limit": "バッチ上限に達しました ({{max}} ファイル)。一部のファイルを削除してください。",
-    "unknown": "問題が発生しました。{{message}}"
+    "conversion_failed": "変換に失敗しました: {{message}}"
   },
   "about": {
     "title": "JSONPrism について",
     "lead": "開発者のための分光ツール。",
-    "p1": "JSONPrism は単一の JSON 入力を受け取り、プリズムを通る白色光のように様々なターゲット形式に分散します。すべての処理はクライアントサイドで行われ、データは端末から外に出ません。",
-    "p2": "React 19、Vite 8、Tailwind CSS v4、shadcn/ui で構築。ソースコードは GitHub で公開しています。",
+    "p1": "JSONPrism はひとつの JSON 入力を、プリズムを通る白色光のように多くの形式へ分光し、その多くを JSON に戻すこともできます。変換はすべて端末上で行われるため、貼り付けたりドロップしたデータが外部に出ることはありません。",
+    "p2": "React 19、TypeScript 7、Vite 8、Tailwind CSS v4、shadcn/ui で構築。Web 版は Cloudflare Workers で配信され、デスクトップ版と Android 版は Tauri 2 で構築されています。ソースは GitHub にあります。",
     "version": "バージョン {{version}}",
     "donate": {
       "title": "プロジェクトを支援",
@@ -267,42 +290,160 @@
       "build": "ビルドとツール",
       "tauri": "デスクトップ (Tauri)",
       "i18n": "国際化",
-      "see_full_list": "完全なリストを見る →"
+      "see_full_list": "完全なリストを見る →",
+      "web": "Web（Cloudflare）"
     },
     "build": {
       "title": "ビルド情報",
       "version": "バージョン",
       "commit": "コミット",
-      "date": "ビルド日"
+      "date": "ビルド日",
+      "platform": "プラットフォーム",
+      "platform_web": "Web",
+      "platform_desktop": "デスクトップアプリ",
+      "platform_android": "Android アプリ",
+      "copy_diagnostics": "診断情報をコピー",
+      "diagnostics_copied": "コピーしました。不具合報告に貼り付けてください。"
     },
     "links": {
       "title": "リンク",
       "repo": "ソースコード",
       "issues": "バグ報告",
       "discussions": "ディスカッション",
-      "demo": "ライブデモ",
-      "license": "ライセンス (Apache 2.0)"
+      "demo": "Web アプリ",
+      "license": "ライセンス (Apache 2.0)",
+      "releases": "リリースとダウンロード"
     },
     "disclaimer": {
       "title": "免責事項",
       "body": "JSONPrism は AI 支援による 1 人プロジェクトです。保証はありません。翻訳は AI 生成です。詳細は DISCLAIMER.md を参照してください。"
+    },
+    "kicker": "概要",
+    "privacy": {
+      "title": "あなたのデータ",
+      "web": "変換はブラウザ内で行われ、貼り付けたファイルやテキストがアップロードされることはありません。このウェブサイトは Cloudflare でホストされ、Turnstile で簡単な人間確認を行い、「表示設定」でオフにしない限り Cloudflare Web Analytics（Cookie なし）で匿名のページビューを計測します。",
+      "desktop": "このデスクトップアプリは完全にオフラインで動作します。統計も人間確認もなく、自分で開いたリンク以外のネットワーク通信は行いません。",
+      "android": "この Android アプリは完全にオフラインで動作します。統計も人間確認もなく、自分で開いたリンク以外のネットワーク通信は行いません。",
+      "read_policy": "プライバシーポリシー全文を読む →"
+    },
+    "contact": {
+      "title": "連絡先",
+      "lead": "バグや機能の提案は GitHub Issues が最も早く対応できます。非公開の用件は次の宛先へ:",
+      "code": "プロジェクト・行動規範",
+      "security": "セキュリティ報告",
+      "privacy": "プライバシーに関する依頼",
+      "legal": "法務・ライセンス",
+      "sponsor": "スポンサー"
     }
   },
   "common": {
     "loading": "読み込み中…",
-    "error": "エラー",
-    "retry": "再試行",
-    "scroll_to_top": "トップへ戻る"
-  },
-  "disclaimer": {
-    "translation": "このページの翻訳は AI 生成です。100% の正確性は保証されません。"
+    "scroll_to_top": "トップへ戻る",
+    "close": "閉じる",
+    "notifications": "通知"
   },
   "social": {
     "discord": "Discord",
     "x": "X (Twitter)",
-    "bluesky": "Bluesky",
-    "mastodon": "Mastodon",
-    "telegram": "Telegram",
-    "youtube": "YouTube"
+    "bluesky": "Bluesky"
+  },
+  "file_dialog": {
+    "json": "JSON",
+    "text": "テキスト",
+    "zip": "Zip アーカイブ"
+  },
+  "footer": {
+    "built_by": "制作"
+  },
+  "language": {
+    "label": "言語"
+  },
+  "appearance": {
+    "title": "表示設定",
+    "theme": "テーマ",
+    "display": "表示とプライバシー",
+    "hide_scrollbars": "スクロールバーを隠す",
+    "analytics": "匿名の利用統計",
+    "analytics_hint": "Cloudflare Web Analytics（Cookie 不使用）。オフは次回のアクセスから有効です。"
+  },
+  "consent": {
+    "title": "はじめる前に",
+    "intro": "JSONPrism はすべての変換を端末上で行い、扱うファイルやテキストが外部に送られることはありません。利用規約を確認して同意してください:",
+    "web_services": "このウェブサイトでは、Cloudflare がアプリをホストし、簡単な人間確認（Turnstile）を行い、「表示設定」でオフにしない限り匿名のページビューを計測します（Web Analytics、Cookie なし）。デスクトップ版と Android 版はいずれも使用しません。",
+    "agree": "ライセンス、利用規約（EULA）、プライバシーポリシー、免責事項を読み、同意します。",
+    "continue": "続行",
+    "links": {
+      "license": "ライセンス",
+      "terms": "利用規約（EULA）",
+      "privacy": "プライバシーポリシー",
+      "disclaimer": "免責事項"
+    }
+  },
+  "human_check": {
+    "title": "簡単な確認",
+    "recheck_intro": "Cloudflare Turnstile が週に一度ほど人間であることを確認します。通常は数秒で終わります。",
+    "loading": "人間であることを確認しています…",
+    "verifying": "検証中…",
+    "verified": "確認しました。ありがとうございます!",
+    "rejected": "確認に失敗しました。もう一度お試しください。",
+    "unavailable": "現在、確認を利用できません。",
+    "unavailable_hint": "オフライン時やブロッカーが Cloudflare を遮断している場合に発生します。JSONPrism は端末上で変換するため、このまま続行できます。",
+    "continue_anyway": "確認せずに続行"
+  },
+  "error_page": {
+    "403": {
+      "title": "アクセスできません",
+      "message": "このページを表示する権限がありません。"
+    },
+    "404": {
+      "title": "ページが見つかりません",
+      "message": "プリズムはここにあるものしか分光できません。このページは存在しません。"
+    },
+    "419": {
+      "title": "セッションの有効期限切れ",
+      "message": "セッションがタイムアウトしました。再読み込みしてやり直してください。"
+    },
+    "500": {
+      "title": "サーバーエラー",
+      "message": "問題が発生しました。しばらくしてから再度お試しください。"
+    },
+    "generic": {
+      "title": "問題が発生しました",
+      "message": "予期しないエラーが発生しました。ページを再読み込みしてください。"
+    },
+    "offline": {
+      "message": "オフラインです。JSONPrism は引き続き動作します。変換にネットワークは不要です。"
+    },
+    "chunk": {
+      "title": "アプリの一部を読み込めませんでした",
+      "message": "リソースの読み込みに失敗しました。新しいバージョンが公開された直後によく起こります。再読み込みして最新版を取得してください。"
+    },
+    "actions": {
+      "home": "変換に戻る",
+      "reload": "再読み込み"
+    }
+  },
+  "editor": {
+    "phrases": {
+      "find": "検索",
+      "replace": "置換",
+      "next": "次へ",
+      "previous": "前へ",
+      "all": "すべて",
+      "match_case": "大文字と小文字を区別",
+      "regexp": "正規表現",
+      "by_word": "単語単位",
+      "replace_one": "置換",
+      "replace_all": "すべて置換",
+      "close": "閉じる",
+      "go_to_line": "行へ移動",
+      "go": "移動",
+      "fold_line": "行を折りたたむ",
+      "unfold_line": "行を展開",
+      "folded_code": "折りたたまれたコード",
+      "unfold": "展開",
+      "diagnostics": "診断",
+      "no_diagnostics": "診断なし"
+    }
   }
 }

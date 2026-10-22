@@ -1,13 +1,13 @@
 {
   "app": {
-    "name": "JSONPrism",
-    "tagline": "将 JSON 分散为多种格式",
-    "description": "一份 JSON 输入,多目标格式,全程在浏览器中完成。"
+    "description": "一个 JSON 输入，十二种格式——还能反向转换。所有转换都在你的设备上完成。"
   },
   "nav": {
     "home": "转换",
     "about": "关于",
-    "github": "GitHub"
+    "github": "GitHub",
+    "label": "主导航",
+    "home_brand": "JSONPrism 首页"
   },
   "home": {
     "input_label": "JSON 输入",
@@ -19,17 +19,21 @@
     "output_label": "输出",
     "output_empty": "提供有效的 JSON 后,输出将显示在此处。",
     "output_empty_format": "提供有效的 {{ext}} 后,输出将显示在此处。",
-    "drop_zone": "将 JSON 文件拖到此处",
     "drop_zone_active": "释放即可加载",
-    "drop_zone_hint": "最多 500 个文件。全部在浏览器中运行 — 数据不会离开你的设备。",
+    "drop_zone_hint": "一次最多 500 个文件。文件和文本在你的设备上转换，绝不会上传。",
     "load_sample": "示例",
     "open_file": "打开",
     "clear": "清除",
     "format_picker_label": "目标格式",
-    "convert": "转换",
     "copy": "复制",
     "download": "下载",
-    "options": "选项"
+    "options": "选项",
+    "kicker": "JSON → 12 种格式 · 可双向转换",
+    "title_accent": "色散",
+    "title_rest": "JSON。",
+    "copied": "已复制",
+    "error_position": "第 {{line}} 行，第 {{column}} 列",
+    "output_aria": "{{format}} 输出（只读）"
   },
   "formats": {
     "jsonl": "JSONL",
@@ -48,7 +52,7 @@
   "format_status": {
     "ready": "可用",
     "suggested": "适用于检测到的数据形状",
-    "planned": "将在阶段 {{phase}} 推出",
+    "not_suggested": "不推荐用于检测到的数据形状",
     "no_reverse": "此格式不支持反向解析"
   },
   "direction": {
@@ -71,7 +75,9 @@
       "nested_strategy": "嵌套值处理",
       "nested_strategy_desc": "单元格中嵌套对象或数组的处理方式。",
       "nested_json": "JSON 字符串化",
-      "nested_flatten": "扁平化键 (alpha)"
+      "nested_flatten": "扁平化键 (alpha)",
+      "escape_formulae": "防止公式注入",
+      "escape_formulae_desc": "在以 = + - @ 开头的单元格前添加 '，防止电子表格将其作为公式执行。会改变数据，因此默认关闭。"
     },
     "yaml": {
       "indent": "缩进 (空格数)",
@@ -90,7 +96,11 @@
     },
     "toml": {
       "sort_keys": "按字母顺序排序键",
-      "sort_keys_desc": "递归应用到每一层嵌套,有助于产生稳定的 diff。"
+      "sort_keys_desc": "递归应用到每一层嵌套,有助于产生稳定的 diff。",
+      "null_handling": "null 值",
+      "null_handling_desc": "TOML 没有 null。“省略”会删除值为 null 的键和数组元素；“报错”会停止并指出 null 的位置。",
+      "null_omit": "省略",
+      "null_error": "报错"
     },
     "markdown": {
       "alignment": "列对齐方式",
@@ -114,13 +124,14 @@
       "chunk_size": "分块大小",
       "chunk_size_desc": "启用多行模式时,每条 INSERT 的最大行数。",
       "include_create": "包含 CREATE TABLE",
-      "include_create_desc": "从第一行推断列类型并输出 CREATE TABLE 语句。"
+      "include_create_desc": "根据所有行推断列类型并生成 CREATE TABLE 语句。",
+      "table_name_desc": "带架构的名称写作 schema.table（例如 dbo.Users）。"
     },
     "resx": {
       "comment_key": "注释键",
       "comment_key_desc": "当条目形如 { value, _comment } 时,该键的值将作为 <comment> 元素。",
       "include_schema": "包含 xsd:schema 头",
-      "include_schema_desc": "Visual Studio 需要该头。仅在生成 diff 时关闭。",
+      "include_schema_desc": "Visual Studio 需要此部分。必需的 resheader 条目始终会写入。",
       "sort_keys": "按字母顺序排序条目",
       "sort_keys_desc": "便于在不同 locale 文件之间产生稳定的 diff。"
     },
@@ -150,15 +161,23 @@
     "array": "数组",
     "flat-object": "扁平对象",
     "array-of-objects": "对象数组",
-    "unknown": "未知"
+    "unknown": "未知",
+    "detected_value": "检测到：{{shape}}"
   },
   "status": {
     "in": "输入",
     "out": "输出",
-    "time": "parse"
+    "state": {
+      "idle": "空闲",
+      "working": "处理中",
+      "ok": "完成",
+      "error": "错误"
+    },
+    "time_value": "{{ms}} ms",
+    "precision": "精度丢失",
+    "precision_hint": "超出 ±2^53 的整数无法精确表示，已被四舍五入。请将其写成字符串以保留全部数字。"
   },
   "shortcut": {
-    "clear": "清除",
     "download": "下载",
     "settings": "设置"
   },
@@ -166,7 +185,7 @@
     "title": "选项",
     "description": "调整该格式的生成方式。设置按格式分别保存。",
     "no_options": "该格式暂无可用选项。",
-    "no_options_long": "此转换器尚未暴露任何选项。阶段 2 落地后,你将在此找到方言、缩进等设置。",
+    "no_options_long": "此转换器没有可配置的选项。",
     "reset": "恢复默认"
   },
   "toast": {
@@ -175,30 +194,33 @@
     "downloaded": "已下载 {{filename}}",
     "file_loaded": "已加载 {{name}}",
     "file_failed": "加载文件失败: {{message}}",
-    "options_reset": "已恢复默认选项"
+    "options_reset": "已恢复默认选项",
+    "download_failed": "下载失败：{{message}}",
+    "files_loaded": "已加载 {{count}} 个文件",
+    "files_loaded_other": "已加载 {{count}} 个文件"
   },
   "batch": {
     "trigger": "批量",
     "title": "批量队列",
-    "description": "一次性将多个 {{from}} 文件转换为 {{to}}。全部在浏览器中处理。",
-    "drop_idle": "将 JSON 文件拖到此处",
+    "description": "一次将多个 {{from}} 文件转换为 {{to}}。所有处理都在你的设备上进行。",
     "drop_idle_format": "将 {{format}} 文件拖到此处",
     "drop_active": "释放以添加文件",
     "browse": "或点击浏览…",
-    "empty": "队列中暂无文件。将 JSON 文件拖到上方即可开始。",
     "empty_format": "队列中暂无文件。将 {{format}} 文件拖到上方即可开始。",
     "stat": {
       "queued": "等待中",
       "done": "完成",
-      "failed": "失败"
+      "failed": "失败",
+      "processing": "处理中",
+      "error": "失败"
     },
     "process": "处理",
     "cancel": "取消",
     "clear": "清空",
     "download_zip": "下载 .zip",
     "row": {
-      "out": "输出",
-      "remove": "从队列中移除"
+      "remove": "从队列中移除 {{name}}",
+      "out_value": "输出：{{size}}"
     },
     "toast": {
       "added": "已添加 {{count}} 个文件到队列",
@@ -218,6 +240,12 @@
       "zipped_other": "已将 {{count}} 个文件打包为 .zip",
       "zip_failed": "无法构建 .zip: {{message}}",
       "nothing_to_process": "队列中没有可处理的内容。"
+    },
+    "queue_label": "批处理队列",
+    "error": {
+      "empty_file": "文件为空。",
+      "no_reverse": "此格式无法转换回 JSON。",
+      "read_failed": "无法读取或转换此文件。"
     }
   },
   "theme": {
@@ -226,18 +254,13 @@
     "system": "跟随系统"
   },
   "errors": {
-    "invalid_json": "无效的 JSON: {{message}}",
-    "empty_input": "输入为空。",
-    "converter_not_ready": "该转换器尚未实现。",
-    "converter_not_ready_phase": "该转换器将在阶段 {{phase}} 推出。详见路线图。",
-    "batch_limit": "已达批量上限 ({{max}} 个文件)。请先移除一些文件。",
-    "unknown": "发生错误。{{message}}"
+    "conversion_failed": "转换失败：{{message}}"
   },
   "about": {
     "title": "关于 JSONPrism",
     "lead": "为开发者打造的分光工具。",
-    "p1": "JSONPrism 接收单份 JSON 输入,并像白光穿过棱镜一样将其分散为多种目标格式。一切都在客户端完成,数据不会离开你的设备。",
-    "p2": "使用 React 19、Vite 8、Tailwind CSS v4 与 shadcn/ui 构建。源码在 GitHub。",
+    "p1": "JSONPrism 将一个 JSON 输入分解为多种目标格式——就像白光穿过棱镜——并且大多数格式都能转换回来。所有转换都在你的设备上完成，你粘贴或拖入的数据绝不会离开设备。",
+    "p2": "基于 React 19、TypeScript 7、Vite 8、Tailwind CSS v4 和 shadcn/ui 构建。网页版由 Cloudflare Workers 提供服务；桌面版和 Android 版使用 Tauri 2 构建。源代码托管在 GitHub。",
     "version": "版本 {{version}}",
     "donate": {
       "title": "支持本项目",
@@ -267,42 +290,160 @@
       "build": "构建与工具链",
       "tauri": "桌面端 (Tauri)",
       "i18n": "国际化",
-      "see_full_list": "查看完整列表 →"
+      "see_full_list": "查看完整列表 →",
+      "web": "网页版（Cloudflare）"
     },
     "build": {
       "title": "构建信息",
       "version": "版本",
       "commit": "Commit",
-      "date": "构建日期"
+      "date": "构建日期",
+      "platform": "平台",
+      "platform_web": "网页版",
+      "platform_desktop": "桌面应用",
+      "platform_android": "Android 应用",
+      "copy_diagnostics": "复制诊断信息",
+      "diagnostics_copied": "已复制，请粘贴到你的问题报告中。"
     },
     "links": {
       "title": "链接",
       "repo": "源代码",
       "issues": "反馈 bug",
       "discussions": "讨论区",
-      "demo": "在线演示",
-      "license": "许可证 (Apache 2.0)"
+      "demo": "网页版",
+      "license": "许可证 (Apache 2.0)",
+      "releases": "版本与下载"
     },
     "disclaimer": {
       "title": "免责声明",
       "body": "JSONPrism 是 1 人 + AI 协助的项目。不提供任何保证。译文由 AI 生成。详情参见 DISCLAIMER.md。"
+    },
+    "kicker": "关于",
+    "privacy": {
+      "title": "你的数据",
+      "web": "转换在你的浏览器中完成，你粘贴的文件和文本绝不会被上传。本网站托管于 Cloudflare，使用 Turnstile 进行快速人机验证，并在你未于“外观”中关闭时，通过 Cloudflare Web Analytics（不使用 Cookie）统计匿名页面浏览量。",
+      "desktop": "此桌面应用完全离线运行：没有统计、没有人机验证，除你自己打开的链接外不发起任何网络请求。",
+      "android": "此 Android 应用完全离线运行：没有统计、没有人机验证，除你自己打开的链接外不发起任何网络请求。",
+      "read_policy": "阅读完整隐私政策 →"
+    },
+    "contact": {
+      "title": "联系方式",
+      "lead": "报告问题或提出功能建议，GitHub Issues 最快。私人事务请发送邮件至：",
+      "code": "项目与行为准则",
+      "security": "安全报告",
+      "privacy": "隐私请求",
+      "legal": "法律与许可",
+      "sponsor": "赞助"
     }
   },
   "common": {
     "loading": "加载中…",
-    "error": "错误",
-    "retry": "重试",
-    "scroll_to_top": "回到顶部"
-  },
-  "disclaimer": {
-    "translation": "本页面译文由 AI 生成,不保证 100% 准确。"
+    "scroll_to_top": "回到顶部",
+    "close": "关闭",
+    "notifications": "通知"
   },
   "social": {
     "discord": "Discord",
     "x": "X (Twitter)",
-    "bluesky": "Bluesky",
-    "mastodon": "Mastodon",
-    "telegram": "Telegram",
-    "youtube": "YouTube"
+    "bluesky": "Bluesky"
+  },
+  "file_dialog": {
+    "json": "JSON",
+    "text": "文本",
+    "zip": "Zip 压缩包"
+  },
+  "footer": {
+    "built_by": "开发者"
+  },
+  "language": {
+    "label": "语言"
+  },
+  "appearance": {
+    "title": "外观",
+    "theme": "主题",
+    "display": "显示与隐私",
+    "hide_scrollbars": "隐藏滚动条",
+    "analytics": "匿名使用统计",
+    "analytics_hint": "Cloudflare Web Analytics，不使用 Cookie。关闭后从下次访问起生效。"
+  },
+  "consent": {
+    "title": "开始之前",
+    "intro": "JSONPrism 的所有转换都在你的设备上完成，你处理的文件和文本不会离开设备。请阅读并接受以下条款：",
+    "web_services": "在本网站上，Cloudflare 负责托管应用、执行一次快速的人机验证（Turnstile），并且除非你在“外观”中关闭，还会统计匿名页面浏览量（Web Analytics，不使用 Cookie）。桌面版和 Android 版均不使用这些服务。",
+    "agree": "我已阅读并同意许可证、使用条款（EULA）、隐私政策和免责声明。",
+    "continue": "继续",
+    "links": {
+      "license": "许可证",
+      "terms": "使用条款（EULA）",
+      "privacy": "隐私政策",
+      "disclaimer": "免责声明"
+    }
+  },
+  "human_check": {
+    "title": "快速验证",
+    "recheck_intro": "Cloudflare Turnstile 大约每周确认一次你是真人，通常只需一秒。",
+    "loading": "正在验证你是真人…",
+    "verifying": "验证中…",
+    "verified": "验证通过，谢谢！",
+    "rejected": "验证失败，请重试。",
+    "unavailable": "人机验证暂时不可用。",
+    "unavailable_hint": "离线或拦截插件阻止了 Cloudflare 时会出现这种情况。JSONPrism 在你的设备上完成转换，因此可以继续使用。",
+    "continue_anyway": "跳过验证并继续"
+  },
+  "error_page": {
+    "403": {
+      "title": "禁止访问",
+      "message": "你没有权限查看此内容。"
+    },
+    "404": {
+      "title": "页面不存在",
+      "message": "棱镜只能分解这里有的光——此页面不存在。"
+    },
+    "419": {
+      "title": "会话已过期",
+      "message": "会话已超时，请重新加载。"
+    },
+    "500": {
+      "title": "服务器错误",
+      "message": "出现问题，请稍后再试。"
+    },
+    "generic": {
+      "title": "出错了",
+      "message": "发生意外错误，请尝试重新加载页面。"
+    },
+    "offline": {
+      "message": "你已离线——JSONPrism 仍可正常使用，转换无需联网。"
+    },
+    "chunk": {
+      "title": "无法加载部分应用",
+      "message": "资源加载失败，通常是因为刚发布了新版本。请重新加载以获取最新版本。"
+    },
+    "actions": {
+      "home": "返回转换",
+      "reload": "重新加载"
+    }
+  },
+  "editor": {
+    "phrases": {
+      "find": "查找",
+      "replace": "替换",
+      "next": "下一个",
+      "previous": "上一个",
+      "all": "全部",
+      "match_case": "区分大小写",
+      "regexp": "正则表达式",
+      "by_word": "全字匹配",
+      "replace_one": "替换",
+      "replace_all": "全部替换",
+      "close": "关闭",
+      "go_to_line": "跳转到行",
+      "go": "跳转",
+      "fold_line": "折叠行",
+      "unfold_line": "展开行",
+      "folded_code": "已折叠代码",
+      "unfold": "展开",
+      "diagnostics": "诊断",
+      "no_diagnostics": "无诊断"
+    }
   }
 }

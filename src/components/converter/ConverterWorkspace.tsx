@@ -2,21 +2,27 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from '@/components/ui/sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { extensionsFor, getConverter } from '@/converters/registry';
+import type { Direction, FormatId } from '@/converters/types';
 import { useBatchFileRouter } from '@/hooks/useBatchFileRouter';
 import { useConversionResult } from '@/hooks/useConversionResult';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useOutputBadge } from '@/hooks/useOutputBadge';
-import { getConverter } from '@/converters/registry';
-import type { FormatId } from '@/converters/types';
+import { utf8ByteLength } from '@/lib/bytes';
+import { errorMessage } from '@/lib/errors';
+import { extOf, getAllowedExtensions } from '@/lib/file-filter';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
-import { DirectionToggle, type Direction } from './DirectionToggle';
+import { DirectionToggle } from './DirectionToggle';
 import { FormatPicker } from './FormatPicker';
 import { InputPanel } from './InputPanel';
 import { OutputPanel } from './OutputPanel';
 import { SettingsPanel } from './SettingsPanel';
 import { ShapeHint } from './ShapeHint';
-import { StatusBar } from './StatusBar';
+import { StatusBar, type ConversionState } from './StatusBar';
 import { BatchPanel } from './BatchPanel';
+
+const REVERSIBLE_FALLBACKS: FormatId[] = ['jsonl', 'csv', 'yaml', 'toml', 'resx'];
 
 export function ConverterWorkspace() {
   const { t } = useTranslation();
@@ -29,32 +35,47 @@ export function ConverterWorkspace() {
   const setFormat = useWorkspaceStore((s) => s.setFormat);
   const direction = useWorkspaceStore((s) => s.direction);
   const setDirection = useWorkspaceStore((s) => s.setDirection);
-  const optionsByFormat = useWorkspaceStore((s) => s.optionsByFormat);
+  const storedOptions = useWorkspaceStore((s) => s.optionsByFormat[s.format]);
   const setOptionsForFormat = useWorkspaceStore((s) => s.setOptionsForFormat);
   const resetOptionsForFormat = useWorkspaceStore((s) => s.resetOptionsForFormat);
 
   const actionsRef = useRef<{ copy: () => void; download: () => void } | null>(null);
   const [batchOpen, setBatchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  // Mobile tab state — desktop ignores this and renders both panels side-by-side.
+  // Mobile tab state — desktop renders both panels side-by-side.
   const [activeTab, setActiveTab] = useState<'input' | 'output'>('input');
+  // One layout at a time: mounting both (CSS-hidden) doubled every editor
+  // update. Defaults to desktop where matchMedia is unavailable.
+  const isDesktop = useMediaQuery('(min-width: 768px)', true);
 
   const openBatch = useCallback(() => setBatchOpen(true), []);
-  const handleMultiFileDrop = useBatchFileRouter(format, direction, openBatch);
 
-  const switchFormat = useCallback(
-    (next: FormatId) => {
-      setFormat(next);
+  const loadSingleFile = useCallback(
+    (file: File) => {
+      const allowed = getAllowedExtensions(direction, extensionsFor(format));
+      const ext = extOf(file.name);
+      if (ext && !allowed.includes(ext)) {
+        toast.warning(t('batch.toast.wrong_format', { count: 1 }));
+        return;
+      }
+      file.text().then(
+        (text) => {
+          setInput(text);
+          toast.success(t('toast.file_loaded', { name: file.name }));
+        },
+        (err: unknown) => toast.error(t('toast.file_failed', { message: errorMessage(err) })),
+      );
     },
-    [setFormat],
+    [direction, format, setInput, t],
   );
+  const handleMultiFileDrop = useBatchFileRouter(format, direction, loadSingleFile, openBatch);
 
   const switchDirection = useCallback(
     (next: Direction) => {
       setDirection(next);
       // If the current format doesn't support the new direction, switch to one that does.
       if (next === 'reverse' && typeof getConverter(format).reverse !== 'function') {
-        const fallback = (['jsonl', 'csv', 'yaml', 'toml', 'resx'] as FormatId[]).find(
+        const fallback = REVERSIBLE_FALLBACKS.find(
           (id) => typeof getConverter(id).reverse === 'function',
         );
         if (fallback) setFormat(fallback);
@@ -63,12 +84,13 @@ export function ConverterWorkspace() {
     [format, setDirection, setFormat],
   );
 
-  const currentOptions = optionsByFormat[format] ?? getConverter(format).defaultOptions;
+  const currentOptions = useMemo(
+    () => storedOptions ?? { ...getConverter(format).defaultOptions },
+    [format, storedOptions],
+  );
 
   const setCurrentOptions = useCallback(
-    (next: Record<string, unknown>) => {
-      setOptionsForFormat(format, next);
-    },
+    (next: Record<string, unknown>) => setOptionsForFormat(format, next),
     [format, setOptionsForFormat],
   );
 
@@ -77,38 +99,65 @@ export function ConverterWorkspace() {
     toast.success(t('toast.options_reset'));
   }, [format, resetOptionsForFormat, t]);
 
-  const { output, inputError, outputError, shape, parseMs } = useConversionResult(
-    input,
-    format,
-    direction,
-    currentOptions,
-  );
+  const result = useConversionResult(input, format, direction, currentOptions);
 
   useKeyboardShortcuts([
-    { key: 'k', mod: true, handler: () => setInput('') },
-    { key: 's', mod: true, handler: () => actionsRef.current?.download() },
-    { key: ',', mod: true, handler: () => setSettingsOpen((v) => !v) },
+    { code: 'KeyS', mod: true, handler: () => actionsRef.current?.download() },
+    { code: 'Comma', mod: true, handler: () => setSettingsOpen((v) => !v) },
   ]);
 
-  const hasUnreadOutput = useOutputBadge(output, activeTab);
+  const hasUnreadOutput = useOutputBadge(result.output, activeTab);
+  const inputBytes = useMemo(() => utf8ByteLength(input), [input]);
+  const registerActions = useCallback((a: { copy: () => void; download: () => void }) => {
+    actionsRef.current = a;
+  }, []);
 
-  const inputBytes = useMemo(() => new TextEncoder().encode(input).length, [input]);
-  const outputBytes = useMemo(() => new TextEncoder().encode(output).length, [output]);
+  const state: ConversionState = result.pending
+    ? 'working'
+    : result.inputError || result.outputError
+      ? 'error'
+      : result.output
+        ? 'ok'
+        : 'idle';
+
+  const inputPanel = (
+    <InputPanel
+      value={input}
+      onChange={setInput}
+      error={result.inputError}
+      errorLine={result.inputErrorLine}
+      errorColumn={result.inputErrorColumn}
+      format={format}
+      direction={direction}
+      onMultiFileDrop={handleMultiFileDrop}
+    />
+  );
+  const outputPanel = (
+    <OutputPanel
+      format={format}
+      content={result.output}
+      error={result.outputError}
+      pending={result.pending}
+      options={currentOptions}
+      direction={direction}
+      registerActions={registerActions}
+    />
+  );
 
   return (
-    <div className="flex h-full flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-3">
+    <div className="flex h-full flex-col gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           <DirectionToggle value={direction} onChange={switchDirection} />
           <FormatPicker
             value={format}
-            onChange={switchFormat}
-            shape={shape}
+            onChange={setFormat}
+            shape={result.shape}
             direction={direction}
           />
         </div>
-        <div className="flex items-center gap-3">
-          <ShapeHint shape={shape} />
+        <div className="flex items-center gap-2">
+          <ShapeHint shape={result.shape} />
           <BatchPanel
             format={format}
             direction={direction}
@@ -127,79 +176,55 @@ export function ConverterWorkspace() {
         </div>
       </div>
 
-      <div className="border-border bg-card/40 flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border">
-        {/* Mobile: Tabs UI — each tab gets the full workspace height so panels
-            never overlap on short viewports. */}
-        <Tabs
-          value={activeTab}
-          onValueChange={(v) => setActiveTab(v as 'input' | 'output')}
-          className="flex min-h-0 flex-1 flex-col md:hidden"
-        >
-          <TabsList className="border-border/60 w-full justify-start gap-0 rounded-none border-b px-2">
-            <TabsTrigger value="input">{t('home.tab_input')}</TabsTrigger>
-            <TabsTrigger value="output" className="relative">
-              {t('home.tab_output')}
-              {hasUnreadOutput && (
-                <span
-                  aria-hidden
-                  className="bg-primary absolute top-1 right-1 h-1.5 w-1.5 rounded-full"
-                />
-              )}
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="input" className="min-h-0 flex-1">
-            <InputPanel
-              value={input}
-              onChange={setInput}
-              error={inputError}
-              format={format}
-              direction={direction}
-              onMultiFileDrop={handleMultiFileDrop}
-            />
-          </TabsContent>
-          <TabsContent value="output" className="min-h-0 flex-1">
-            <OutputPanel
-              format={format}
-              content={output}
-              error={outputError}
-              options={currentOptions}
-              direction={direction}
-              registerActions={(a) => {
-                actionsRef.current = a;
-              }}
-            />
-          </TabsContent>
-        </Tabs>
-
-        {/* Desktop: side-by-side grid (≥ md). Rendered in parallel with the
-            Tabs above so neither remounts on viewport resize and CodeMirror
-            state survives the swap. */}
-        <div className="hidden min-h-0 flex-1 md:grid md:grid-cols-2">
-          <div className="border-border/60 min-h-0 border-r">
-            <InputPanel
-              value={input}
-              onChange={setInput}
-              error={inputError}
-              format={format}
-              direction={direction}
-              onMultiFileDrop={handleMultiFileDrop}
-            />
+      <div className="border-border bg-card/60 corner-ticks flex min-h-0 flex-1 flex-col rounded-lg border backdrop-blur-[2px]">
+        {isDesktop ? (
+          <div className="grid min-h-0 flex-1 grid-cols-2">
+            <div className="border-border/70 min-h-0 border-r">{inputPanel}</div>
+            <div className="min-h-0">{outputPanel}</div>
           </div>
-          <div className="min-h-0">
-            <OutputPanel
-              format={format}
-              content={output}
-              error={outputError}
-              options={currentOptions}
-              direction={direction}
-              registerActions={(a) => {
-                actionsRef.current = a;
-              }}
-            />
-          </div>
-        </div>
+        ) : (
+          <Tabs
+            value={activeTab}
+            onValueChange={(v) => setActiveTab(v as 'input' | 'output')}
+            className="flex min-h-0 flex-1 flex-col"
+          >
+            <TabsList className="border-border/70 w-full justify-start gap-0 rounded-none border-b px-2">
+              <TabsTrigger value="input">{t('home.tab_input')}</TabsTrigger>
+              <TabsTrigger value="output" className="relative">
+                {t('home.tab_output')}
+                {hasUnreadOutput && (
+                  <span
+                    aria-hidden
+                    className="bg-primary absolute top-1 right-1 h-1.5 w-1.5 rounded-full"
+                  />
+                )}
+              </TabsTrigger>
+            </TabsList>
+            {/* forceMount keeps both editors alive (undo history, scroll) across tab switches. */}
+            <TabsContent
+              value="input"
+              forceMount
+              className="min-h-0 flex-1 data-[state=inactive]:hidden"
+            >
+              {inputPanel}
+            </TabsContent>
+            <TabsContent
+              value="output"
+              forceMount
+              className="min-h-0 flex-1 data-[state=inactive]:hidden"
+            >
+              {outputPanel}
+            </TabsContent>
+          </Tabs>
+        )}
 
-        <StatusBar inputBytes={inputBytes} outputBytes={outputBytes} parseMs={parseMs} />
+        <StatusBar
+          state={state}
+          inputBytes={inputBytes}
+          outputBytes={result.outputBytes}
+          ms={result.ms}
+          precisionLoss={result.precisionLoss}
+        />
       </div>
     </div>
   );

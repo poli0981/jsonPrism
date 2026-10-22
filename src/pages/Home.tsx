@@ -5,15 +5,16 @@ export function Home() {
   const { t } = useTranslation();
 
   return (
-    <div className="mx-auto flex min-h-0 w-full max-w-screen-2xl flex-1 flex-col gap-4 px-4 py-4 sm:gap-6 sm:px-6 sm:py-6">
-      <header className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between md:gap-6">
+    <div className="mx-auto flex min-h-0 w-full max-w-screen-2xl flex-1 flex-col gap-3 px-3 py-3 sm:gap-4 sm:px-6 sm:py-5">
+      <header className="flex flex-col gap-1.5 md:flex-row md:items-end md:justify-between md:gap-6">
         <div>
-          <h1 className="font-display text-4xl leading-none tracking-tight md:text-5xl">
-            <span className="text-spectrum italic">Disperse</span> JSON.
+          <p className="label-mono mb-1">{t('home.kicker')}</p>
+          <h1 className="text-3xl leading-none font-semibold tracking-tight md:text-4xl">
+            <span className="text-spectrum">{t('home.title_accent')}</span> {t('home.title_rest')}
           </h1>
           <p className="text-muted-foreground mt-2 max-w-xl text-sm">{t('app.description')}</p>
         </div>
-        <div className="text-muted-foreground/60 hidden font-mono text-xs md:block">
+        <div className="text-muted-foreground hidden font-mono text-xs md:block">
           {t('home.drop_zone_hint')}
         </div>
       </header>

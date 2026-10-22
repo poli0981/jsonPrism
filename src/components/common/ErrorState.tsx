@@ -29,12 +29,16 @@ export function ErrorState({ code, title, message, icon, actions, className }: E
         className,
       )}
     >
-      <div className="border-border bg-card flex w-full max-w-md flex-col items-center gap-4 rounded-lg border p-8 text-center">
+      {/* Hoisted into <head> by React 19, so error routes aren't titled like the app. */}
+      <title>{`${title} · JSONPrism`}</title>
+      <div className="border-border bg-card corner-ticks flex w-full max-w-md flex-col items-center gap-4 rounded-lg border p-8 text-center">
         {code !== undefined && (
-          <span className="font-display text-spectrum text-6xl leading-none italic">{code}</span>
+          <span className="text-spectrum font-mono text-6xl leading-none font-semibold">
+            {code}
+          </span>
         )}
         {icon}
-        <h1 className="font-display text-2xl">{title}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
         {message && <p className="text-muted-foreground text-sm">{message}</p>}
         {actions && (
           <div className="mt-2 flex flex-wrap items-center justify-center gap-2">{actions}</div>

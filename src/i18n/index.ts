@@ -7,6 +7,15 @@ import vi from './locales/vi.json';
 import ja from './locales/ja.json';
 import zhCN from './locales/zh-CN.json';
 
+const SUPPORTED_LANGUAGES = ['en', 'vi', 'ja', 'zh-CN'] as const;
+
+/** Keeps <html lang> in sync so screen readers and CJK glyph selection follow the UI language. */
+function syncDocumentLanguage(language: string | undefined): void {
+  if (typeof document !== 'undefined' && language) document.documentElement.lang = language;
+}
+
+i18n.on('languageChanged', syncDocumentLanguage);
+
 void i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -18,11 +27,12 @@ void i18n
       'zh-CN': { translation: zhCN },
     },
     fallbackLng: 'en',
-    supportedLngs: ['en', 'vi', 'ja', 'zh-CN'],
+    supportedLngs: [...SUPPORTED_LANGUAGES],
     interpolation: { escapeValue: false },
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
       lookupLocalStorage: 'jsonprism.lang',
     },
-  });
+  })
+  .then(() => syncDocumentLanguage(i18n.resolvedLanguage));

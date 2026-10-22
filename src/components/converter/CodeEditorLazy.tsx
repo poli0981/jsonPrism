@@ -19,6 +19,7 @@ function EditorFallback({
   placeholder,
   readOnly = false,
   className,
+  ariaLabel,
 }: CodeEditorProps) {
   return (
     <div className={cn('h-full overflow-hidden', className)}>
@@ -27,8 +28,9 @@ function EditorFallback({
         readOnly={readOnly}
         spellCheck={false}
         placeholder={placeholder}
+        aria-label={ariaLabel}
         onChange={onChange ? (e) => onChange(e.target.value) : undefined}
-        className="text-foreground placeholder:text-muted-foreground/50 h-full w-full resize-none bg-transparent px-4 py-4 font-mono text-[13px] leading-[1.6] outline-none"
+        className="text-foreground placeholder:text-muted-foreground h-full w-full resize-none bg-transparent px-4 py-3 font-mono text-[13px] leading-[1.6] outline-none"
       />
     </div>
   );
