@@ -28,37 +28,60 @@ jobs:
     timeout-minutes: 20
     permissions: {}
     steps:
+      # A new deploy reaches Cloudflare's edge locations over a minute or so;
+      # until then some requests still hit the previous version. Wait until the
+      # commit has been served several times in a row.
       - name: Wait for this commit to go live
         if: github.event_name == 'push'
         env:
           SHA: ${{ github.sha }}
         run: |
           want="${SHA:0:7}"
-          for attempt in $(seq 1 60); do
+          streak=0
+          for attempt in $(seq 1 90); do
             live=$(curl -fsS -A "$UA" --max-time 10 "$SITE/" | sed -n 's/.*<meta name="jsonprism-commit" content="\([0-9a-f]*\)".*/\1/p' | head -n 1 || true)
             if [ "$live" = "$want" ]; then
-              echo "Production serves $live"
-              exit 0
+              streak=$((streak + 1))
+              if [ "$streak" -ge 3 ]; then
+                echo "Production serves $live"
+                exit 0
+              fi
+              sleep 10
+              continue
             fi
+            streak=0
             echo "Attempt $attempt: live=${live:-unknown}, waiting for $want"
-            sleep 15
+            sleep 10
           done
           echo "::error::Production did not serve $want within 15 minutes. Check Workers Builds in the Cloudflare dashboard."
           exit 1
 
       - name: Check headers, routes and API
         run: |
-          set -euo pipefail
-          fail() { echo "::error::$1"; exit 1; }
-          headers=$(curl -fsSI -A "$UA" "$SITE/")
-          for expected in "content-security-policy: default-src 'self'" "strict-transport-security: max-age=" "x-content-type-options: nosniff" "x-frame-options: deny"; do
-            grep -qi "^$expected" <<<"$headers" || fail "Missing header: $expected"
+          set -uo pipefail
+          checks() {
+            local headers expected old code
+            headers=$(curl -fsSI -A "$UA" "$SITE/") || { echo "home page unreachable"; return 1; }
+            for expected in "content-security-policy: default-src 'self'" "strict-transport-security: max-age=" "x-content-type-options: nosniff" "x-frame-options: deny"; do
+              grep -qi "^$expected" <<<"$headers" || { echo "missing header: $expected"; return 1; }
+            done
+            [ "$(curl -sS -A "$UA" -o /dev/null -w '%{http_code}' "$SITE/about")" = 200 ] || { echo "/about is not served by the SPA fallback"; return 1; }
+            old=$(curl -sS -A "$UA" -o /dev/null -w '%{http_code} %{redirect_url}' "$SITE/jsonPrism/about")
+            [ "$old" = "301 $SITE/about" ] || { echo "/jsonPrism/about gave '$old', expected a 301 to /about"; return 1; }
+            [ "$(curl -fsS -A "$UA" "$SITE/api/health")" = '{"ok":true,"service":"jsonprism"}' ] || { echo "/api/health is not healthy"; return 1; }
+            curl -fsS -A "$UA" "$SITE/.well-known/security.txt" | grep -q '^Contact: mailto:security@poli0981.dev' || { echo "security.txt is missing or stale"; return 1; }
+            code=$(curl -sS -A "$UA" -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://example.com' -H 'Content-Type: application/json' --data '{"token":"x"}' "$SITE/api/turnstile/verify")
+            [ "$code" = 403 ] || { echo "/api/turnstile/verify answered $code to a foreign origin, expected 403"; return 1; }
+          }
+          # Retry briefly in case a request still lands on an edge location
+          # that hasn't picked up the deploy yet.
+          for attempt in 1 2 3 4; do
+            if problem=$(checks); then
+              echo "Production checks passed."
+              exit 0
+            fi
+            echo "Attempt $attempt: $problem"
+            sleep 20
           done
-          [ "$(curl -sS -A "$UA" -o /dev/null -w '%{http_code}' "$SITE/about")" = 200 ] || fail "/about is not served by the SPA fallback"
-          old=$(curl -sS -A "$UA" -o /dev/null -w '%{http_code} %{redirect_url}' "$SITE/jsonPrism/about")
-          [ "$old" = "301 $SITE/about" ] || fail "/jsonPrism/about gave '$old', expected a 301 to /about"
-          [ "$(curl -fsS -A "$UA" "$SITE/api/health")" = '{"ok":true,"service":"jsonprism"}' ] || fail "/api/health is not healthy"
-          curl -fsS -A "$UA" "$SITE/.well-known/security.txt" | grep -q '^Contact: mailto:security@poli0981.dev' || fail "security.txt is missing or stale"
-          code=$(curl -sS -A "$UA" -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://example.com' -H 'Content-Type: application/json' --data '{"token":"x"}' "$SITE/api/turnstile/verify")
-          [ "$code" = 403 ] || fail "/api/turnstile/verify answered $code to a foreign origin, expected 403"
-          echo "Production checks passed."
+          echo "::error::$problem"
+          exit 1
