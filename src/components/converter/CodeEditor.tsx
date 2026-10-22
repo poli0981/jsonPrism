@@ -1,6 +1,11 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import CodeMirror, { EditorState, EditorView, type BasicSetupOptions } from '@uiw/react-codemirror';
+import CodeMirror, {
+  EditorState,
+  EditorView,
+  ViewPlugin,
+  type BasicSetupOptions,
+} from '@uiw/react-codemirror';
 import { json } from '@codemirror/lang-json';
 import { yaml } from '@codemirror/lang-yaml';
 import { xml } from '@codemirror/lang-xml';
@@ -107,6 +112,21 @@ const jsonlLint = linter((view) => {
   }
   return diagnostics;
 });
+
+/**
+ * Read-only output isn't contenteditable (that would raise the on-screen
+ * keyboard on phones), so CodeMirror never moves a cursor through it and
+ * swallows the arrow keys. Make the scroll container itself focusable instead:
+ * the browser then scrolls it with the arrow and page keys.
+ */
+function focusableScroller(label: string | undefined) {
+  return ViewPlugin.define((view) => {
+    view.scrollDOM.tabIndex = 0;
+    view.scrollDOM.setAttribute('role', 'region');
+    if (label) view.scrollDOM.setAttribute('aria-label', label);
+    return {};
+  });
+}
 
 function languageExtensions(language: EditorLanguage, readOnly: boolean) {
   switch (language) {
@@ -237,6 +257,7 @@ export function CodeEditor({
         ...(ariaLabel ? { 'aria-label': ariaLabel } : {}),
         ...(readOnly ? { 'aria-readonly': 'true' } : {}),
       }),
+      ...(readOnly ? [focusableScroller(ariaLabel)] : []),
       theme,
     ];
   }, [ariaLabel, language, phrases, readOnly, resolvedTheme, wrap]);
@@ -244,6 +265,10 @@ export function CodeEditor({
   return (
     <div className={cn('h-full overflow-hidden', className)}>
       <CodeMirror
+        // The wrapper div this component renders must fill the panel too, or
+        // `height="100%"` has nothing to resolve against: the editor grows to
+        // its content, gets clipped, and never scrolls.
+        className="h-full"
         value={value}
         readOnly={readOnly}
         editable={!readOnly}

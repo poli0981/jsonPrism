@@ -87,10 +87,11 @@ Widening the scope requires both a capability edit and a CSP review in
 `app.security.csp` in `tauri.conf.json`:
 
 ```
-default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self'; connect-src 'self' ipc: http://ipc.localhost; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' ipc: http://ipc.localhost; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
 ```
 
 - 2.0.0 added `object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'`.
+- 2.0.1 added `'wasm-unsafe-eval'` to `script-src`: bson compiles a tiny WebAssembly helper for 64-bit math (it falls back to JavaScript when blocked, but every WebView logged a CSP violation).
 - No third-party origins. Cloudflare Turnstile and Web Analytics are web-only
   and compiled out of Tauri builds (`__IS_TAURI_BUILD__`), so this CSP never
   needs their hosts. The web CSP lives in `public/_headers` — see

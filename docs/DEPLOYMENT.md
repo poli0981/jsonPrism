@@ -196,11 +196,11 @@ Vite copies `public/` into `dist/`; Workers Static Assets applies `_headers` and
 
 | Header | Value |
 | --- | --- |
-| `Content-Security-Policy` | `default-src 'self'`; scripts from self, `static.cloudflareinsights.com` and `challenges.cloudflare.com`; `connect-src` self + `cloudflareinsights.com`; `frame-src` Turnstile; `worker-src 'self'`; `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`, `upgrade-insecure-requests`. `style-src` keeps `'unsafe-inline'` (CodeMirror, Radix and Sonner inject styles at runtime). |
+| `Content-Security-Policy` | `default-src 'self'`; scripts from self, `static.cloudflareinsights.com` and `challenges.cloudflare.com`, plus `'wasm-unsafe-eval'` (WebAssembly only, for bson's 64-bit math helper); `connect-src` self + `cloudflareinsights.com`; `frame-src` Turnstile; `worker-src 'self'`; `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`, `upgrade-insecure-requests`. `style-src` keeps `'unsafe-inline'` (CodeMirror, Radix and Sonner inject styles at runtime). |
 | `Strict-Transport-Security` | `max-age=31536000`, deliberately without `includeSubDomains` |
 | `X-Content-Type-Options`, `X-Frame-Options` | `nosniff`, `DENY` |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
-| `Permissions-Policy` | camera, microphone, geolocation, motion sensors, payment, USB and Topics all disabled |
+| `Permissions-Policy` | camera, microphone, geolocation, motion sensors, payment and USB disabled (`browsing-topics` was dropped in 2.0.1: Brave and Firefox log it as an unknown feature, and the site runs no ad code) |
 | `Cross-Origin-Opener-Policy` | `same-origin` |
 | `Cache-Control` | HTML `no-cache, no-transform`; `/assets/*` `public, max-age=31536000, immutable` (hashed file names) |
 
