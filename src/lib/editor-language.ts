@@ -1,17 +1,34 @@
 import type { EditorLanguage } from '@/components/converter/CodeEditor';
-import type { Direction } from '@/components/converter/DirectionToggle';
-import type { FormatId } from '@/converters/types';
+import type { Direction, FormatId } from '@/converters/types';
 
-// CodeMirror language pack for the input editor. Forward mode is always JSON.
-// In reverse mode, pick the closest available pack — formats without an
-// official CodeMirror grammar fall back to plain text.
+/** Closest CodeMirror language pack for text in a given format. */
+function languageOfFormat(format: FormatId): EditorLanguage {
+  switch (format) {
+    case 'yaml':
+      return 'yaml';
+    case 'xml':
+    case 'resx':
+      return 'xml';
+    case 'jsonl':
+      return 'json';
+    case 'markdown':
+      return 'markdown';
+    case 'sql':
+      return 'sql';
+    case 'toml':
+      return 'toml';
+    default:
+      // CSV/TSV and the base64/hex text of binary formats have no grammar.
+      return 'plain';
+  }
+}
+
+/** Language for the input editor: JSON going forward, the format's own going back. */
 export function editorLanguageFor(format: FormatId, direction: Direction): EditorLanguage {
-  if (direction !== 'reverse') return 'json';
-  if (format === 'yaml') return 'yaml';
-  if (format === 'xml' || format === 'resx') return 'xml';
-  if (format === 'jsonl') return 'json';
-  if (format === 'markdown') return 'markdown';
-  if (format === 'sql') return 'sql';
-  if (format === 'toml') return 'toml';
-  return 'plain';
+  return direction === 'reverse' ? languageOfFormat(format) : 'json';
+}
+
+/** Language for the read-only output editor. */
+export function outputLanguageFor(format: FormatId, direction: Direction): EditorLanguage {
+  return direction === 'reverse' ? 'json' : languageOfFormat(format);
 }

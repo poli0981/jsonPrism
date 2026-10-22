@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detectShape, parseJsonInput } from '../detect';
+import { detectShape, errorPosition, findSyntaxErrorOffset, parseJsonInput } from '../detect';
 
 describe('detectShape', () => {
   it('recognizes scalars', () => {
@@ -65,5 +65,63 @@ describe('parseJsonInput', () => {
     if (!result.ok) return;
     expect(result.value).toBe('just a string');
     expect(result.shape).toBe('scalar');
+  });
+});
+
+describe('parseJsonInput error positions', () => {
+  it('reports the line of the error relative to the original text, blank lines included', () => {
+    const result = parseJsonInput('\n\n\n{\n  "a": 1,\n  "b": }\n}');
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.line).toBe(6);
+  });
+
+  it('accepts a leading byte-order mark', () => {
+    const result = parseJsonInput('\uFEFF{"a":1}');
+    expect(result.ok).toBe(true);
+  });
+
+  it('flags integers that lose precision', () => {
+    const lossy = parseJsonInput('{"id": 12345678901234567890}');
+    expect(lossy.ok && lossy.precisionLoss).toBe(true);
+    const safe = parseJsonInput('{"id": "12345678901234567890", "n": 9007199254740991}');
+    expect(safe.ok && safe.precisionLoss).toBe(false);
+  });
+});
+
+describe('errorPosition', () => {
+  it('understands the Firefox message format', () => {
+    expect(
+      errorPosition('JSON.parse: expected , at line 2 column 5 of the JSON data', '{\n'),
+    ).toEqual({
+      line: 2,
+      column: 5,
+    });
+  });
+
+  it('ignores "position" text echoed inside the quoted snippet', () => {
+    const text = '{"a": x}';
+    expect(errorPosition('Unexpected token \'x\', "position 999" is not valid JSON', text)).toEqual(
+      { line: 1, column: 7 },
+    );
+  });
+
+  it('falls back to scanning when the engine gives no position (WebKit)', () => {
+    expect(errorPosition("JSON Parse error: Expected '}'", '{\n  "a": 1\n')).toEqual({
+      line: 3,
+      column: 1,
+    });
+  });
+});
+
+describe('findSyntaxErrorOffset', () => {
+  it('returns -1 for valid JSON', () => {
+    expect(findSyntaxErrorOffset(' {"a":[1,2,{"b":null}],"c":"\u00e9"} ')).toBe(-1);
+  });
+
+  it('points at the offending character', () => {
+    expect(findSyntaxErrorOffset('[1, 2,, 3]')).toBe(6);
+    expect(findSyntaxErrorOffset('{"a": tru}')).toBe(6);
+    expect(findSyntaxErrorOffset('"\u0001"')).toBe(1);
   });
 });

@@ -1,12 +1,15 @@
 /**
  * Tauri runtime helpers.
  *
- * In a web build these functions are tree-shaken because `isTauri()`
- * resolves to a static `false`. In a Tauri build, they bridge to native
- * dialogs / file system via the @tauri-apps/* plugins.
- *
- * Imports are dynamic so the web bundle doesn't pull the Tauri plugins.
+ * Every export checks the build-time `__IS_TAURI_BUILD__` constant before the
+ * runtime check, so in the web build the bundler drops the dynamic
+ * `@tauri-apps/*` imports entirely (no plugin chunks ship to the web). In a
+ * Tauri build they bridge to native dialogs / file system via the plugins.
  */
+
+import { createLogger } from './logger';
+
+const log = createLogger('tauri');
 
 interface TauriWindowGlobals {
   __TAURI__?: unknown;
@@ -14,44 +17,51 @@ interface TauriWindowGlobals {
 }
 
 export function isTauri(): boolean {
+  if (!__IS_TAURI_BUILD__) return false;
   if (typeof window === 'undefined') return false;
   const g = window as unknown as TauriWindowGlobals;
   return g.__TAURI__ !== undefined || g.__TAURI_INTERNALS__ !== undefined;
 }
 
+export interface DialogFilter {
+  name: string;
+  extensions: string[];
+}
+
 /**
- * Open a native file picker. Returns selected file paths,
- * or null if the user cancelled.
+ * Open a native file picker. Returns selected file paths, or null if the user
+ * cancelled. Callers pass translated filter names for the current direction.
  */
-export async function nativeOpenFiles(options?: { multiple?: boolean }): Promise<string[] | null> {
-  if (!isTauri()) return null;
+export async function nativeOpenFiles(options: {
+  multiple?: boolean;
+  filters: DialogFilter[];
+}): Promise<string[] | null> {
+  if (!__IS_TAURI_BUILD__ || !isTauri()) return null;
   const { open } = await import('@tauri-apps/plugin-dialog');
   const result = await open({
-    multiple: options?.multiple ?? false,
-    filters: [
-      { name: 'JSON', extensions: ['json'] },
-      { name: 'Text', extensions: ['txt'] },
-      { name: 'All', extensions: ['*'] },
-    ],
+    multiple: options.multiple ?? false,
+    filters: options.filters,
   });
   if (result === null) return null;
   return Array.isArray(result) ? result : [result];
 }
 
 /**
- * Show a native save dialog for a binary blob (e.g. the batch .zip).
- * Returns the path the user picked, or null on cancel.
+ * Show a native save dialog and write a blob to the chosen path. Used for the
+ * batch .zip and for single-output downloads (Android WebViews ignore
+ * `<a download>` blob links). Returns the path, or null on cancel.
  */
-export async function nativeSaveBlob(blob: Blob, suggestedName: string): Promise<string | null> {
-  if (!isTauri()) return null;
+export async function nativeSaveBlob(
+  blob: Blob,
+  suggestedName: string,
+  filter: DialogFilter,
+): Promise<string | null> {
+  if (!__IS_TAURI_BUILD__ || !isTauri()) return null;
   const { save } = await import('@tauri-apps/plugin-dialog');
   const { writeFile } = await import('@tauri-apps/plugin-fs');
   const path = await save({
     defaultPath: suggestedName,
-    filters: [
-      { name: 'Zip Archive', extensions: ['zip'] },
-      { name: 'All Files', extensions: ['*'] },
-    ],
+    filters: [filter, { name: '*', extensions: ['*'] }],
   });
   if (!path) return null;
   const buffer = new Uint8Array(await blob.arrayBuffer());
@@ -63,24 +73,27 @@ export async function nativeSaveBlob(blob: Blob, suggestedName: string): Promise
  * Read a file at the given native path as a UTF-8 string.
  */
 async function nativeReadText(path: string): Promise<string> {
-  if (!isTauri()) {
+  if (!__IS_TAURI_BUILD__ || !isTauri()) {
     throw new Error('nativeReadText is only available inside Tauri.');
   }
   const { readTextFile } = await import('@tauri-apps/plugin-fs');
   return readTextFile(path);
 }
 
-// MIME type per extension. Used so File objects created from native paths
-// carry a sensible `type` instead of being hard-coded to `application/json`.
+// MIME type per extension, so File objects created from native paths carry a
+// sensible `type` instead of being hard-coded to `application/json`.
 const TYPE_BY_EXT: Record<string, string> = {
   json: 'application/json',
-  yaml: 'application/x-yaml',
-  yml: 'application/x-yaml',
+  jsonl: 'application/x-ndjson',
+  ndjson: 'application/x-ndjson',
+  yaml: 'application/yaml',
+  yml: 'application/yaml',
   toml: 'application/toml',
   xml: 'application/xml',
   csv: 'text/csv',
   tsv: 'text/tab-separated-values',
   resx: 'application/xml',
+  md: 'text/markdown',
   txt: 'text/plain',
 };
 
@@ -102,16 +115,19 @@ export function pathHashAsMillis(path: string): number {
 /**
  * Derive a clean basename from a native path or an Android content URI.
  *
- * Desktop paths (`C:\…\data.json`, `/home/…/data.json`) pass through
- * unchanged. Android's dialog returns a percent-encoded `content://` URI
- * whose document id usually embeds the real path
- * (e.g. `…/document/raw%3A%2Fstorage%2Femulated%2F0%2FDownload%2Fdata.json`).
- * Decode it, then strip everything up to the last `/` or `:` so the editor,
- * the format-extension filter, and toasts see `data.json` instead of the raw
- * URI. Providers that hand back an opaque id (e.g. `msf:1000000123`) still
- * collapse to a short, stable token.
+ * Desktop paths (`C:\…\data.json`, `/home/…/data.json`) keep everything after
+ * the last separator untouched — `%` and `:` are legal in filenames there.
+ * Android's dialog returns a percent-encoded `content://` URI whose document
+ * id usually embeds the real path
+ * (e.g. `…/document/raw%3A%2Fstorage%2Femulated%2F0%2FDownload%2Fdata.json`);
+ * only those are decoded and trimmed after the last `/` or `:`, so providers
+ * that hand back an opaque id (e.g. `msf:1000000123`) collapse to a short,
+ * stable token.
  */
 export function basenameFromPath(path: string): string {
+  if (!/^content:\/\//i.test(path)) {
+    return path.replace(/^.*[\\/]/, '') || path;
+  }
   let decoded = path;
   try {
     decoded = decodeURIComponent(path);
@@ -143,9 +159,10 @@ export async function fileFromNativePath(path: string): Promise<File> {
     const { stat } = await import('@tauri-apps/plugin-fs');
     const info = await stat(path);
     lastModified = info.mtime ? info.mtime.getTime() : pathHashAsMillis(path);
-  } catch {
+  } catch (err) {
     // Capability missing or file vanished between read + stat — fall back
     // to a deterministic hash so repeat drops still dedup.
+    log.debug('stat() failed, using a path hash for lastModified:', err);
     lastModified = pathHashAsMillis(path);
   }
 
@@ -162,7 +179,7 @@ export async function fileFromNativePath(path: string): Promise<File> {
  * The opener plugin routes through the platform's Intent/openURL API instead.
  */
 export async function openExternal(url: string): Promise<void> {
-  if (!isTauri()) {
+  if (!__IS_TAURI_BUILD__ || !isTauri()) {
     window.open(url, '_blank', 'noopener,noreferrer');
     return;
   }
@@ -170,18 +187,19 @@ export async function openExternal(url: string): Promise<void> {
   await openUrl(url);
 }
 
-/**
- * Diagnostic info from the Rust side (OS, arch, app version).
- * Not currently shown in the UI but useful for bug reports.
- * @public
- */
-export async function tauriHostInfo(): Promise<{
+export interface HostInfo {
   os: string;
   arch: string;
   family: string;
   app_version: string;
-} | null> {
-  if (!isTauri()) return null;
+}
+
+/**
+ * Diagnostic info from the Rust side (OS, arch, app version), included in the
+ * About page's "Copy diagnostics" report.
+ */
+export async function tauriHostInfo(): Promise<HostInfo | null> {
+  if (!__IS_TAURI_BUILD__ || !isTauri()) return null;
   const { invoke } = await import('@tauri-apps/api/core');
-  return invoke('host_info');
+  return invoke<HostInfo>('host_info');
 }

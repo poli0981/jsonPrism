@@ -7,14 +7,18 @@ function f(name: string): File {
 
 describe('getAllowedExtensions', () => {
   it('returns json + txt for forward direction regardless of format', () => {
-    expect(getAllowedExtensions('forward', 'yaml')).toEqual(['json', 'txt']);
-    expect(getAllowedExtensions('forward', 'resx')).toEqual(['json', 'txt']);
+    expect(getAllowedExtensions('forward', ['yaml', 'yml'])).toEqual(['json', 'txt']);
+    expect(getAllowedExtensions('forward', ['resx'])).toEqual(['json', 'txt']);
   });
 
-  it('returns format extension + txt for reverse direction, lowercased', () => {
-    expect(getAllowedExtensions('reverse', 'yaml')).toEqual(['yaml', 'txt']);
-    expect(getAllowedExtensions('reverse', 'RESX')).toEqual(['resx', 'txt']);
-    expect(getAllowedExtensions('reverse', 'toml')).toEqual(['toml', 'txt']);
+  it('returns the format extensions + txt for reverse direction, lowercased', () => {
+    expect(getAllowedExtensions('reverse', ['yaml', 'yml'])).toEqual(['yaml', 'yml', 'txt']);
+    expect(getAllowedExtensions('reverse', ['RESX'])).toEqual(['resx', 'txt']);
+    expect(getAllowedExtensions('reverse', ['jsonl', 'ndjson'])).toEqual([
+      'jsonl',
+      'ndjson',
+      'txt',
+    ]);
   });
 });
 

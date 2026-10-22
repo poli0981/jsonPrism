@@ -2,6 +2,9 @@ import { create } from 'zustand';
 
 export type BatchItemStatus = 'queued' | 'processing' | 'done' | 'error';
 
+/** Failures the UI translates itself; other errors carry the converter's message. */
+export type BatchErrorCode = 'empty_file' | 'no_reverse' | 'read_failed';
+
 export interface BatchItem {
   id: string;
   /** Original file reference; not serializable, kept in memory only. */
@@ -12,6 +15,7 @@ export interface BatchItem {
   output?: string;
   outputSize?: number;
   error?: string;
+  errorCode?: BatchErrorCode;
 }
 
 /** Hard upper bound on queue size. UI may suggest a smaller default. */
@@ -37,6 +41,8 @@ interface BatchState {
   setProcessing(p: boolean): void;
   setAbortController(c: AbortController | null): void;
   updateItem(id: string, patch: Partial<BatchItem>): void;
+  /** Applies many patches in one store update (one render instead of N). */
+  updateItems(patches: ReadonlyMap<string, Partial<BatchItem>>): void;
   resetStatuses(): void;
 }
 
@@ -50,6 +56,21 @@ function nextId(): string {
  * `(name, size, lastModified)` is the standard "same file" heuristic. */
 function fileKey(file: File): string {
   return `${file.name}|${file.size}|${file.lastModified}`;
+}
+
+/**
+ * Applies a status patch. A new status clears the previous run's output/error
+ * fields so a re-processed row never shows stale results.
+ */
+function withPatch(current: BatchItem, patch: Partial<BatchItem>): BatchItem {
+  if (patch.status === undefined || patch.status === current.status)
+    return { ...current, ...patch };
+  const { output: _o, outputSize: _os, error: _e, errorCode: _ec, ...rest } = current;
+  void _o;
+  void _os;
+  void _e;
+  void _ec;
+  return { ...rest, ...patch } as BatchItem;
 }
 
 export const useBatchStore = create<BatchState>((set, get) => ({
@@ -147,8 +168,19 @@ export const useBatchStore = create<BatchState>((set, get) => ({
       const current = state.items[id];
       if (!current) return state;
       return {
-        items: { ...state.items, [id]: { ...current, ...patch } },
+        items: { ...state.items, [id]: withPatch(current, patch) },
       };
+    }),
+
+  updateItems: (patches) =>
+    set((state) => {
+      if (patches.size === 0) return state;
+      const items = { ...state.items };
+      for (const [id, patch] of patches) {
+        const current = items[id];
+        if (current) items[id] = withPatch(current, patch);
+      }
+      return { items };
     }),
 
   resetStatuses: () =>
@@ -158,10 +190,11 @@ export const useBatchStore = create<BatchState>((set, get) => ({
         const item = state.items[id]!;
         // Reset to queued; drop any prior output/error fields without
         // assigning `undefined` (forbidden under exactOptionalPropertyTypes).
-        const { output: _o, outputSize: _os, error: _e, ...rest } = item;
+        const { output: _o, outputSize: _os, error: _e, errorCode: _ec, ...rest } = item;
         void _o;
         void _os;
         void _e;
+        void _ec;
         newItems[id] = { ...rest, status: 'queued' };
       }
       return { items: newItems };
