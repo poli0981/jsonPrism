@@ -31,7 +31,6 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "cf:dev": "wrangler dev",
     "cf:types": "wrangler types",
     "cf:check": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
     "preview:cf": "wrangler dev",

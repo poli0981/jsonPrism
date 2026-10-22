@@ -129,9 +129,7 @@ describe('POST /api/turnstile/verify', () => {
       async () =>
         new Response(JSON.stringify({ success: true, hostname: 'example.com', action: '' })),
     );
-    expect((await call(verifyRequest(), env({ TURNSTILE_SECRET: TEST_SECRET }))).status).toBe(
-      200,
-    );
+    expect((await call(verifyRequest(), env({ TURNSTILE_SECRET: TEST_SECRET }))).status).toBe(200);
     expect((await call(verifyRequest())).status).toBe(403);
   });
 

@@ -23,6 +23,11 @@ export function compareOrdinal(a: string, b: string): number {
   return 0;
 }
 
+/** Unpredictable, so input strings can't imitate the bigint placeholder. */
+function randomToken(): string {
+  return Array.from(crypto.getRandomValues(new Uint32Array(2)), (n) => n.toString(36)).join('');
+}
+
 /**
  * `JSON.stringify` that emits `bigint` values as bare integer literals instead
  * of throwing. Used when a parser hands back 64-bit integers (e.g. TOML) that
@@ -30,7 +35,7 @@ export function compareOrdinal(a: string, b: string): number {
  */
 export function stringifyJson(value: unknown, space?: number): string {
   let sawBigInt = false;
-  const marker = `\u0000bigint:${Math.random().toString(36).slice(2)}:`;
+  const marker = `\u0000bigint:${randomToken()}:`;
   const json = JSON.stringify(
     value,
     (_key, v: unknown) => {
