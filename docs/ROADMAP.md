@@ -348,7 +348,7 @@ A platform release: a new home for the web app, a human check and analytics conf
 
 ### Deliverable
 
-JSONPrism 2.0.0 on its own domain, with the human check and analytics confined to the web build. **367 tests in 39 files** (converters incl. regression + contract tests, lib, hooks, stores, i18n parity across 4 locales, Worker).
+JSONPrism 2.0.0 on its own domain, with the human check and analytics confined to the web build. **864 tests in 92 files**, 97% line coverage (converters incl. regression + contract tests, every UI component, hooks, stores, the Web Worker client, i18n parity across 4 locales, Worker).
 
 ---
 

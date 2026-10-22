@@ -14,7 +14,7 @@ A new home, a hardened toolchain and a full audit. The web app moves to **<https
 
 ### Added
 
-- **Cloudflare Workers hosting.** `wrangler.jsonc` serves `dist/` as static assets with an SPA fallback on the custom domain; only `/api/*` runs Worker code (`worker/`). Cloudflare Workers Builds deploys every push to `main`. New scripts: `cf:types`, `cf:check` (deploy dry run, also in CI) and `preview:cf` (`wrangler dev` on port 8787; `wrangler.jsonc` builds first). See `docs/DEPLOYMENT.md`.
+- **Cloudflare Workers hosting.** `wrangler.jsonc` serves `dist/` as static assets with an SPA fallback on the custom domain; only `/api/*` runs Worker code (`worker/`). Cloudflare Workers Builds deploys every push to `main` and publishes a Worker Preview for other branches (`previews` block). New scripts: `cf:types`, `cf:check` (deploy dry run, also in CI) and `preview:cf` (`wrangler dev` on port 8787; `wrangler.jsonc` builds first). See `docs/DEPLOYMENT.md`.
 - **Edge security headers** in `public/_headers`: a strict CSP, HSTS, `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, COOP, and immutable caching for hashed assets. `public/_redirects` 301s the old `/jsonPrism/*` paths. Also new: `robots.txt`, `sitemap.xml`, `/.well-known/security.txt`, an Open Graph image and canonical URLs.
 - **Cloudflare Turnstile human check (web only).** Runs inside the Consent Gate and is verified server-side by `POST /api/turnstile/verify` (same-origin check, JSON only, 4 KB body cap, per-client rate limit, siteverify with retry and hostname/action/age checks, no visitor IP sent). A pass is remembered for 7 days. A rejected token keeps the gate closed; if Cloudflare cannot be reached the user may continue after a warning, since conversion never needs the network. `GET /api/health` reports Worker health.
 - **Cloudflare Web Analytics (web only, cookieless).** Loaded only on the production hostname, after consent, while the new Appearance toggle is on; it starts off when the browser sends Global Privacy Control.
@@ -34,6 +34,7 @@ A new home, a hardened toolchain and a full audit. The web app moves to **<https
 - **"Technical" UI refresh, same layout.** Blueprint grid, mono labels, corner ticks, separate light and dark prism colours (light-theme text now meets 4.5:1 contrast), success/warning tokens, a terminal-style status bar (state, bytes in → out, time, encoding), animated icons behind `prefers-reduced-motion`, and headings in Geist (Instrument Serif lacked Vietnamese glyphs). Format chips that don't suit the detected shape get a dashed border instead of faded text. The theme is applied before first paint (`public/theme-init.js`), so there is no flash.
 - **Consent Gate.** Also shown on macOS and Linux desktop (only the Windows installer has its own license page); legal links point at the exact commit of the build; the app renders behind the gate instead of a blank page.
 - **Faster typing.** One layout rendered at a time, stable editor extensions (no reconfiguration per keystroke), deferred live conversion, a virtualised read-only CodeMirror for output, batched batch-progress updates and streaming ZIP creation.
+- **Tauri bundles carry no web-only code.** The analytics beacon and the Turnstile widget are compiled out of desktop and Android builds instead of only being switched off at runtime.
 - **Tauri permissions narrowed.** The static file scope is now Documents, Downloads and Desktop (previously all of `$HOME`); files you pick or drop are added at runtime. Dotfiles never match scope globs, unused permissions (`os`, `set-title`, `write-text-file`, message dialogs) are gone, and the app CSP adds `object-src 'none'`, `base-uri`, `form-action` and `frame-ancestors`. The version now comes from `package.json`; Android `versionCode` 20000 and `allowBackup="false"`.
 - **Keyboard shortcuts.** Ctrl/⌘+S downloads, Ctrl/⌘+, opens settings; Ctrl/⌘+K (clear) is removed because it hijacked the browser's search. Shortcuts ignore key repeat, IME composition and open dialogs.
 - **Internationalisation.** Japanese and Simplified Chinese gained 27 missing strings, unused keys were removed, remaining hard-coded strings (including CodeMirror's search and lint panels) are translated, and a test keeps the four locales in sync.
@@ -52,7 +53,8 @@ A new home, a hardened toolchain and a full audit. The web app moves to **<https
 - **TOML** reports `null` values with their path (or omits them, by option), keeps integers beyond 2^53 exact and sorts keys deterministically.
 - **JSONL** tolerates a BOM and reports real line numbers, blank lines included.
 - **JSON errors** show the correct line and column in Chromium, Firefox and WebKit.
-- The editor inserted the text of dropped files itself, racing the file loader; file drops now go only to the drop zone. An empty editor is no longer flagged as invalid JSON.
+- The editor inserted the text of dropped files itself, racing the file loader; file drops now go only to the drop zone. An empty editor is no longer flagged as invalid JSON, JSONL typed in the → JSON direction is checked line by line instead of being marked invalid, and a leading byte-order mark is accepted like the converter accepts it.
+- File sizes just under 1 MiB showed as "1024.0 KB".
 - **Download** and Ctrl/⌘+S reported success on Android without saving; desktop and Android now use the native save dialog.
 - Native open dialogs filter by conversion direction and accept `.yml`, `.ndjson` and `.markdown`; a drag-and-drop listener could leak when the component unmounted early.
 - Route errors now reset when you navigate away, and a stale tab that fails to load a chunk after a deploy reloads once instead of breaking.
@@ -72,7 +74,7 @@ A new home, a hardened toolchain and a full audit. The web app moves to **<https
 
 ### Tests
 
-- **367 tests in 39 files** (up from 215): regression tests for every fix above, a contract test that feeds hostile input to every converter, hook tests (batch processing, shortcuts), store and storage tests, locale parity, and Worker tests for the verify endpoint and router. Vitest runs two projects (`app` in jsdom, `worker` in Node) and reports coverage to SonarQube Cloud.
+- **864 tests in 92 files** (up from 215), 97% line and 91% branch coverage: regression tests for every fix above, a contract test that feeds hostile input to every converter, component tests for the whole UI (Testing Library + user-event, with a fake Turnstile widget and Tauri IPC mocks), hook, store and storage tests, the Web Worker client, locale parity, and Worker tests for the verify endpoint and router. Vitest runs two projects (`app` in jsdom, `worker` in Node) and reports coverage to SonarQube Cloud, whose quality gate now passes.
 
 ## [1.7.2] — 2026-06-16
 
