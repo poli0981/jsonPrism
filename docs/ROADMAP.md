@@ -4,6 +4,8 @@ This document is the **single source of truth** for what's done, what's next, an
 
 Update it as work lands — keep the project status honest.
 
+**Current release: v2.0.0 (2026-10-22).** The web app runs at https://jsonprism.poli0981.dev (Cloudflare Workers); desktop and Android builds are on [GitHub Releases](https://github.com/poli0981/jsonPrism/releases).
+
 ---
 
 ## Phase 0 — Scaffold ✅
@@ -42,7 +44,7 @@ Goal: make the four working converters production-quality and the UX delightful 
 - [x] Folding for nested structures
 - [x] Theme: custom Prism Spectrum tokens applied to lezer highlight tags
 - [x] Parse-error linting (visible gutter markers)
-- [ ] Output panel uses CodeMirror in read-only mode with format-specific syntax — *deferred to Phase 2 (needs per-format language packages: yaml, xml, sql)*
+- [x] Output panel uses CodeMirror in read-only mode with format-specific syntax — *deferred at the time; landed in 2.0.0 (Phase 8)*
 
 #### 1.2 Settings panel
 
@@ -78,11 +80,11 @@ Goal: make the four working converters production-quality and the UX delightful 
 
 #### 1.7 Polish
 
-- [x] Keyboard shortcuts: ⌘/Ctrl+K (clear), ⌘/Ctrl+S (download)
+- [x] Keyboard shortcuts: ⌘/Ctrl+K (clear), ⌘/Ctrl+S (download) — *⌘/Ctrl+K removed in 2.0.0: it clashed with the browser's search shortcut*
 - [x] Status bar showing: input bytes, output bytes, parse time, shortcut hints
 - [x] Shape detection hint (scalar / object / array / flat-object / array-of-objects)
 - [x] Disabled-format chips show "P2"/"P3" badge with tooltip
-- [ ] Cmd/Ctrl+, to open settings — *deferred; Sheet trigger handles its own keyboard nav via Radix*
+- [x] Cmd/Ctrl+, to open settings — *deferred at the time; added in a later 1.x release*
 
 ### Deliverable
 
@@ -252,7 +254,7 @@ Codebase hygiene plus a small UX addition — no converter behavior changed.
 Compliance + reliability + first-paint performance. No converter behavior changed.
 
 - [x] Custom error pages: reusable `ErrorState`, 404 catch-all, generic `/error/:code` (403/419/5xx variants), offline banner, and a chunk-load error boundary folded into the existing crash boundary's look.
-- [x] GitHub Pages SPA deep-link fix (`public/404.html` + `index.html` decoder for the `/jsonPrism/` base).
+- [x] GitHub Pages SPA deep-link fix (`public/404.html` + `index.html` decoder for the `/jsonPrism/` base). *Removed in 2.0.0: the web app moved to Cloudflare Workers, which has an SPA fallback.*
 - [x] First-launch legal consent gate (web only) — accept License/Terms/Privacy/Disclaimer, persisted to `localStorage` with a version for re-prompting; skipped on desktop.
 - [x] Windows installer license-acceptance page via Tauri `bundle.licenseFile` (`src-tauri/license.rtf`), covering both NSIS `.exe` and WiX `.msi`.
 - [x] Lazy-load routes + the CodeMirror editor; refined `manualChunks` (react/router/i18n/cm-core/cm-langs/per-parser/ui); removed the `bson` initial-graph leak via `lib/bytes.ts`. +16 tests (209 total).
@@ -261,7 +263,7 @@ Compliance + reliability + first-paint performance. No converter behavior change
 
 ## Phase 7 — Android (sideload APK) 🔜
 
-**Status**: in progress
+**Status**: in progress — the APK has shipped with every release since v1.7.0 (2026-06-16); only the real-device checks below remain.
 
 Goal: ship JSONPrism as an Android app users sideload from a `.apk`. Same React UI, no behavior change to the converters. **Minimum Android 12 (API 31)** — older devices are blocked by the OS.
 
@@ -271,14 +273,14 @@ Goal: ship JSONPrism as an Android app users sideload from a `.apk`. Same React 
 - [x] `tauri android init` → Android Gradle project at `src-tauri/gen/android/`, **committed** (source only; build outputs + secrets gitignored via nested + root `.gitignore`)
 - [x] Verified `minSdk = 31` propagated to `app/build.gradle.kts`; Rust compiles for all 4 ABIs (validated against NDK r27/r30)
 - [x] Release signing wired in `app/build.gradle.kts` from a gitignored `keystore.properties` (graceful unsigned fallback when absent)
-- [x] Self-hosted fonts via `@fontsource` (Geist / Instrument Serif / JetBrains Mono) — removed Google Fonts `<link>`, tightened CSP, app renders correctly **offline**
+- [x] Self-hosted fonts via `@fontsource` (Geist / Instrument Serif / JetBrains Mono) — removed Google Fonts `<link>`, tightened CSP, app renders correctly **offline** (*Instrument Serif dropped in 2.0.0: it has no Vietnamese glyphs*)
 - [x] Local scripts: `tauri:android:init` / `tauri:android:dev` / `tauri:android:build` (universal APK; chains `tauri:icon`)
 - [x] CI: `android` job in `release.yml` builds + signs (keystore from secrets) + uploads the universal APK to the same draft release
 - [x] Docs: README / README.vi "Android" sections + maintainer notes in `docs/TAURI-NOTES.md`
 - [x] Emulator-validated: signed APK installs on Android 12+, **blocked on API < 31** (`INSTALL_FAILED_OLDER_SDK`), launches, renders (CodeMirror + self-hosted fonts), runs converters, fully offline
 - [x] Native file open works — `plugin-dialog` fires the SAF picker, `plugin-fs` reads the `content://` URI; `basenameFromPath()` recovers a clean filename (unit-tested)
 - [x] Found: layout needs WebView **Chromium ≥ 111** (Tailwind v4); fine on updated Android 12+ devices, broken on the API 31 emulator's stock Chromium 91 — see `docs/TAURI-NOTES.md`
-- [ ] Add CI signing secrets (`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, …) — maintainer action
+- [x] Add CI signing secrets (`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, …) — maintainer action; the signed APK is attached to v1.7.0–v1.7.2
 - [ ] Remaining manual checks: save `.zip` via SAF, all 12 converters end-to-end, theme + 4 locales, upgrade-in-place on a real device
 
 ### Deliverable
@@ -287,16 +289,93 @@ A signed universal `.apk` attached to each GitHub release, installable on Androi
 
 ---
 
+## Phase 8 — 2.0.0: Cloudflare, hardening & technical UI ✅
+
+**Status**: complete (shipped in v2.0.0, 2026-10-22)
+
+A platform release: a new home for the web app, a human check and analytics confined to the web build, a toolchain jump, an audit of every converter, a UI refresh and a hardened pipeline. Same 12 formats, same layout.
+
+### Tasks
+
+#### 8.1 Cloudflare Workers + custom domain
+
+- [x] Web app served by the Cloudflare Worker `jsonprism` (Workers Static Assets, SPA fallback) at **https://jsonprism.poli0981.dev**; config in `wrangler.jsonc`, operations in [`docs/DEPLOYMENT.md`](DEPLOYMENT.md)
+- [x] Cloudflare Workers Builds deploys every push to `main`; the GitHub Pages deploy workflow and `public/404.html` are gone
+- [x] `/api/*` Worker in `worker/`: `POST /api/turnstile/verify` (same-origin only, 4 KB body cap, 30 requests / 60 s rate limit) and `GET /api/health`; structured Workers Logs without IPs, tokens or user content
+- [x] Static headers in `public/_headers` (CSP, HSTS, COOP, Permissions-Policy, immutable `/assets/*`), `/jsonPrism/*` → 301 in `public/_redirects`, `robots.txt`, `sitemap.xml`, `.well-known/security.txt`, Open Graph image
+- [x] GitHub Pages keeps only a path-preserving redirect to the new domain (`pages-redirect.yml`, run by hand)
+- [x] `production-smoke.yml` waits for each pushed commit to go live, then checks headers, routes, redirects and the API
+
+#### 8.2 Turnstile & Web Analytics (web only)
+
+- [x] Cloudflare Turnstile inside the Consent Gate, verified server-side by the Worker; a pass is remembered for 7 days; if Cloudflare is unreachable the user may continue after a warning
+- [x] Cloudflare Web Analytics (cookieless page views): production hostname only, after consent, toggle under Appearance, off by default when the browser sends Global Privacy Control
+- [x] Neither service exists in desktop or Android builds
+- [x] `CONSENT_VERSION` 2 asks every user again; the gate shows on web, Android, macOS and Linux (Windows relies on the installer license page)
+
+#### 8.3 Toolchain: TypeScript 7 / Node 26
+
+- [x] Node.js 26 (`.nvmrc`, `engines`), npm 11; CI installs with `npm ci --ignore-scripts`
+- [x] TypeScript 7 native compiler for `tsc`, plus a TypeScript 6 API alias for typescript-eslint; ES2025 target with an ES2023 `lib` to keep the Android WebView (Chromium 111) and macOS 12 floors
+- [x] Majors: React 19.3, React Router 8.5 (`react-router` only), Vite 8.3, Tailwind CSS 4.3, i18next 26, ESLint 10, Vitest 5 (`app` + `worker` projects), Knip 6, Tauri 2.12
+- [x] Removed: `react-router-dom`, Instrument Serif, the Tauri os plugin
+
+#### 8.4 Audit fixes
+
+- [x] CSV: columns from every row (not just the first), optional `escapeFormulae` guard, reverse only converts canonical numbers
+- [x] SQL: MySQL backslash escaping, MSSQL `N'…'` + NVARCHAR and 1000-row batches, CREATE TABLE types inferred across all rows, dotted table names quoted per part
+- [x] RESX: reverse keeps strings such as `"007"`, rejects DOCTYPE, validates XML; resheaders always written; CR encoded
+- [x] XML: invalid element names sanitised, nested arrays wrapped, control characters replaced, output validated
+- [x] BSON > 16 MiB → clear error; YAML `quoteStyle` works again + alias/merge-key limits; TOML reports nulls with their path, keeps big integers, stable key order
+- [x] Batch: real binary in the ZIP for BSON/CBOR/MessagePack, processing twice keeps results, abort returns items to the queue
+- [x] Accurate JSON error line/column on every engine; precision warning for integers beyond 2^53
+- [x] Desktop/Android: trimmed capabilities and fs scope, stricter CSP, `allowBackup="false"`, downloads through the native save dialog
+- [x] Performance: inputs > 256 KB and all batches convert in a Web Worker; read-only, virtualised output editor; streaming ZIP
+- [x] Accessibility (live regions, editor names, ≥ 24 px targets, `<html lang>`), i18n (ja + zh-CN completed, parity test in CI), local-only logger + "Copy diagnostics" on About
+
+#### 8.5 Technical UI refresh
+
+- [x] Blueprint grid, mono uppercase labels, corner ticks, per-theme prism colours (light-theme contrast ≥ 4.5:1)
+- [x] Header: animated wordmark, `v2.0.0 · <commit>` chip, EN/VI/JA/ZH switcher, Appearance menu (theme, hide scrollbars, analytics)
+- [x] Terminal-style status bar, thin custom scrollbars, animations only under `motion-safe`, no theme flash, per-route document titles
+
+#### 8.6 CI hardening
+
+- [x] Actions pinned to full commit SHAs, `persist-credentials: false`, least-privilege job permissions
+- [x] CI: format, lint, knip, TypeScript 7 typecheck, tests + coverage, build, Worker deploy dry run; SonarQube Cloud (CI-based analysis); Rust fmt + clippy
+- [x] Release: tag = `package.json` = `Cargo.toml` version check, one draft release, tauri-action v1, macOS universal build, `JSONPrism_<version>_android-universal.apk`, `SHA256SUMS.txt` + build-provenance attestations
+- [x] Discord notifiers called with explicit webhook secrets; Dependabot grouped by package family with a cooldown
+
+### Deliverable
+
+JSONPrism 2.0.0 on its own domain, with the human check and analytics confined to the web build. **367 tests in 39 files** (converters incl. regression + contract tests, lib, hooks, stores, i18n parity across 4 locales, Worker).
+
+---
+
 ## Beyond — Ideas (no commitment)
 
-- **JSON → Excel (.xlsx)** via SheetJS — possible if Markdown/CSV doesn't cover the use case
-- **Reverse direction** (other format → JSON): different mental model; might warrant a sibling app
-- **Schema inference**: emit JSON Schema, TypeScript types, or Go structs from sample JSON
+### Deferred from 2.0.0
+
+- **Lazy-load non-English locales** — about 20 KB gzip off the first load
+- **PWA / offline install** for the web app
+- **Code signing** — Windows Authenticode and macOS notarization — plus a signed updater
+- **SBOM** for release builds
+- **OpenSSF Scorecard**
+- **End-to-end tests** — Playwright (web), tauri-driver (desktop)
+- **JSON tools** — JSON Schema, JSONPath and diff features
+- **More formats** — INI, `.env`, Java `.properties`, Excel `.xlsx`
+- **Streaming NDJSON** for very large files
+- **Community translation workflow** (ja and zh-CN are AI-translated today)
+- **Drop the TypeScript 6 alias** once TypeScript 7 ships an API that typescript-eslint supports
+
+### Other ideas
+
+- **Type generation**: TypeScript types or Go structs from sample JSON
 - **CLI version**: same converter modules, exposed as a Node CLI for CI pipelines
 - **VS Code extension**: surface the converters in the editor command palette
 - **Sharing**: hash-based shareable URLs (`#data=...`) for sample inputs (privacy: opt-in only)
 
-These are deliberately deferred — Phase 1–5 first.
+Nothing here is scheduled. An item moves into a numbered phase when work on it starts.
 
 ---
 

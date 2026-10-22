@@ -10,6 +10,22 @@ Status legend:
 
 Recommended minimum viewport: **360 × 640**. Phones in landscape orientation are best-effort — see [recommendation](#recommendation).
 
+## v2.0.0 check (2026-10-22)
+
+Chromium device emulation against the production build served by `wrangler dev` (`npm run preview:cf`), in the light and the dark theme at each size.
+
+| Viewport   | Form factor | Themes      | Status | Notes                                 |
+| ---------- | ----------- | ----------- | ------ | ------------------------------------- |
+| 360 × 740  | Phone       | Light, dark | ✅     | No horizontal overflow; header fits   |
+| 768 × 1024 | Tablet      | Light, dark | ✅     | Split input/output layout from 768 px |
+| 1280 × 800 | Desktop     | Light, dark | ✅     | Split input/output layout             |
+
+Also checked in this round:
+
+- Consent Gate with the Turnstile flow on Cloudflare's test keys (always-pass sitekey and secret).
+- Appearance menu: theme switching and "Hide scrollbars".
+- Browser console free of Content-Security-Policy violations.
+
 ## Test results (last verified 2026-05-14)
 
 ### Phones (portrait)
@@ -47,8 +63,10 @@ Recommended minimum viewport: **360 × 640**. Phones in landscape orientation ar
 
 ## How to retest
 
-1. Open Chrome DevTools → "Toggle device toolbar" (Ctrl+Shift+M).
-2. Pick a device from the dropdown or set a custom viewport.
-3. Verify on the Home page: Header navigation visible, Input/Output Tabs accessible, FormatPicker trigger fits, no horizontal scroll on `<body>`.
+1. Serve the production build with `npm run preview:cf` (http://localhost:8787; needs `.dev.vars`, see [dev_env.md](dev_env.md)). Unlike `npm run dev`, it applies the CSP from `public/_headers` and runs the Worker that verifies Turnstile.
+2. Open Chrome DevTools → "Toggle device toolbar" (Ctrl+Shift+M).
+3. Pick a device from the dropdown or set a custom viewport.
+4. Verify on the Home page: Header navigation visible, Input/Output Tabs accessible, FormatPicker trigger fits, no horizontal scroll on `<body>`.
+5. Repeat in light and dark (Appearance menu), pass the Consent Gate (the Turnstile test key passes on its own), and check the console for CSP violations.
 
 Test results contributed by the maintainer. PRs welcome to expand the matrix.

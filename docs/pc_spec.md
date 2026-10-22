@@ -10,8 +10,8 @@ within Tauri's general support matrix).
 
 | Component | Detail |
 |---|---|
-| **OS** | Windows 11 Pro 25H2 Insider Preview (Dev Channel) |
-| **Build** | 26300.8376 |
+| **OS** | Windows 11 Pro Insider Preview (Dev Channel) |
+| **Build** | 29648.1000 |
 | **CPU** | Intel Core i7-14700KF |
 | **GPU** | NVIDIA GeForce RTX 5080 (16 GB VRAM) |
 | **RAM** | 32 GB DDR5 |
@@ -20,8 +20,8 @@ within Tauri's general support matrix).
 
 ## Mobile / web-test devices
 
-Used to verify the web build (mainly the GitHub Pages deploy) on touch
-form factors:
+Used to verify the web build (mainly the production site,
+https://jsonprism.poli0981.dev) on touch form factors:
 
 - iPhone 14 Pro — iOS 26.x — Chrome, Brave
 - iPhone 13 Pro Max — iOS 26.x — Chrome, Brave
