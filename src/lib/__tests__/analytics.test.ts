@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { loadWebAnalytics, PRODUCTION_HOSTNAME } from '../analytics';
 
 const BEACON = 'script[data-cf-beacon]';
@@ -58,5 +58,18 @@ describe('loadWebAnalytics', () => {
     expect(detached.location).toBeNull();
     expect(loadWebAnalytics({ consented: true, enabled: true }, detached)).toBe(false);
     expect(detached.querySelector(BEACON)).toBeNull();
+  });
+
+  describe('in Tauri builds', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it('never injects the beacon, even on the production host', () => {
+      vi.stubGlobal('__IS_TAURI_BUILD__', true);
+      const doc = documentAt(PRODUCTION_HOSTNAME);
+      expect(loadWebAnalytics({ consented: true, enabled: true }, doc)).toBe(false);
+      expect(doc.querySelector(BEACON)).toBeNull();
+    });
   });
 });

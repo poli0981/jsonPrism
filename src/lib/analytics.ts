@@ -36,6 +36,8 @@ export function loadWebAnalytics(
   env: Omit<AnalyticsEnvironment, 'isTauriBuild' | 'hostname'>,
   doc: Document = document,
 ): boolean {
+  // Compile-time constant: Tauri builds drop the beacon code entirely.
+  if (__IS_TAURI_BUILD__) return false;
   const allowed = shouldLoadWebAnalytics({
     ...env,
     isTauriBuild: __IS_TAURI_BUILD__,

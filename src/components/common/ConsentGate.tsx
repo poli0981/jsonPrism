@@ -49,7 +49,12 @@ export function ConsentGate({ children }: { children: ReactNode }) {
             onInteractOutside={(e) => e.preventDefault()}
             className="max-w-md"
           >
-            {accepted ? <RecheckForm /> : <ConsentForm humanVerified={humanVerified} />}
+            {/* Tauri builds never run the human check, so the bundler drops it there. */}
+            {accepted && !__IS_TAURI_BUILD__ ? (
+              <RecheckForm />
+            ) : (
+              <ConsentForm humanVerified={humanVerified} />
+            )}
           </DialogContent>
         </Dialog>
       )}
@@ -100,7 +105,7 @@ function ConsentForm({ humanVerified }: { humanVerified: boolean }) {
         <span>{t('consent.agree')}</span>
       </label>
 
-      {needsCheck && <HumanCheck />}
+      {!__IS_TAURI_BUILD__ && needsCheck && <HumanCheck />}
 
       <button
         type="button"
