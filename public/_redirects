@@ -1,0 +1,4 @@
+# Old GitHub Pages paths (https://poli0981.github.io/jsonPrism/…) carried a
+# /jsonPrism prefix; keep links that were rewritten to the new host working.
+/jsonPrism  /  301
+/jsonPrism/*  /:splat  301

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jsonprism.poli0981.dev/sitemap.xml
