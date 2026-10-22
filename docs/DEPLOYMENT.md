@@ -56,20 +56,37 @@ Configured in the Cloudflare dashboard (the `jsonprism` Worker →
 | --- | --- |
 | Repository | `poli0981/jsonPrism` |
 | Production branch | `main` |
-| Build command | empty (or `npm run build`) |
+| Build command | `npm run build` (may also be empty) |
 | Deploy command | `npx wrangler deploy` |
-| Non-production branch deploy command | `npx wrangler versions upload` |
+| Non-production branch deploy command | `npx wrangler preview` |
 | Root directory | repository root |
 | Node.js | 26, from `.nvmrc` or the `NODE_VERSION` build variable |
 
 - `wrangler.jsonc` → `build.command` runs `npm run build` before every
-  `wrangler deploy`, `versions upload` and `dev`, so the deploy works even with
-  no build command in the dashboard (setting one only builds twice).
+  `wrangler deploy`, `preview` and `dev`, so a deploy works even with no build
+  command in the dashboard (setting one only builds twice).
 - Workers Builds installs dependencies with `npm clean-install` using its own
-  npm (10.9.2 at the time of writing), with install scripts enabled. The
-  lockfile must stay installable with that npm: a peer-dependency conflict
-  fails the build at the install step (this kept `main` undeployable before
-  2.0.0).
+  npm (10.9.2 at the time of writing). The lockfile must stay installable with
+  that npm: a peer-dependency conflict fails the build at the install step
+  (this kept `main` undeployable before 2.0.0).
+
+### Previews (pull requests and other branches)
+
+Non-production branches run `npx wrangler preview`, which publishes a
+[Worker Preview](https://developers.cloudflare.com/workers/previews/) named
+after the branch (`<branch>-jsonprism.<subdomain>.workers.dev` when workers.dev
+is enabled) and reports it on the pull request.
+
+- Previews inherit no production vars or bindings. `wrangler.jsonc` → `previews`
+  declares them again: a separate rate-limit counter (`namespace_id` 4202) and
+  an empty `ALLOWED_HOSTNAMES`. Any binding added at the top level needs a
+  preview-safe twin there, or `wrangler preview` fails with "missing a
+  `previews` block".
+- Previews get no `TURNSTILE_SECRET` (set one with
+  `npx wrangler preview base-config secret put` only if you need the check on
+  previews), and the production sitekey doesn't run on preview hostnames, so
+  the human check reports "unavailable" and testers continue past it. Web
+  Analytics never loads there.
 
 - Every push to `main` builds and deploys. No GitHub Action deploys the web
   app, and GitHub holds no Cloudflare credentials.

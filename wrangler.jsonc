@@ -38,6 +38,24 @@
       "simple": { "limit": 30, "period": 60 }
     }
   ],
+  // Workers Builds runs `npx wrangler preview` for non-production branches.
+  // Previews inherit no vars or bindings, so they are declared again here:
+  // a separate rate-limit counter, and no hostnames for the human check —
+  // previews get no TURNSTILE_SECRET either, so the check reports
+  // "unavailable" and lets testers continue. Web Analytics only loads on the
+  // production hostname.
+  "previews": {
+    "vars": {
+      "ALLOWED_HOSTNAMES": ""
+    },
+    "ratelimits": [
+      {
+        "name": "VERIFY_LIMITER",
+        "namespace_id": "4202",
+        "simple": { "limit": 30, "period": 60 }
+      }
+    ]
+  },
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1
