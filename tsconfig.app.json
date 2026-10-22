@@ -1,9 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2025",
     "useDefineForClassFields": true,
+    /* ES2025 syntax, but only ES2023 runtime APIs: the documented floors
+       (Android WebView 111+, macOS 12 WebKit) lack Iterator helpers, Set
+       methods, Promise.try and RegExp.escape. The compiler enforces that. */
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "ESNext",
+    /* TS 7 defaults `types` to []; Vite's client types come in through the
+       triple-slash reference in src/vite-env.d.ts. Keep Node types out of
+       browser code. */
+    "types": [],
     "skipLibCheck": true,
 
     /* Bundler mode */
@@ -24,11 +32,11 @@
     "exactOptionalPropertyTypes": true,
     "noImplicitOverride": true,
 
-    /* Path aliases */
-    "baseUrl": ".",
+    /* Path aliases (relative to this file — TS 7 removed baseUrl) */
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/**/__tests__", "src/**/*.test.ts", "src/**/*.test.tsx", "src/test"]
 }

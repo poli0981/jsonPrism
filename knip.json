@@ -1,14 +1,9 @@
 {
-  "project": ["src/**/*.{ts,tsx}"],
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["src/lib/convert-worker.ts"],
+  "project": ["src/**/*.{ts,tsx,css}", "worker/**/*.ts"],
   "ignore": ["src/components/ui/**"],
-  "ignoreDependencies": [
-    "@radix-ui/react-slot",
-    "tailwindcss",
-    "tw-animate-css",
-    "@tauri-apps/plugin-opener",
-    "@tauri-apps/plugin-os",
-    "@testing-library/user-event"
-  ],
+  "ignoreDependencies": ["@radix-ui/react-slot", "@testing-library/user-event"],
   "rules": {
     "types": "off"
   }
