@@ -2,18 +2,20 @@
 # API responses from worker/ set their own headers.
 #
 # CSP notes:
-#  - script-src: the Cloudflare Web Analytics beacon and the Turnstile widget.
+#  - script-src: the Cloudflare Web Analytics beacon and the Turnstile widget;
+#    'wasm-unsafe-eval' lets bson compile its small WebAssembly helper for
+#    64-bit math (it allows WebAssembly only, not JavaScript eval).
 #  - style-src 'unsafe-inline': CodeMirror, Radix and Sonner inject styles at runtime.
 #  - connect-src: the analytics beacon reports to cloudflareinsights.com (or /cdn-cgi/rum).
 #  - frame-src: the Turnstile challenge iframe.
 #  - worker-src 'self': the conversion Web Worker.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://static.cloudflareinsights.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
   Strict-Transport-Security: max-age=31536000
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), browsing-topics=()
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
   Cross-Origin-Opener-Policy: same-origin
   # HTML must revalidate so a deploy is picked up; no-transform keeps zone
   # features (Rocket Loader, Email Obfuscation) from rewriting pages and

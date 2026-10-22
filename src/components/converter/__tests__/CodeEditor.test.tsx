@@ -113,6 +113,17 @@ describe('CodeEditor — editable', () => {
   });
 });
 
+describe('CodeEditor — sizing', () => {
+  // Regression: the wrapper @uiw/react-codemirror renders had no height, so the
+  // editor grew to its content inside an overflow-hidden panel and could not scroll.
+  it.each([false, true])('fills its panel so long documents scroll (readOnly=%s)', (readOnly) => {
+    const { root } = renderEditor({ value: 'x\n'.repeat(500), readOnly });
+    const wrapper = root.parentElement!;
+    expect(wrapper).toHaveClass('cm-theme-none', 'h-full');
+    expect(wrapper.parentElement).toHaveClass('h-full', 'overflow-hidden');
+  });
+});
+
 describe('CodeEditor — read-only', () => {
   it('marks the content read-only and drops the editing chrome', () => {
     const { content, container } = renderEditor({
@@ -123,6 +134,12 @@ describe('CodeEditor — read-only', () => {
     });
     expect(content).toHaveAttribute('contenteditable', 'false');
     expect(content).toHaveAttribute('aria-readonly', 'true');
+    // Regression: not contenteditable, so the scroll container takes focus and
+    // the browser scrolls it with the arrow and page keys.
+    const scroller = container.querySelector('.cm-scroller')!;
+    expect(scroller).toHaveAttribute('tabindex', '0');
+    expect(scroller).toHaveAttribute('role', 'region');
+    expect(scroller).toHaveAttribute('aria-label', 'YAML output (read-only)');
     expect(content).toHaveAttribute('aria-label', 'YAML output (read-only)');
     expect(container.querySelector('.cm-lineNumbers')).not.toBeNull();
     expect(container.querySelector('.cm-activeLine')).toBeNull();

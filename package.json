@@ -1,7 +1,7 @@
 {
   "name": "jsonprism",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "description": "Disperse JSON into 12 formats (six convert back) — JSONL, CSV, TSV, YAML, XML, TOML, RESX, Markdown, SQL, BSON, CBOR, MessagePack. Conversion runs locally in your browser or desktop app.",
   "author": "poli0981 <code@poli0981.dev> (https://github.com/poli0981)",

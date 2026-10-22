@@ -8,6 +8,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond".
 
+## [2.0.1] — 2026-10-22
+
+### Fixed
+
+- **The editor and the output panel scroll again.** The wrapper `@uiw/react-codemirror` renders around the editor had no height, so both editors grew to fit their content inside a clipped panel: long input or output could not be scrolled with the mouse, touch or keyboard. The wrapper now fills its panel. The read-only output's scroll container also takes keyboard focus, so the arrow and page keys scroll it, without making the output editable (which would open the on-screen keyboard on phones).
+- **Fewer console errors.** The content security policy now allows WebAssembly (`'wasm-unsafe-eval'`, which still forbids JavaScript `eval`) on the website and in the apps, so the bson library's small 64-bit math helper no longer logs a violation (it fell back to JavaScript before). `browsing-topics` was removed from the `Permissions-Policy` header, which Brave and Firefox reported as an unknown feature. The remaining messages come from inside Cloudflare's Turnstile frame, which has its own policy.
+- **Production smoke check.** After a deploy it now waits until the new version answers several times in a row and retries before failing, because a deploy takes a moment to reach every Cloudflare edge location.
+
 ## [2.0.0] — 2026-10-22
 
 A new home, a hardened toolchain and a full audit. The web app moves to **<https://jsonprism.poli0981.dev>** on Cloudflare Workers; the old GitHub Pages address redirects there, keeping the path. Because the website now uses Cloudflare services, the Privacy Policy and Terms are at version 2.0 and **everyone is asked to accept them again** (`CONSENT_VERSION` 2).
