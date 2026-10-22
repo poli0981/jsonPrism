@@ -137,7 +137,20 @@ describe('useBatchActions.start', () => {
     // The user clears the queue and starts again while run #1 winds down.
     act(() => useBatchStore.getState().clear());
     expect(firstController?.signal.aborted).toBe(true);
-    seed([{ name: 'b.json', content: '[2]' }]);
+    // Run #2 reads a file that only resolves when the test says so, so it is
+    // still running when run #1 settles, however fast or slow the machine is.
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const slow = new File(['[2]'], 'b.json');
+    Object.defineProperty(slow, 'text', {
+      value: async () => {
+        await gate;
+        return '[2]';
+      },
+    });
+    act(() => useBatchStore.getState().addFiles([slow]));
     let second!: Promise<void>;
     act(() => {
       second = result.current.start();
@@ -149,6 +162,7 @@ describe('useBatchActions.start', () => {
     expect(useBatchStore.getState().processing).toBe(true);
     expect(useBatchStore.getState().abortController).toBe(secondController);
 
+    release();
     await act(() => second);
     expect(useBatchStore.getState().processing).toBe(false);
     expect(statuses()).toEqual(['done']);

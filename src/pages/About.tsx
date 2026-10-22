@@ -162,7 +162,7 @@ export function About() {
       <title>{t('about.title')}</title>
       <div
         ref={scrollRef}
-        tabIndex={0}
+        tabIndex={0} // NOSONAR(S6845): scrollable region; keyboard users need focus to scroll it
         aria-label={t('about.title')}
         className="min-h-0 flex-1 overflow-y-auto outline-none"
       >

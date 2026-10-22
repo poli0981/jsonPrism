@@ -251,7 +251,7 @@ export function BatchPanel({ format, direction, options, open, onOpenChange }: B
         {/* Queue list */}
         <div
           className="flex-1 [scrollbar-gutter:stable] overflow-y-auto px-6 pb-3"
-          tabIndex={0}
+          tabIndex={0} // NOSONAR(S6845): scrollable region; keyboard users need focus to scroll it
           aria-label={t('batch.queue_label')}
         >
           {totalCount === 0 ? (

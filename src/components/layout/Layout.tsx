@@ -7,10 +7,17 @@ import { SITE_URL } from '@/lib/links';
 import { Header } from './Header';
 import { Footer } from './Footer';
 
+/** `pathname` without trailing slashes; a loop, because `/\/+$/` backtracks on long runs. */
+function trimTrailingSlashes(pathname: string): string {
+  let end = pathname.length;
+  while (end > 0 && pathname.charCodeAt(end - 1) === 47) end--;
+  return pathname.slice(0, end);
+}
+
 /** Points canonical / og:url at the production URL of the current route. */
 function useCanonicalUrl(pathname: string) {
   useEffect(() => {
-    const url = `${SITE_URL}${pathname === '/' ? '/' : pathname.replace(/\/+$/, '')}`;
+    const url = `${SITE_URL}${pathname === '/' ? '/' : trimTrailingSlashes(pathname)}`;
     document.querySelector('link[rel="canonical"]')?.setAttribute('href', url);
     document.querySelector('meta[property="og:url"]')?.setAttribute('content', url);
   }, [pathname]);

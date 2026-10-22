@@ -145,7 +145,7 @@ export function OutputPanel({
         {error ? (
           <div
             role="alert"
-            tabIndex={0}
+            tabIndex={0} // NOSONAR(S6845): scrollable region; keyboard users need focus to scroll it
             className="text-destructive h-full overflow-auto p-4 font-mono text-sm whitespace-pre-wrap"
           >
             {error}

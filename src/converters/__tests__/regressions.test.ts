@@ -253,7 +253,10 @@ describe('XML', () => {
   });
 
   it('clamps an out-of-range indent instead of throwing', () => {
-    ok(xmlConverter.convert({ data: { a: 1 } }, { ...xmlConverter.defaultOptions, indent: -1 }));
+    const output = ok(
+      xmlConverter.convert({ data: { a: 1 } }, { ...xmlConverter.defaultOptions, indent: -1 }),
+    );
+    expect(output).toContain('<a>1</a>');
   });
 });
 

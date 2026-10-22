@@ -8,8 +8,9 @@ beforeEach(() => {
   useBatchStore.getState().clear();
 });
 
+// Up to 5 s: shared CI runners can be far slower than a workstation.
 async function waitForIdle() {
-  for (let i = 0; i < 100 && useBatchStore.getState().processing; i++) {
+  for (let i = 0; i < 500 && useBatchStore.getState().processing; i++) {
     await act(async () => {
       await new Promise((r) => setTimeout(r, 10));
     });
