@@ -1,29 +1,20 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Default permissions for the JSONPrism main window.",
+  "description": "JSONPrism main window: native open/save dialogs, reading files the user picks or drops, writing where they choose to save, and opening links in the system browser. Picked and dropped paths are added to the fs scope at runtime; the static scope only covers common folders.",
   "windows": ["main"],
   "permissions": [
     "core:default",
-    "core:event:allow-listen",
-    "core:event:allow-unlisten",
-    "core:webview:default",
-    "core:window:default",
-    "core:window:allow-set-title",
     "opener:default",
-    "os:default",
-    "dialog:default",
     "dialog:allow-open",
     "dialog:allow-save",
-    "dialog:allow-message",
     "fs:default",
     "fs:allow-read-text-file",
-    "fs:allow-write-text-file",
     "fs:allow-write-file",
     "fs:allow-stat",
     {
       "identifier": "fs:scope",
-      "allow": ["$HOME/**", "$DOCUMENT/**", "$DOWNLOAD/**", "$DESKTOP/**"]
+      "allow": ["$DOCUMENT/**", "$DOWNLOAD/**", "$DESKTOP/**"]
     }
   ]
 }
