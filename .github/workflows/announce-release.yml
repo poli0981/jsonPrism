@@ -6,18 +6,21 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Existing release tag to re-announce"
+        description: Existing release tag to re-announce
         required: true
         type: string
 
-# Reusable announce-release.yml only needs `contents: read` to fetch
-# release metadata via the gh CLI.
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   announce:
-    uses: poli0981/.github/.github/workflows/announce-release.yml@main
+    permissions:
+      contents: read
+    uses: poli0981/.github/.github/workflows/announce-release.yml@c3e118a01d40e95b36b2c3466dc206638c11eb5a # main 2026-07-06
     with:
       tag_override: ${{ inputs.tag || '' }}
-    secrets: inherit
+    # Only the webhooks it needs, not every repository secret.
+    secrets:
+      DISCORD_RELEASES_WEBHOOK: ${{ secrets.DISCORD_RELEASES_WEBHOOK }}
+      DISCORD_REPO_WEBHOOK: ${{ secrets.DISCORD_REPO_WEBHOOK }}
+      DISCORD_PING_ROLE_ID: ${{ secrets.DISCORD_PING_ROLE_ID }}

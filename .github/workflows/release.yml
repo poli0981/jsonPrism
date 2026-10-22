@@ -1,56 +1,121 @@
 name: Release Tauri bundles
 
+# Builds the desktop bundles and the Android APK for a version tag into ONE
+# draft release, then adds SHA256SUMS.txt and build-provenance attestations.
+# The maintainer publishes the draft, which triggers the announcements.
+
 on:
   push:
-    tags:
-      - 'v*'
+    tags: ['v*']
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to (re)build, e.g. v2.0.0
+        required: true
+        type: string
 
-permissions:
-  contents: write
+permissions: {}
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
-  # Create the draft release ONCE, up front, so every platform in the matrix
-  # below uploads into the same release. Previously each matrix job ran
-  # tauri-action's "find or create release" concurrently; with no release yet,
-  # they raced to create it and produced duplicate drafts that split the assets
-  # (Linux bundles in one draft, macOS/Windows in another). A single
-  # pre-created release referenced by `releaseId` removes the race.
+  verify:
+    name: Verify tag and tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Validate tag format
+        run: |
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]] || { echo "::error::'$TAG' is not a version tag"; exit 1; }
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ env.TAG }}
+          persist-credentials: false
+
+      - name: Check the tag matches the app version
+        id: version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          cargo_version=$(sed -n 's/^version = "\(.*\)"$/\1/p' src-tauri/Cargo.toml | head -n 1)
+          [ "$TAG" = "v$version" ] || { echo "::error::Tag $TAG does not match package.json version $version"; exit 1; }
+          [ "$cargo_version" = "$version" ] || { echo "::error::Cargo.toml version $cargo_version does not match $version"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Test
+        run: npm test
+
+  # One draft for the whole matrix: parallel "find or create" calls used to
+  # race and split the assets across duplicate drafts.
   create-release:
     name: Create draft release
-    runs-on: ubuntu-latest
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
     outputs:
-      release_id: ${{ steps.create-release.outputs.result }}
+      release_id: ${{ steps.release.outputs.result }}
     steps:
-      - name: Create draft release
-        id: create-release
-        uses: actions/github-script@v9
+      - name: Create or reuse the draft
+        id: release
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
-            const tag = context.ref.replace('refs/tags/', '').replace('refs/heads/', '');
+            const tag = process.env.TAG;
+            const { owner, repo } = context.repo;
+            const releases = await github.paginate(github.rest.repos.listReleases, { owner, repo, per_page: 100 });
+            const existing = releases.find((r) => r.tag_name === tag);
+            if (existing) {
+              if (!existing.draft) throw new Error(`Release ${tag} is already published; delete it or tag a new version.`);
+              core.info(`Reusing draft ${existing.id}`);
+              return existing.id;
+            }
             const { data } = await github.rest.repos.createRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              owner,
+              repo,
               tag_name: tag,
               name: `JSONPrism ${tag}`,
-              body: [
-                'Native desktop builds for Windows, macOS, and Linux, plus an Android APK (sideload, Android 12+).',
-                '',
-                'Android: download the `.apk`, then enable "install unknown apps" for your browser/file manager to sideload.',
-                '',
-                'See the [CHANGELOG](https://github.com/poli0981/jsonPrism/blob/main/CHANGELOG.md) for details.',
-              ].join('\n'),
               draft: true,
-              prerelease: false,
+              prerelease: tag.includes('-'),
+              body: [
+                'Native builds for Windows, macOS (universal) and Linux, plus an Android APK (sideload, Android 12+). The web app runs at https://jsonprism.poli0981.dev.',
+                '',
+                'Verify a download with `sha256sum -c SHA256SUMS.txt --ignore-missing`, or check its build provenance with `gh attestation verify <file> --repo poli0981/jsonPrism`.',
+                '',
+                'Android: download the `.apk`, then allow "install unknown apps" for your browser or file manager.',
+                '',
+                `See the [CHANGELOG](https://github.com/${owner}/${repo}/blob/${tag}/CHANGELOG.md) for details.`,
+              ].join('\n'),
             });
             return data.id;
 
-  build:
+  desktop:
     name: Build · ${{ matrix.platform.name }}
     needs: create-release
     runs-on: ${{ matrix.platform.runner }}
-    timeout-minutes: 40
-
+    timeout-minutes: 45
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -61,118 +126,108 @@ jobs:
           - name: macOS (universal)
             runner: macos-14
             args: '--target universal-apple-darwin'
+          # The oldest supported Ubuntu keeps the AppImage/deb glibc floor low.
           - name: Linux
             runner: ubuntu-22.04
             args: ''
-
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ env.TAG }}
+          persist-credentials: false
 
       - name: Install Linux build dependencies
-        if: matrix.platform.runner == 'ubuntu-22.04'
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            libappindicator3-dev \
-            librsvg2-dev \
-            patchelf \
-            libssl-dev \
-            libgtk-3-dev
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev libgtk-3-dev
 
-      - name: Setup Node 22
-        uses: actions/setup-node@v6
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22.x
+          node-version-file: .nvmrc
           cache: npm
 
-      - name: Setup Rust (stable)
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
         with:
-          # macOS universal2 build needs both aarch64 + x86_64 targets installed.
-          targets: ${{ matrix.platform.runner == 'macos-14' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          toolchain: stable
+          # The universal macOS bundle needs both Apple targets.
+          targets: ${{ runner.os == 'macOS' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
-      - name: Cache Cargo build artifacts
-        uses: swatinem/rust-cache@v2
+      - name: Cache Cargo
+        uses: swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           workspaces: './src-tauri -> target'
+          key: ${{ matrix.platform.runner }}
 
-      - name: Install npm dependencies
-        run: npm ci --no-audit --no-fund
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Generate icons (Linux & macOS)
-        if: matrix.platform.runner != 'windows-latest'
+      - name: Generate icons
         run: npm run tauri:icon
 
-      - name: Generate icons (Windows)
-        if: matrix.platform.runner == 'windows-latest'
-        run: npm run tauri:icon
-        shell: pwsh
-
-      - name: Build, sign, and upload to release
-        uses: tauri-apps/tauri-action@v0
+      - name: Build and upload to the draft
+        uses: tauri-apps/tauri-action@1deb371b0cd8bd54025b384f1cd735e725c4060f # action-v1.0.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         with:
-          # Upload into the single draft created by the create-release job above
-          # instead of finding/creating one per matrix job (which caused
-          # duplicate drafts + split assets). The maintainer un-drafts manually.
           releaseId: ${{ needs.create-release.outputs.release_id }}
           args: ${{ matrix.platform.args }}
 
-  # Android is built separately: tauri-action does not build mobile targets, so
-  # this job drives the Tauri CLI directly (Java + Android SDK/NDK + Rust android
-  # targets), signs with the release keystore from secrets, and uploads the
-  # universal APK into the same draft release as the desktop bundles.
-  #
-  # Requires these repository secrets (see docs/TAURI-NOTES.md):
-  #   ANDROID_KEYSTORE_BASE64    base64 of upload-keystore.jks
-  #   ANDROID_KEYSTORE_PASSWORD  the keystore (store) password
-  #   ANDROID_KEY_PASSWORD       the key password (optional; defaults to store password)
-  #   ANDROID_KEY_ALIAS          the key alias (optional; defaults to "upload")
+  # tauri-action builds desktop targets only; Android drives the Tauri CLI
+  # directly and signs with the release keystore (see docs/TAURI-NOTES.md):
+  #   ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD,
+  #   ANDROID_KEY_PASSWORD (optional), ANDROID_KEY_ALIAS (optional, "upload").
   android:
     name: Build · Android (APK)
-    needs: create-release
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
+    needs: [verify, create-release]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ env.TAG }}
+          persist-credentials: false
 
       - name: Setup Java 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v4
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
 
-      - name: Install SDK platform + NDK
+      - name: Install SDK platform and NDK
         run: |
           sdkmanager "platforms;android-36" "ndk;27.2.12479018"
           echo "NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
 
-      - name: Setup Rust (stable) + Android targets
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust with Android targets
+        uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
         with:
+          toolchain: stable
           targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
 
-      - name: Cache Cargo build artifacts
-        uses: swatinem/rust-cache@v2
+      - name: Cache Cargo
+        uses: swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           workspaces: './src-tauri -> target'
           key: android
 
-      - name: Setup Node 22
-        uses: actions/setup-node@v6
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22.x
+          node-version-file: .nvmrc
           cache: npm
 
-      - name: Install npm dependencies
-        run: npm ci --no-audit --no-fund
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Generate icons
         run: npm run tauri:icon
@@ -185,7 +240,7 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
-            echo "::error::ANDROID_KEYSTORE_BASE64 secret is not set — cannot sign the release APK."
+            echo "::error::ANDROID_KEYSTORE_BASE64 is not set; cannot sign the release APK."
             exit 1
           fi
           KEYSTORE_PATH="$RUNNER_TEMP/upload-keystore.jks"
@@ -200,22 +255,86 @@ jobs:
       - name: Build signed universal APK
         run: npm run tauri -- android build --apk
 
-      - name: Upload APK to release
-        uses: actions/github-script@v9
+      - name: Upload the APK to the draft
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          RELEASE_ID: ${{ needs.create-release.outputs.release_id }}
+          VERSION: ${{ needs.verify.outputs.version }}
         with:
           script: |
-            const fs = require('fs');
-            const tag = context.ref.replace('refs/tags/', '').replace('refs/heads/', '');
+            const fs = require('node:fs');
+            const { owner, repo } = context.repo;
+            const releaseId = Number(process.env.RELEASE_ID);
             const dir = 'src-tauri/gen/android/app/build/outputs/apk/universal/release';
             const apks = fs.readdirSync(dir).filter((f) => f.endsWith('.apk'));
-            if (apks.length === 0) throw new Error(`No APK found in ${dir}`);
-            const src = `${dir}/${apks[0]}`;
-            const name = `JSONPrism-${tag}-android-universal.apk`;
+            if (apks.length !== 1) throw new Error(`Expected one APK in ${dir}, found: ${apks.join(', ') || 'none'}`);
+            // Same naming scheme as the desktop bundles.
+            const name = `JSONPrism_${process.env.VERSION}_android-universal.apk`;
+            const assets = await github.paginate(github.rest.repos.listReleaseAssets, { owner, repo, release_id: releaseId });
+            for (const old of assets.filter((a) => a.name === name)) {
+              await github.rest.repos.deleteReleaseAsset({ owner, repo, asset_id: old.id });
+            }
             await github.rest.repos.uploadReleaseAsset({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: ${{ needs.create-release.outputs.release_id }},
+              owner,
+              repo,
+              release_id: releaseId,
               name,
-              data: fs.readFileSync(src),
+              data: fs.readFileSync(`${dir}/${apks[0]}`),
             });
-            core.info(`Uploaded ${name} from ${src}`);
+            core.info(`Uploaded ${name}`);
+
+  checksums:
+    name: Checksums and provenance
+    needs: [create-release, desktop, android]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - name: Download the draft's assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ needs.create-release.outputs.release_id }}
+        run: |
+          mkdir assets
+          gh api --paginate "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID/assets" \
+            --jq '.[] | select(.name != "SHA256SUMS.txt") | [.id, .name] | @tsv' |
+          while IFS=$'\t' read -r id name; do
+            gh api -H 'Accept: application/octet-stream' "repos/$GITHUB_REPOSITORY/releases/assets/$id" > "assets/$name"
+          done
+          ls -l assets
+
+      - name: Write SHA256SUMS.txt
+        working-directory: assets
+        run: |
+          sha256sum -- * > ../SHA256SUMS.txt
+          cat ../SHA256SUMS.txt
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: assets/*
+
+      - name: Upload SHA256SUMS.txt to the draft
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          RELEASE_ID: ${{ needs.create-release.outputs.release_id }}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const { owner, repo } = context.repo;
+            const releaseId = Number(process.env.RELEASE_ID);
+            const name = 'SHA256SUMS.txt';
+            const assets = await github.paginate(github.rest.repos.listReleaseAssets, { owner, repo, release_id: releaseId });
+            for (const old of assets.filter((a) => a.name === name)) {
+              await github.rest.repos.deleteReleaseAsset({ owner, repo, asset_id: old.id });
+            }
+            await github.rest.repos.uploadReleaseAsset({
+              owner,
+              repo,
+              release_id: releaseId,
+              name,
+              data: fs.readFileSync(name),
+            });
