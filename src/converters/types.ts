@@ -23,10 +23,18 @@ export type FormatId =
 
 export type ImplementationPhase = 1 | 2 | 3 | 4;
 
+/** Forward = JSON → format; reverse = format → JSON. */
+export type Direction = 'forward' | 'reverse';
+
 export interface ConverterMeta {
   id: FormatId;
   labelKey: string;
   extension: string;
+  /**
+   * Other extensions accepted when this format is the *input* (reverse mode),
+   * e.g. `yml` for YAML or `ndjson` for JSONL. Lowercase, no leading dot.
+   */
+  altExtensions?: readonly string[];
   mimeType: string;
   phase: ImplementationPhase;
   ready: boolean;

@@ -1,4 +1,5 @@
 import type { Converter } from './types';
+import { errorMessage } from '@/lib/errors';
 
 interface JsonlOptions {
   /** Pretty-print each line? Usually false (canonical JSONL is one-line-per-record). */
@@ -10,6 +11,7 @@ export const jsonlConverter: Converter<JsonlOptions> = {
     id: 'jsonl',
     labelKey: 'formats.jsonl',
     extension: 'jsonl',
+    altExtensions: ['ndjson'],
     mimeType: 'application/x-ndjson',
     phase: 1,
     ready: true,
@@ -36,22 +38,30 @@ export const jsonlConverter: Converter<JsonlOptions> = {
       );
       return { ok: true, output: lines.join('\n') + '\n' };
     } catch (err) {
-      return { ok: false, error: (err as Error).message };
+      return { ok: false, error: errorMessage(err) };
     }
   },
   reverse({ text }, { pretty }) {
-    const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0);
+    // Strip a UTF-8 BOM; keep blank lines in the count so error line numbers
+    // match what the user sees in the editor.
+    const lines = text.replace(/^\uFEFF/, '').split(/\r\n|\r|\n/);
     const values: unknown[] = [];
     for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]!;
+      if (line.trim().length === 0) continue;
       try {
-        values.push(JSON.parse(lines[i]!));
+        values.push(JSON.parse(line));
       } catch (err) {
-        return {
-          ok: false,
-          error: `Line ${i + 1}: ${(err as Error).message}`,
-        };
+        return { ok: false, error: `Line ${i + 1}: ${errorMessage(err)}` };
       }
     }
-    return { ok: true, output: pretty ? JSON.stringify(values, null, 2) : JSON.stringify(values) };
+    try {
+      return {
+        ok: true,
+        output: pretty ? JSON.stringify(values, null, 2) : JSON.stringify(values),
+      };
+    } catch (err) {
+      return { ok: false, error: errorMessage(err) };
+    }
   },
 };

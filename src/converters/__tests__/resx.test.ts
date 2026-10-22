@@ -44,7 +44,7 @@ describe('resxConverter', () => {
     expect(result.output).toContain('System.Resources.ResXResourceWriter');
   });
 
-  it('omits schema header when includeSchema=false', () => {
+  it('omits the xsd:schema block but keeps the required resheaders when includeSchema=false', () => {
     const result = resxConverter.convert(
       { data: { K: 'V' } },
       { ...resxConverter.defaultOptions, includeSchema: false },
@@ -52,7 +52,9 @@ describe('resxConverter', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.output).not.toContain('<xsd:schema');
-    expect(result.output).not.toContain('<resheader');
+    // ResXResourceReader rejects files without these.
+    expect(result.output).toContain('<resheader name="resmimetype">');
+    expect(result.output).toContain('System.Resources.ResXResourceReader');
   });
 
   it('emits each entry as a <data> element with xml:space="preserve"', () => {

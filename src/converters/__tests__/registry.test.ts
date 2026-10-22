@@ -42,7 +42,7 @@ describe('converter registry', () => {
     }
   });
 
-  it('all 9 converters are marked ready', () => {
+  it('all 12 converters are marked ready', () => {
     for (const id of ALL_FORMATS) {
       expect(getConverter(id).meta.ready).toBe(true);
     }

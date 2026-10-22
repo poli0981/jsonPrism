@@ -1,6 +1,7 @@
 import { encode } from '@msgpack/msgpack';
 import type { Converter } from './types';
 import { encodeBytes, type Encoding } from '@/lib/bytes';
+import { errorMessage } from '@/lib/errors';
 
 interface MsgpackOptions {
   encoding: Encoding;
@@ -36,7 +37,7 @@ export const msgpackConverter: Converter<MsgpackOptions> = {
       const view = new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength);
       return { ok: true, output: encodeBytes(view, opts.encoding) };
     } catch (err) {
-      return { ok: false, error: (err as Error).message };
+      return { ok: false, error: errorMessage(err) };
     }
   },
 };

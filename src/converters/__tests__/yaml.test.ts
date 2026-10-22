@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import yaml from 'js-yaml';
+import { load } from 'js-yaml';
 import { yamlConverter } from '../yaml';
 
 describe('yamlConverter', () => {
@@ -17,7 +17,7 @@ describe('yamlConverter', () => {
     const result = yamlConverter.convert({ data }, yamlConverter.defaultOptions);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const parsed = yaml.load(result.output);
+    const parsed = load(result.output);
     expect(parsed).toEqual(data);
   });
 

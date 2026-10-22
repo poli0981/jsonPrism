@@ -1,5 +1,7 @@
-import { XMLParser } from 'fast-xml-parser';
+import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import type { Converter } from './types';
+import { errorMessage } from '@/lib/errors';
+import { compareOrdinal, defineOwn } from '@/lib/json';
 
 interface ResxOptions {
   /**
@@ -21,7 +23,7 @@ interface ResxOptions {
  *
  * Source: https://learn.microsoft.com/en-us/dotnet/framework/resources/working-with-resx-files-programmatically
  */
-const RESX_SCHEMA_HEADER = `  <!--
+const RESX_SCHEMA = `  <!--
     Microsoft ResX Schema
 
     Version 2.0
@@ -76,8 +78,13 @@ const RESX_SCHEMA_HEADER = `  <!--
         </xsd:choice>
       </xsd:complexType>
     </xsd:element>
-  </xsd:schema>
-  <resheader name="resmimetype">
+  </xsd:schema>`;
+
+/**
+ * The four resheaders are required by ResXResourceReader regardless of whether
+ * the xsd:schema block is present, so they are always emitted.
+ */
+const RESX_RESHEADERS = `  <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
   </resheader>
   <resheader name="version">
@@ -134,7 +141,7 @@ export const resxConverter: Converter<ResxOptions> = {
       };
     }
 
-    const entries: Array<{ key: string; value: string; comment?: string }> = [];
+    const entries: ResxEntry[] = [];
 
     for (const [key, raw] of Object.entries(data as Record<string, unknown>)) {
       if (typeof raw === 'string' || typeof raw === 'number' || typeof raw === 'boolean') {
@@ -145,21 +152,26 @@ export const resxConverter: Converter<ResxOptions> = {
         entries.push({ key, value: '' });
         continue;
       }
-      if (
-        typeof raw === 'object' &&
-        !Array.isArray(raw) &&
-        'value' in raw &&
-        typeof (raw as { value: unknown }).value !== 'object'
-      ) {
+      if (typeof raw === 'object' && !Array.isArray(raw) && 'value' in raw) {
         // { "value": "...", "_comment": "..." } shape
         const obj = raw as Record<string, unknown>;
-        const value = String(obj.value ?? '');
+        const inner = obj.value;
+        if (inner !== null && inner !== undefined && typeof inner === 'object') {
+          return {
+            ok: false,
+            error: `Key "${key}" has a nested "value". RESX entries must be plain text.`,
+          };
+        }
         const commentRaw = obj[opts.commentKey];
         const comment =
           typeof commentRaw === 'string' || typeof commentRaw === 'number'
             ? String(commentRaw)
             : undefined;
-        entries.push({ key, value, ...(comment !== undefined ? { comment } : {}) });
+        entries.push({
+          key,
+          value: inner === null || inner === undefined ? '' : String(inner),
+          ...(comment !== undefined ? { comment } : {}),
+        });
         continue;
       }
       return {
@@ -169,41 +181,76 @@ export const resxConverter: Converter<ResxOptions> = {
     }
 
     if (opts.sortKeys) {
-      entries.sort((a, b) => a.key.localeCompare(b.key));
+      // Ordinal order keeps diffs identical on every machine (localeCompare
+      // depends on the user's locale).
+      entries.sort((a, b) => compareOrdinal(a.key, b.key));
     }
 
     return { ok: true, output: buildResx(entries, opts) };
   },
   reverse({ text }, opts) {
+    // RESX never declares a DOCTYPE; refusing one rules out entity-expansion
+    // ("billion laughs") documents before the parser sees them.
+    if (/<!DOCTYPE/i.test(text)) {
+      return { ok: false, error: 'Not a RESX file: DOCTYPE declarations are not supported.' };
+    }
+    const validation = XMLValidator.validate(text);
+    if (validation !== true) {
+      return {
+        ok: false,
+        error: `Not well-formed XML: ${validation.err.msg} (line ${validation.err.line}, column ${validation.err.col}).`,
+      };
+    }
     try {
       const parser = new XMLParser({
         ignoreAttributes: false,
         attributeNamePrefix: '@_',
+        // Resource strings are text: "007", "1.10" or "  padded  " must come
+        // back exactly as written (the file declares xml:space="preserve").
+        parseTagValue: false,
+        parseAttributeValue: false,
+        trimValues: false,
+        // Decodes numeric character references such as &#xD; (CR) that the
+        // writer uses to keep CRLF line endings intact.
+        htmlEntities: true,
       });
-      const xml = parser.parse(text) as {
-        root?: { data?: ResxDataEntry | ResxDataEntry[] };
+      const xml = parser.parse(text) as { root?: unknown };
+      if (xml.root === undefined) {
+        return { ok: false, error: 'Not a RESX file: the document has no <root> element.' };
+      }
+      const root = (typeof xml.root === 'object' && xml.root !== null ? xml.root : {}) as {
+        data?: ResxDataEntry | ResxDataEntry[];
       };
-      const dataEntries = xml.root?.data;
-      if (!dataEntries) return { ok: true, output: '{}' };
-      const entries = Array.isArray(dataEntries) ? dataEntries : [dataEntries];
+      const dataEntries = root.data;
+      const entries =
+        dataEntries === undefined ? [] : Array.isArray(dataEntries) ? dataEntries : [dataEntries];
       const out: Record<string, unknown> = {};
       for (const e of entries) {
         const key = e['@_name'];
         if (typeof key !== 'string') continue;
-        const value = e.value ?? '';
-        const comment = e.comment;
-        if (comment !== undefined && comment !== '') {
-          out[key] = { value: String(value), [opts.commentKey]: String(comment) };
+        const value = textOf(e.value);
+        const comment = textOf(e.comment);
+        if (comment !== '') {
+          const entry: Record<string, unknown> = {};
+          defineOwn(entry, 'value', value);
+          defineOwn(entry, opts.commentKey, comment);
+          defineOwn(out, key, entry);
         } else {
-          out[key] = String(value);
+          defineOwn(out, key, value);
         }
       }
       return { ok: true, output: JSON.stringify(out, null, 2) };
     } catch (err) {
-      return { ok: false, error: (err as Error).message };
+      return { ok: false, error: errorMessage(err) };
     }
   },
 };
+
+interface ResxEntry {
+  key: string;
+  value: string;
+  comment?: string;
+}
 
 interface ResxDataEntry {
   '@_name'?: string;
@@ -211,16 +258,24 @@ interface ResxDataEntry {
   comment?: unknown;
 }
 
-function buildResx(
-  entries: Array<{ key: string; value: string; comment?: string }>,
-  opts: ResxOptions,
-): string {
+/** Element text: a plain string, or the `#text` of an element that has attributes. */
+function textOf(node: unknown): string {
+  if (node === undefined || node === null) return '';
+  if (typeof node === 'object') {
+    const text = (node as Record<string, unknown>)['#text'];
+    return text === undefined || text === null ? '' : String(text);
+  }
+  return String(node);
+}
+
+function buildResx(entries: ResxEntry[], opts: ResxOptions): string {
   const parts: string[] = [];
   parts.push('<?xml version="1.0" encoding="utf-8"?>');
   parts.push('<root>');
   if (opts.includeSchema) {
-    parts.push(RESX_SCHEMA_HEADER);
+    parts.push(RESX_SCHEMA);
   }
+  parts.push(RESX_RESHEADERS);
   for (const e of entries) {
     parts.push(`  <data name="${escapeAttr(e.key)}" xml:space="preserve">`);
     parts.push(`    <value>${escapeText(e.value)}</value>`);
@@ -233,14 +288,33 @@ function buildResx(
   return parts.join('\n') + '\n';
 }
 
+// Characters XML 1.0 can't carry at all (not even as references).
+// eslint-disable-next-line no-control-regex
+const INVALID_XML_CHARS_RE = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g;
+
 export function escapeText(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return (
+    s
+      .replace(INVALID_XML_CHARS_RE, '\uFFFD')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      // XML parsers normalize CR/CRLF to LF; encoding CR keeps CRLF text intact.
+      .replace(/\r/g, '&#xD;')
+  );
 }
 
 export function escapeAttr(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+  return (
+    s
+      .replace(INVALID_XML_CHARS_RE, '\uFFFD')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      // Attribute-value normalization would turn these into spaces.
+      .replace(/\t/g, '&#x9;')
+      .replace(/\n/g, '&#xA;')
+      .replace(/\r/g, '&#xD;')
+  );
 }
