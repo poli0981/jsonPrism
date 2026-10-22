@@ -15,7 +15,7 @@ export interface WorkerEnv {
   /** Comma-separated hostnames a token may have been issued on. */
   ALLOWED_HOSTNAMES: string;
   /** Secret set in the Cloudflare dashboard (.dev.vars locally). */
-  TURNSTILE_SECRET_KEY?: string | undefined;
+  TURNSTILE_SECRET?: string | undefined;
   VERIFY_LIMITER?: RateLimit;
 }
 
@@ -81,7 +81,7 @@ async function readBodyLimited(request: Request, limit: number): Promise<string 
 
 export async function handleVerify(request: Request, env: WorkerEnv): Promise<Response> {
   const started = Date.now();
-  const secret = env.TURNSTILE_SECRET_KEY;
+  const secret = env.TURNSTILE_SECRET;
   const testMode = secret === TEST_SECRET;
   const colo = (request.cf as { colo?: string } | undefined)?.colo;
   const finish = (

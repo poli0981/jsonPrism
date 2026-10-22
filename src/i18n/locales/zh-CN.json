@@ -259,7 +259,7 @@
   "about": {
     "title": "关于 JSONPrism",
     "lead": "为开发者打造的分光工具。",
-    "p1": "JSONPrism 将一个 JSON 输入分解为多种目标格式——就像白光穿过棱镜——并且大多数格式都能转换回来。所有转换都在你的设备上完成，你粘贴或拖入的数据绝不会离开设备。",
+    "p1": "JSONPrism 将一个 JSON 输入分解为多种目标格式——就像白光穿过棱镜——其中六种格式还能转换回 JSON。所有转换都在你的设备上完成，你粘贴或拖入的数据绝不会离开设备。",
     "p2": "基于 React 19、TypeScript 7、Vite 8、Tailwind CSS v4 和 shadcn/ui 构建。网页版由 Cloudflare Workers 提供服务；桌面版和 Android 版使用 Tauri 2 构建。源代码托管在 GitHub。",
     "version": "版本 {{version}}",
     "donate": {

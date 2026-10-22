@@ -292,7 +292,7 @@
   "about": {
     "title": "Về JSONPrism",
     "lead": "Một công cụ tán sắc cho developer.",
-    "p1": "JSONPrism nhận một đầu vào JSON và tán nó ra nhiều định dạng đích — như ánh sáng trắng đi qua lăng kính — và đọc ngược được phần lớn các định dạng đó. Mọi chuyển đổi chạy hoàn toàn trên thiết bị của bạn, nên dữ liệu bạn dán hoặc thả vào không bao giờ rời khỏi máy.",
+    "p1": "JSONPrism nhận một đầu vào JSON và tán nó ra nhiều định dạng đích — như ánh sáng trắng đi qua lăng kính — và đọc ngược được sáu trong số đó. Mọi chuyển đổi chạy hoàn toàn trên thiết bị của bạn, nên dữ liệu bạn dán hoặc thả vào không bao giờ rời khỏi máy.",
     "p2": "Xây dựng với React 19, TypeScript 7, Vite 8, Tailwind CSS v4 và shadcn/ui. Bản web chạy trên Cloudflare Workers; ứng dụng desktop và Android được xây dựng bằng Tauri 2. Mã nguồn trên GitHub.",
     "version": "Phiên bản {{version}}",
     "donate": {

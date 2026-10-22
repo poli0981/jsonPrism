@@ -7,7 +7,7 @@ license = "Apache-2.0"
 repository = "https://github.com/poli0981/jsonPrism"
 homepage = "https://jsonprism.poli0981.dev"
 edition = "2021"
-rust-version = "1.77"
+rust-version = "1.90"
 
 # Disable the default `main.rs` binary lookup; we want a library + bin.
 [lib]

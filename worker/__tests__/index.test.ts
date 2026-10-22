@@ -10,7 +10,7 @@ function env(overrides: Partial<WorkerEnv> = {}): WorkerEnv {
   return {
     ASSETS: {} as Fetcher,
     ALLOWED_HOSTNAMES: 'jsonprism.poli0981.dev',
-    TURNSTILE_SECRET_KEY: 'real-secret',
+    TURNSTILE_SECRET: 'real-secret',
     ...overrides,
   };
 }
@@ -109,7 +109,7 @@ describe('POST /api/turnstile/verify', () => {
   });
 
   it('answers 503 when the secret is missing', async () => {
-    const res = await call(verifyRequest(), env({ TURNSTILE_SECRET_KEY: undefined }));
+    const res = await call(verifyRequest(), env({ TURNSTILE_SECRET: undefined }));
     expect(res.status).toBe(503);
     expect(siteverify).not.toHaveBeenCalled();
   });
@@ -129,7 +129,7 @@ describe('POST /api/turnstile/verify', () => {
       async () =>
         new Response(JSON.stringify({ success: true, hostname: 'example.com', action: '' })),
     );
-    expect((await call(verifyRequest(), env({ TURNSTILE_SECRET_KEY: TEST_SECRET }))).status).toBe(
+    expect((await call(verifyRequest(), env({ TURNSTILE_SECRET: TEST_SECRET }))).status).toBe(
       200,
     );
     expect((await call(verifyRequest())).status).toBe(403);
@@ -139,7 +139,7 @@ describe('POST /api/turnstile/verify', () => {
     'accepts the local origin %s only with the test secret (wrangler dev)',
     async (origin) => {
       const local = verifyRequest({ headers: { Origin: origin } });
-      const testEnv = env({ TURNSTILE_SECRET_KEY: TEST_SECRET });
+      const testEnv = env({ TURNSTILE_SECRET: TEST_SECRET });
       expect((await call(local.clone(), testEnv)).status).toBe(200);
       expect((await call(local)).status).toBe(403);
     },

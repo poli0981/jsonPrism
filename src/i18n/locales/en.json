@@ -292,7 +292,7 @@
   "about": {
     "title": "About JSONPrism",
     "lead": "A refracting tool for developers.",
-    "p1": "JSONPrism takes a single JSON input and disperses it into many target formats — like white light through a prism — and parses most of them back. Conversion runs entirely on your device, so the data you paste or drop never leaves it.",
+    "p1": "JSONPrism takes a single JSON input and disperses it into many target formats — like white light through a prism — and parses six of them back. Conversion runs entirely on your device, so the data you paste or drop never leaves it.",
     "p2": "Built with React 19, TypeScript 7, Vite 8, Tailwind CSS v4 and shadcn/ui. The web version is served by Cloudflare Workers; the desktop and Android apps are built with Tauri 2. Source on GitHub.",
     "version": "Version {{version}}",
     "donate": {

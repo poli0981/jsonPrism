@@ -259,7 +259,7 @@
   "about": {
     "title": "JSONPrism について",
     "lead": "開発者のための分光ツール。",
-    "p1": "JSONPrism はひとつの JSON 入力を、プリズムを通る白色光のように多くの形式へ分光し、その多くを JSON に戻すこともできます。変換はすべて端末上で行われるため、貼り付けたりドロップしたデータが外部に出ることはありません。",
+    "p1": "JSONPrism はひとつの JSON 入力を、プリズムを通る白色光のように多くの形式へ分光し、そのうち 6 形式は JSON に戻すこともできます。変換はすべて端末上で行われるため、貼り付けたりドロップしたデータが外部に出ることはありません。",
     "p2": "React 19、TypeScript 7、Vite 8、Tailwind CSS v4、shadcn/ui で構築。Web 版は Cloudflare Workers で配信され、デスクトップ版と Android 版は Tauri 2 で構築されています。ソースは GitHub にあります。",
     "version": "バージョン {{version}}",
     "donate": {

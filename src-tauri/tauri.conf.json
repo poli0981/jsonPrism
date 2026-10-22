@@ -42,7 +42,7 @@
     ],
     "category": "DeveloperTool",
     "shortDescription": "Disperse JSON into many formats",
-    "longDescription": "JSONPrism is a refracting tool for developers. It takes a single JSON input and disperses it into twelve formats — JSONL, CSV, TSV, YAML, XML, TOML, .NET RESX, Markdown table, SQL INSERT, BSON, CBOR and MessagePack — and parses most of them back, entirely on your machine.",
+    "longDescription": "JSONPrism is a refracting tool for developers. It takes a single JSON input and disperses it into twelve formats — JSONL, CSV, TSV, YAML, XML, TOML, .NET RESX, Markdown table, SQL INSERT, BSON, CBOR and MessagePack — and parses six of them back, entirely on your machine.",
     "copyright": "Copyright (c) 2026 poli0981",
     "publisher": "poli0981",
     "homepage": "https://jsonprism.poli0981.dev",
