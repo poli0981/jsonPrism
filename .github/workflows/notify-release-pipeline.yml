@@ -2,17 +2,16 @@ name: Notify Release Pipeline
 
 on:
   workflow_run:
-    # Subscribe only to release-pipeline workflows. The previous catch-all
-    # ("*") triggered this workflow on every completion (including CI and
-    # this workflow itself), most of which immediately skipped.
-    workflows: ["Release Tauri bundles", "Deploy to GitHub Pages"]
+    workflows: ["Release Tauri bundles"]
     types: [completed]
 
-permissions:
-  contents: read
-  actions: read
+permissions: {}
 
 jobs:
   notify:
-    uses: poli0981/.github/.github/workflows/notify-release-pipeline.yml@main
-    secrets: inherit
+    permissions:
+      contents: read
+      actions: read
+    uses: poli0981/.github/.github/workflows/notify-release-pipeline.yml@c3e118a01d40e95b36b2c3466dc206638c11eb5a # main 2026-07-06
+    secrets:
+      DISCORD_RELEASE_PIPELINE_WEBHOOK: ${{ secrets.DISCORD_RELEASE_PIPELINE_WEBHOOK }}

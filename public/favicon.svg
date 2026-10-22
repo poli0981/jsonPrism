@@ -1,8 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <style>
+    .ink { stroke: #f5f5f5; }
+    .body { fill: #0b0c14; }
+    @media (prefers-color-scheme: light) {
+      .ink { stroke: #14151f; }
+      .body { fill: #fbfbfe; }
+    }
+  </style>
   <!-- Incoming white ray -->
-  <line x1="2" y1="32" x2="22" y2="32" stroke="#f5f5f5" stroke-width="3" stroke-linecap="round" />
+  <line class="ink" x1="2" y1="32" x2="22" y2="32" stroke-width="3" stroke-linecap="round" />
   <!-- Prism triangle -->
-  <path d="M22 12 L46 32 L22 52 Z" fill="#0a0b14" stroke="#f5f5f5" stroke-width="2.5" stroke-linejoin="round" />
+  <path class="ink body" d="M22 12 L46 32 L22 52 Z" stroke-width="2.5" stroke-linejoin="round" />
   <!-- Dispersed rays -->
   <line x1="46" y1="32" x2="62" y2="20" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" />
   <line x1="46" y1="32" x2="62" y2="28" stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round" />

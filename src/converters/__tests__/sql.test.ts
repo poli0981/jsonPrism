@@ -90,9 +90,9 @@ describe('inferSqlType', () => {
     expect(inferSqlType(3.14, 'postgres')).toBe('DOUBLE PRECISION');
   });
 
-  it('infers VARCHAR(255) for strings in mysql/mssql, TEXT elsewhere', () => {
+  it('infers VARCHAR(255) for mysql, NVARCHAR(255) for mssql, TEXT elsewhere', () => {
     expect(inferSqlType('s', 'mysql')).toBe('VARCHAR(255)');
-    expect(inferSqlType('s', 'mssql')).toBe('VARCHAR(255)');
+    expect(inferSqlType('s', 'mssql')).toBe('NVARCHAR(255)');
     expect(inferSqlType('s', 'postgres')).toBe('TEXT');
     expect(inferSqlType('s', 'sqlite')).toBe('TEXT');
   });

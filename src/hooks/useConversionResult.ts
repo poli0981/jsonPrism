@@ -1,85 +1,133 @@
-import { useMemo } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Direction } from '@/components/converter/DirectionToggle';
-import { getConverter } from '@/converters/registry';
-import type { FormatId } from '@/converters/types';
-import { parseJsonInput } from '@/lib/detect';
+import type { Direction, FormatId } from '@/converters/types';
+import { convertLive, SupersededError, WORKER_THRESHOLD_CHARS } from '@/lib/convert-client';
+import { runConversion, type ConversionRequest, type TimedOutcome } from '@/lib/conversion';
+import type { JsonShape } from '@/lib/detect';
+import { errorMessage } from '@/lib/errors';
 
+export interface ConversionView {
+  output: string;
+  inputError: string | null;
+  inputErrorLine: number | null;
+  inputErrorColumn: number | null;
+  outputError: string | null;
+  shape: JsonShape | null;
+  /** Wall time of the parse + convert, in ms. */
+  ms: number | null;
+  outputBytes: number;
+  precisionLoss: boolean;
+  /** A newer result is on its way (worker running or typing in progress). */
+  pending: boolean;
+}
+
+const EMPTY: ConversionView = {
+  output: '',
+  inputError: null,
+  inputErrorLine: null,
+  inputErrorColumn: null,
+  outputError: null,
+  shape: null,
+  ms: null,
+  outputBytes: 0,
+  precisionLoss: false,
+  pending: false,
+};
+
+/** Large inputs wait for a short pause in typing before converting off-thread. */
+const LARGE_INPUT_DEBOUNCE_MS = 200;
+
+/**
+ * Converts the editor input as the user types.
+ *
+ * - `useDeferredValue` keeps keystrokes responsive: React renders the typed
+ *   text first and converts at lower priority.
+ * - Inputs ≥ {@link WORKER_THRESHOLD_CHARS} convert in a Web Worker; the last
+ *   result stays on screen (marked `pending`) until the new one arrives.
+ * - Small inputs convert synchronously for instant feedback.
+ */
 export function useConversionResult(
   input: string,
   format: FormatId,
   direction: Direction,
   options: Record<string, unknown>,
-) {
+): ConversionView {
   const { t } = useTranslation();
+  const deferredInput = useDeferredValue(input);
+  const large = deferredInput.length >= WORKER_THRESHOLD_CHARS;
+
+  const request = useMemo<ConversionRequest>(
+    () => ({ text: deferredInput, format, direction, options }),
+    [deferredInput, format, direction, options],
+  );
+
+  const syncResult = useMemo(() => (large ? null : runConversion(request)), [large, request]);
+
+  const [asyncState, setAsyncState] = useState<{
+    request: ConversionRequest;
+    result: TimedOutcome | { failure: string };
+  } | null>(null);
+
+  useEffect(() => {
+    if (!large) return;
+    let active = true;
+    const timer = setTimeout(() => {
+      convertLive(request).then(
+        (result) => {
+          if (active) setAsyncState({ request, result });
+        },
+        (err: unknown) => {
+          if (active && !(err instanceof SupersededError)) {
+            setAsyncState({ request, result: { failure: errorMessage(err) } });
+          }
+        },
+      );
+    }, LARGE_INPUT_DEBOUNCE_MS);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [large, request]);
 
   return useMemo(() => {
-    const start = performance.now();
-    if (!input.trim()) {
-      return { output: '', inputError: null, outputError: null, shape: null, parseMs: null };
-    }
-    const converter = getConverter(format);
-    if (!converter.meta.ready) {
+    const typing = input !== deferredInput;
+    const latest = large ? asyncState?.result : syncResult;
+    const pending = typing || (large && asyncState?.request !== request);
+    if (!latest) return { ...EMPTY, pending };
+    if ('failure' in latest) {
       return {
-        output: '',
-        inputError: null,
-        outputError: t('errors.converter_not_ready_phase', { phase: converter.meta.phase }),
-        shape: null,
-        parseMs: performance.now() - start,
+        ...EMPTY,
+        outputError: t('errors.conversion_failed', { message: latest.failure }),
+        pending,
       };
     }
-
-    if (direction === 'reverse') {
-      if (typeof converter.reverse !== 'function') {
+    const { outcome, ms } = latest;
+    switch (outcome.kind) {
+      case 'empty':
+        return { ...EMPTY, pending };
+      case 'no-reverse':
+        return { ...EMPTY, outputError: t('format_status.no_reverse'), ms, pending };
+      case 'input-error':
         return {
-          output: '',
-          inputError: null,
-          outputError: t('format_status.no_reverse'),
-          shape: null,
-          parseMs: performance.now() - start,
+          ...EMPTY,
+          inputError: outcome.message,
+          inputErrorLine: outcome.line ?? null,
+          inputErrorColumn: outcome.column ?? null,
+          ms,
+          pending,
         };
-      }
-      const result = converter.reverse(
-        { text: input },
-        options as Parameters<typeof converter.reverse>[1],
-      );
-      const ms = performance.now() - start;
-      return result.ok
-        ? { output: result.output, inputError: null, outputError: null, shape: null, parseMs: ms }
-        : { output: '', inputError: result.error, outputError: null, shape: null, parseMs: ms };
+      case 'output-error':
+        return { ...EMPTY, outputError: outcome.message, shape: outcome.shape, ms, pending };
+      case 'ok':
+        return {
+          ...EMPTY,
+          output: outcome.output,
+          shape: outcome.shape,
+          ms,
+          outputBytes: outcome.outputBytes,
+          precisionLoss: outcome.precisionLoss,
+          pending,
+        };
     }
-
-    const parsed = parseJsonInput(input);
-    if (!parsed.ok) {
-      const msg = parsed.error === 'empty' ? null : parsed.error;
-      return {
-        output: '',
-        inputError: msg,
-        outputError: null,
-        shape: null,
-        parseMs: performance.now() - start,
-      };
-    }
-    const result = converter.convert(
-      { data: parsed.value, rawText: input },
-      options as Parameters<typeof converter.convert>[1],
-    );
-    const ms = performance.now() - start;
-    if (result.ok) {
-      return {
-        output: result.output,
-        inputError: null,
-        outputError: null,
-        shape: parsed.shape,
-        parseMs: ms,
-      };
-    }
-    return {
-      output: '',
-      inputError: null,
-      outputError: result.error,
-      shape: parsed.shape,
-      parseMs: ms,
-    };
-  }, [input, format, options, direction, t]);
+  }, [asyncState, deferredInput, input, large, request, syncResult, t]);
 }

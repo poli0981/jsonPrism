@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
+    /* src/test/setup.ts swaps in Node's Blob for jsdom. */
+    "types": ["node"]
+  },
+  "include": [
+    "src/vite-env.d.ts",
+    "src/**/__tests__/*",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/test/*"
+  ],
+  "exclude": []
+}

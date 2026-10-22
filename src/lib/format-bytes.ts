@@ -1,5 +1,10 @@
+const KIB = 1024;
+const MIB = KIB * 1024;
+
 export function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+  if (bytes < KIB) return `${bytes} B`;
+  // Round before picking the unit, or the last bytes below 1 MiB print as "1024.0 KB".
+  const kib = (bytes / KIB).toFixed(1);
+  if (Number(kib) < 1024) return `${kib} KB`;
+  return `${(bytes / MIB).toFixed(2)} MB`;
 }

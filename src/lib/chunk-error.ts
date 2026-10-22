@@ -2,7 +2,7 @@
 // fetched — typically a stale deploy (hashed filename gone) or a dropped network
 // mid-navigation.
 const CHUNK_ERROR_RE =
-  /Loading chunk|Loading CSS chunk|dynamically imported module|Failed to fetch dynamically imported module|error loading dynamically imported module|importing a module script failed/i;
+  /Loading chunk|Loading CSS chunk|Unable to preload CSS|dynamically imported module|Failed to fetch dynamically imported module|error loading dynamically imported module|importing a module script failed/i;
 
 export function isChunkLoadError(error: unknown): boolean {
   if (!error) return false;

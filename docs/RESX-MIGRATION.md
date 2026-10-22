@@ -95,7 +95,7 @@ You now have flat objects like:
 2. Drop or paste `strings.en.flat.json` into the input panel
 3. The format picker highlights **RESX** (a flat object is its native shape)
 4. Click **RESX**
-5. (Optional) Open the settings panel — enable **Sort entries alphabetically** if you want stable diffs
+5. (Optional) Open the settings panel — enable **Sort entries alphabetically** if you want stable diffs (ordinal order, so the result is the same on every machine)
 6. Click **Download** → you get `output.resx`
 7. Rename to match your .NET project convention, e.g. `Strings.resx` or `Resources.resx`
 
@@ -154,16 +154,27 @@ Change the comment key in the settings panel if your convention is different (e.
 ## Round-trip safety notes
 
 - **Special characters**: `&`, `<`, `>` are XML-escaped automatically in values; `"` is also escaped in `name=` attributes. You don't need to pre-escape.
-- **Whitespace**: `<data>` elements get `xml:space="preserve"`, so leading/trailing spaces in values survive.
+- **Line endings**: a carriage return is written as `&#xD;`, so CRLF text survives a round trip (XML parsers would otherwise turn CRLF into LF). In `name=` attributes, tabs and line breaks are encoded as well.
+- **Control characters**: characters XML 1.0 cannot carry at all (C0 controls other than tab, LF and CR, plus U+FFFE / U+FFFF) are replaced with U+FFFD.
+- **Whitespace**: `<data>` elements get `xml:space="preserve"`, so leading/trailing spaces in values survive — in both directions.
 - **Empty values**: `null` and `undefined` in JSON become empty `<value></value>` elements.
 - **Numbers and booleans**: coerced to their string representation (`true`, `false`, `42`). If you want explicit nullability, wrap in a string in your source JSON.
-- **Schema header**: JSONPrism emits the standard RESX 2.0 schema. Visual Studio expects this — leave the **Include xsd:schema header** option on unless you're diffing manually.
+- **Schema header**: JSONPrism emits the standard RESX 2.0 schema. Visual Studio expects this — leave the **Include xsd:schema header** option on unless you're diffing manually. Turning it off drops only the `xsd:schema` block: the four `<resheader>` entries (`resmimetype`, `version`, `reader`, `writer`) are always written, because `ResXResourceReader` needs them.
 
 ---
 
 ## Reverse direction (RESX → JSON)
 
-JSONPrism doesn't do this — it's a one-way "JSON → many formats" tool. If you need RESX → JSON for round-tripping, the simplest path is a small .NET console app using `ResXResourceReader`:
+JSONPrism converts RESX back to JSON (since v1.1.0). Switch the direction toggle to **→ JSON**, pick **RESX**, then paste or open a `.resx` — or drop several `.resx` files into the batch panel to get a `.zip` of `.json` files.
+
+- Each `<data name="…">` becomes a key, and its `<value>` the string value.
+- An entry with a `<comment>` becomes `{ "value": "…", "_comment": "…" }`, using the comment key from the settings panel — the same shape the forward direction accepts.
+- Values always stay strings: `"007"`, `"1.10"` and padded text come back exactly as written. (Before 2.0.0, `"007"` came back as the number `7`.)
+- `&#xD;` is decoded back to a carriage return, so CRLF text round-trips.
+- The input must be well-formed XML with a `<root>` element; otherwise you get an error with its line and column. Files that declare a `<!DOCTYPE>` are rejected: RESX never uses one, and refusing it rules out entity-expansion ("billion laughs") documents.
+- `<resheader>`, `<metadata>` and `<assembly>` elements and the `type` / `mimetype` attributes are ignored, so typed (non-string) resources come back as their raw `<value>` text.
+
+If you need typed resources resolved, or want to script the conversion outside JSONPrism, a small .NET console app using `ResXResourceReader` does it:
 
 ```csharp
 using System.Resources;
@@ -209,11 +220,11 @@ jobs:
             node scripts/flatten.mjs "$f" "$f.flat"
           done
       # Then either:
-      # a) use a CLI build of JSONPrism (Phase 4 idea), or
+      # a) use a CLI build of JSONPrism (a "Beyond" idea in docs/ROADMAP.md), or
       # b) commit the .flat.json and have a separate workflow open JSONPrism manually
 ```
 
-A CLI version of JSONPrism is on the "Beyond Phase 3" wishlist in `docs/ROADMAP.md`. Until then, batch through the web/desktop UI manually when locales change.
+A CLI version of JSONPrism is on the "Beyond" wishlist in `docs/ROADMAP.md`. Until then, batch through the web/desktop UI manually when locales change.
 
 ---
 

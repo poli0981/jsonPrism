@@ -1,28 +1,30 @@
 import js from '@eslint/js';
+import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 
-export default tseslint.config(
-  { ignores: ['dist', 'node_modules', 'src/components/ui/**', 'src-tauri/**'] },
+export default defineConfig([
+  globalIgnores([
+    '.claude/**',
+    '.idea/**',
+    'dist',
+    'coverage',
+    '.wrangler',
+    'node_modules',
+    'src/components/ui/**',
+    'src-tauri/**',
+    'worker-configuration.d.ts',
+  ]),
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
+    extends: [js.configs.recommended, tseslint.configs.recommended],
     languageOptions: {
-      ecmaVersion: 2022,
+      ecmaVersion: 'latest',
       globals: globals.browser,
     },
-    plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
-    },
     rules: {
-      ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
       '@typescript-eslint/no-unused-vars': [
         'warn',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
@@ -33,4 +35,24 @@ export default tseslint.config(
       ],
     },
   },
-);
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    extends: [reactHooks.configs.flat.recommended, reactRefresh.configs.vite],
+    rules: {
+      // All diagnostics go through src/lib/logger.ts.
+      'no-console': 'warn',
+    },
+  },
+  {
+    files: ['src/lib/logger.ts'],
+    rules: { 'no-console': 'off' },
+  },
+  {
+    files: ['worker/**/*.ts'],
+    languageOptions: { globals: globals.serviceworker },
+  },
+  {
+    files: ['vite.config.ts', 'vitest.config.ts', 'eslint.config.js'],
+    languageOptions: { globals: globals.node },
+  },
+]);

@@ -1,10 +1,19 @@
-import { encode } from 'cbor-x';
+// The no-eval build: the default entry calls `new Function` at load, which a
+// strict Content-Security-Policy blocks.
+import { Encoder } from 'cbor-x/index-no-eval';
 import type { Converter } from './types';
 import { encodeBytes, type Encoding } from '@/lib/bytes';
+import { errorMessage } from '@/lib/errors';
 
 interface CborOptions {
   encoding: Encoding;
 }
+
+// `variableMapSize` writes the shortest map-length header (deterministic,
+// spec-preferred CBOR) instead of cbor-x's fixed 16-bit placeholder.
+// `useRecords: false` matters: a bare `new Encoder()` emits cbor-x's private
+// record extension (tag 0xdfff) that other CBOR decoders can't read.
+const encoder = new Encoder({ variableMapSize: true, useRecords: false });
 
 export const cborConverter: Converter<CborOptions> = {
   meta: {
@@ -31,10 +40,10 @@ export const cborConverter: Converter<CborOptions> = {
   ],
   convert({ data }, opts) {
     try {
-      const bytes = encode(data);
+      const bytes = encoder.encode(data);
       return { ok: true, output: encodeBytes(bytes, opts.encoding) };
     } catch (err) {
-      return { ok: false, error: (err as Error).message };
+      return { ok: false, error: errorMessage(err) };
     }
   },
 };

@@ -1,6 +1,9 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { ChunkErrorFallback } from '@/components/common/ChunkErrorFallback';
 import { isChunkLoadError } from '@/lib/chunk-error';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('chunk');
 
 interface Props {
   children: ReactNode;
@@ -25,7 +28,7 @@ export class ChunkErrorBoundary extends Component<Props, State> {
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
     if (isChunkLoadError(error)) {
-      console.error('JSONPrism chunk-load error:', error, info);
+      log.error('Chunk failed to load:', error, info.componentStack ?? '');
     }
   }
 

@@ -10,8 +10,8 @@ vi hỗ trợ chung của Tauri).
 
 | Thành phần | Chi tiết |
 |---|---|
-| **OS** | Windows 11 Pro 25H2 Insider Preview (Dev Channel) |
-| **Build** | 26300.8376 |
+| **OS** | Windows 11 Pro Insider Preview (Dev Channel) |
+| **Build** | 29648.1000 |
 | **CPU** | Intel Core i7-14700KF |
 | **GPU** | NVIDIA GeForce RTX 5080 (16 GB VRAM) |
 | **RAM** | 32 GB DDR5 |
@@ -20,7 +20,8 @@ vi hỗ trợ chung của Tauri).
 
 ## Thiết bị di động / kiểm tra web
 
-Dùng để kiểm tra bản web (chủ yếu là deploy lên GitHub Pages) trên thiết bị cảm ứng:
+Dùng để kiểm tra bản web (chủ yếu là trang production
+https://jsonprism.poli0981.dev) trên thiết bị cảm ứng:
 
 - iPhone 14 Pro — iOS 26.x — Chrome, Brave
 - iPhone 13 Pro Max — iOS 26.x — Chrome, Brave

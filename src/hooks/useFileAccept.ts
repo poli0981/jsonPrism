@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
-import type { Direction } from '@/components/converter/DirectionToggle';
-import { getConverter } from '@/converters/registry';
-import type { FormatId } from '@/converters/types';
+import { extensionsFor, getConverter } from '@/converters/registry';
+import type { Direction, FormatId } from '@/converters/types';
 import { getAllowedExtensions } from '@/lib/file-filter';
 
 export interface FileAccept {
@@ -19,24 +18,18 @@ export function useFileAccept(format: FormatId, direction: Direction): FileAccep
   const isReverse = direction === 'reverse';
   const converter = getConverter(format);
 
-  const accept = useMemo<Record<string, string[]>>(() => {
-    if (isReverse) {
-      return {
-        [converter.meta.mimeType]: [`.${converter.meta.extension}`],
-        'text/plain': ['.txt'],
-      };
-    }
-    return { 'application/json': ['.json'], 'text/plain': ['.txt'] };
-  }, [isReverse, converter.meta.mimeType, converter.meta.extension]);
-
-  const fileInputAccept = isReverse
-    ? `.${converter.meta.extension},.txt,${converter.meta.mimeType}`
-    : '.json,.txt,application/json';
-
-  const allowedExtensions = useMemo(
-    () => getAllowedExtensions(isReverse ? 'reverse' : 'forward', converter.meta.extension),
-    [isReverse, converter.meta.extension],
-  );
-
-  return { converter, isReverse, accept, fileInputAccept, allowedExtensions };
+  return useMemo(() => {
+    const allowedExtensions = getAllowedExtensions(direction, extensionsFor(format));
+    const dotted = allowedExtensions.map((ext) => `.${ext}`);
+    const accept: Record<string, string[]> = isReverse
+      ? {
+          [converter.meta.mimeType]: dotted.filter((e) => e !== '.txt'),
+          'text/plain': ['.txt'],
+        }
+      : { 'application/json': ['.json'], 'text/plain': ['.txt'] };
+    const fileInputAccept = isReverse
+      ? [...dotted, converter.meta.mimeType].join(',')
+      : '.json,.txt,application/json';
+    return { converter, isReverse, accept, fileInputAccept, allowedExtensions };
+  }, [converter, direction, format, isReverse]);
 }

@@ -1,65 +1,83 @@
 version: 2
 
-# Dependency update schedule for JSONPrism.
-# Groups minor + patch bumps together to reduce PR churn; majors get their
-# own PR so they can be evaluated individually.
+# Weekly updates, grouped by package family so a family's majors land together:
+# a lone `eslint` major once left `npm ci` broken on main for four months.
+# A cooldown skips releases younger than a few days (security updates are exempt).
 
 updates:
-  # npm ecosystem (root package.json + lockfile)
   - package-ecosystem: npm
-    directory: "/"
+    directory: /
     schedule:
       interval: weekly
       day: monday
-      time: "08:00"
+      time: '08:00'
       timezone: Asia/Ho_Chi_Minh
     open-pull-requests-limit: 10
     versioning-strategy: increase
-    labels:
-      - dependencies
-      - npm
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
+    labels: [dependencies, npm]
+    ignore:
+      # `typescript` is an alias for the TypeScript 6 API that typescript-eslint
+      # needs; the compiler itself is TypeScript 7 (`@typescript/native`).
+      - dependency-name: typescript
+        versions: ['>=6.1.0']
+      # @types/node follows the Node major in .nvmrc.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
     groups:
+      eslint:
+        patterns: [eslint, '@eslint/*', typescript-eslint, 'eslint-plugin-*', globals]
+      test:
+        patterns: [vitest, '@vitest/*', jsdom, '@testing-library/*']
+      react:
+        patterns: [react, react-dom, '@types/react', '@types/react-dom', '@vitejs/plugin-react']
+      build:
+        patterns: [vite, tailwindcss, '@tailwindcss/*', tw-animate-css, prettier, 'prettier-plugin-*', knip]
+      i18n:
+        patterns: [i18next, react-i18next]
+      tauri:
+        patterns: ['@tauri-apps/*']
+      codemirror:
+        patterns: ['@codemirror/*', '@uiw/*', '@lezer/*']
+      radix:
+        patterns: ['@radix-ui/*']
+      cloudflare:
+        patterns: [wrangler, '@cloudflare/*', '@marsidev/react-turnstile']
       npm-minor-patch:
-        applies-to: version-updates
-        update-types:
-          - minor
-          - patch
+        update-types: [minor, patch]
 
-  # GitHub Actions used in .github/workflows/
   - package-ecosystem: github-actions
-    directory: "/"
+    directory: /
     schedule:
       interval: weekly
       day: monday
-      time: "08:00"
+      time: '08:00'
       timezone: Asia/Ho_Chi_Minh
     open-pull-requests-limit: 5
-    labels:
-      - dependencies
-      - github-actions
+    cooldown:
+      default-days: 3
+    labels: [dependencies, github-actions]
     groups:
-      actions-minor-patch:
-        applies-to: version-updates
-        update-types:
-          - minor
-          - patch
+      actions:
+        patterns: ['*']
 
-  # Cargo ecosystem for the Tauri shell.
+  # The Tauri shell. Keep the crate versions in step with the @tauri-apps npm packages.
   - package-ecosystem: cargo
-    directory: "/src-tauri"
+    directory: /src-tauri
     schedule:
       interval: weekly
       day: monday
-      time: "08:00"
+      time: '08:00'
       timezone: Asia/Ho_Chi_Minh
     open-pull-requests-limit: 5
-    labels:
-      - dependencies
-      - rust
-      - tauri
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
+    labels: [dependencies, rust, tauri]
     groups:
+      tauri:
+        patterns: ['tauri', 'tauri-*']
       cargo-minor-patch:
-        applies-to: version-updates
-        update-types:
-          - minor
-          - patch
+        update-types: [minor, patch]

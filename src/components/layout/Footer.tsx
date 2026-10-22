@@ -5,12 +5,10 @@ export function Footer() {
   const { t } = useTranslation();
 
   return (
-    <footer className="border-border/60 text-muted-foreground border-t px-6 py-6 text-xs">
-      <div className="mx-auto flex max-w-screen-2xl flex-col items-center justify-between gap-3 sm:flex-row sm:gap-2">
-        <div>
-          <span className="font-mono">JSONPrism</span> · v{__APP_VERSION__} · Apache-2.0
-        </div>
-        <div className="flex items-center gap-2">
+    <footer className="border-border/70 text-muted-foreground border-t px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-xs">
+      <div className="mx-auto flex max-w-screen-2xl flex-col items-center justify-between gap-2 sm:flex-row">
+        <div className="font-mono">JSONPrism · v{__APP_VERSION__} · Apache-2.0</div>
+        <div className="flex items-center gap-1">
           <SocialLink
             href="https://discord.gg/2aNR3aVt"
             label={t('social.discord')}
@@ -28,14 +26,14 @@ export function Footer() {
           />
         </div>
         <div className="flex items-center gap-1.5">
-          <span>Built by</span>
+          <span>{t('footer.built_by')}</span>
           <a
             href="https://github.com/poli0981"
             target="_blank"
             rel="noreferrer"
             className="hover:text-foreground underline-offset-4 hover:underline"
           >
-            poli0981
+            poli0981 (Kokone)
           </a>
         </div>
       </div>
@@ -57,7 +55,7 @@ function SocialLink({ href, label, icon }: SocialLinkProps) {
       rel="noreferrer"
       aria-label={label}
       title={label}
-      className="hover:text-foreground inline-flex h-7 w-7 items-center justify-center rounded transition"
+      className="hover:text-foreground hover:bg-muted inline-flex h-8 w-8 items-center justify-center rounded-md transition motion-safe:hover:-translate-y-px"
     >
       {icon}
     </a>

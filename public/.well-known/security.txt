@@ -1,0 +1,7 @@
+# Security contact for JSONPrism (RFC 9116). Policy: SECURITY.md.
+Contact: https://github.com/poli0981/jsonPrism/security/advisories/new
+Contact: mailto:security@poli0981.dev
+Expires: 2027-10-01T00:00:00.000Z
+Preferred-Languages: en, vi
+Canonical: https://jsonprism.poli0981.dev/.well-known/security.txt
+Policy: https://github.com/poli0981/jsonPrism/blob/main/SECURITY.md

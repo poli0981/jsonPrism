@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import { Toaster as SonnerToaster, type ToasterProps } from 'sonner';
 import { useTheme } from '@/lib/theme';
 
 export function Toaster(props: ToasterProps) {
   const { resolvedTheme } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <SonnerToaster
@@ -10,6 +12,7 @@ export function Toaster(props: ToasterProps) {
       position="bottom-right"
       richColors
       closeButton
+      containerAriaLabel={t('common.notifications')}
       toastOptions={{
         classNames: {
           toast:

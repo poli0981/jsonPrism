@@ -8,18 +8,18 @@
  *  - any value → YAML/XML
  */
 
+import { errorMessage } from './errors';
+import { hasUnsafeInteger } from './json';
+
 export type JsonShape =
-  | 'unknown'
-  | 'scalar'
-  | 'object'
-  | 'array'
-  | 'flat-object'
-  | 'array-of-objects';
+  'unknown' | 'scalar' | 'object' | 'array' | 'flat-object' | 'array-of-objects';
 
 export interface ParseSuccess {
   ok: true;
   value: unknown;
   shape: JsonShape;
+  /** Integer literals beyond ±2^53 were rounded by JSON.parse. */
+  precisionLoss: boolean;
 }
 
 export interface ParseFailure {
@@ -32,18 +32,24 @@ export interface ParseFailure {
 export type ParseResult = ParseSuccess | ParseFailure;
 
 export function parseJsonInput(text: string): ParseResult {
-  const trimmed = text.trim();
-  if (!trimmed) return { ok: false, error: 'empty' };
+  if (!text.trim()) return { ok: false, error: 'empty' };
+  // JSON.parse rejects a byte-order mark; swap it for a space so error
+  // positions still line up with the editor.
+  const source = text.charCodeAt(0) === 0xfeff ? ' ' + text.slice(1) : text;
   try {
-    const value: unknown = JSON.parse(trimmed);
-    return { ok: true, value, shape: detectShape(value) };
+    const value: unknown = JSON.parse(source);
+    return {
+      ok: true,
+      value,
+      shape: detectShape(value),
+      precisionLoss: hasUnsafeInteger(source),
+    };
   } catch (err) {
-    const msg = (err as Error).message;
-    const pos = parsePosition(msg, trimmed);
-    if (pos !== null) {
-      return { ok: false, error: msg, line: pos.line, column: pos.column };
-    }
-    return { ok: false, error: msg };
+    const msg = errorMessage(err);
+    const pos = errorPosition(msg, source);
+    return pos === null
+      ? { ok: false, error: msg }
+      : { ok: false, error: msg, line: pos.line, column: pos.column };
   }
 }
 
@@ -65,20 +71,171 @@ export function detectShape(value: unknown): JsonShape {
   return 'object';
 }
 
-function parsePosition(message: string, text: string): { line: number; column: number } | null {
-  const match = /position\s+(\d+)/i.exec(message);
-  if (!match) return null;
-  const pos = Number.parseInt(match[1]!, 10);
-  if (!Number.isFinite(pos)) return null;
+/**
+ * Line/column (1-based) of a JSON syntax error. Engines disagree on the
+ * message format — V8 says "at position N (line L column C)", Firefox says
+ * "at line L column C", WebKit (Safari, Tauri on macOS/Linux) says nothing —
+ * so fall back to scanning the text ourselves.
+ */
+export function errorPosition(
+  message: string,
+  text: string,
+): { line: number; column: number } | null {
+  const lineCol = /line\s+(\d+)\s+column\s+(\d+)/i.exec(message);
+  if (lineCol) {
+    return { line: Number(lineCol[1]), column: Number(lineCol[2]) };
+  }
+  // "position N" must not be matched inside the JSON snippet V8 echoes in quotes.
+  const position = /(?:^|[^"'])\bposition\s+(\d+)/i.exec(message.replace(/"[^"]*"/g, '""'));
+  const offset = position ? Number(position[1]) : findSyntaxErrorOffset(text);
+  if (offset < 0 || !Number.isFinite(offset)) return null;
+  return offsetToLineColumn(text, offset);
+}
+
+function offsetToLineColumn(text: string, offset: number): { line: number; column: number } {
   let line = 1;
-  let col = 1;
-  for (let i = 0; i < pos && i < text.length; i++) {
-    if (text[i] === '\n') {
+  let column = 1;
+  const end = Math.min(offset, text.length);
+  for (let i = 0; i < end; i++) {
+    if (text.charCodeAt(i) === 10) {
       line++;
-      col = 1;
+      column = 1;
     } else {
-      col++;
+      column++;
     }
   }
-  return { line, column: col };
+  return { line, column };
+}
+
+const NUMBER_RE = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/;
+const ESCAPABLE = '"\\/bfnrt';
+
+/**
+ * Offset of the first JSON syntax error, or -1 if the text is valid (or too
+ * deeply nested to scan). Only runs on the failure path.
+ */
+export function findSyntaxErrorOffset(text: string): number {
+  let i = 0;
+  const n = text.length;
+
+  class Stop {
+    readonly offset: number;
+    constructor(offset: number) {
+      this.offset = offset;
+    }
+  }
+  const fail = (): never => {
+    throw new Stop(i);
+  };
+  const skipWhitespace = () => {
+    while (i < n) {
+      const c = text.charCodeAt(i);
+      if (c === 32 || c === 9 || c === 10 || c === 13) i++;
+      else break;
+    }
+  };
+  const parseString = () => {
+    i++; // opening quote
+    while (i < n) {
+      const c = text.charCodeAt(i);
+      if (c === 34) {
+        i++;
+        return;
+      }
+      if (c === 92) {
+        i++;
+        const e = text[i];
+        if (e === 'u') {
+          if (!/^[0-9a-fA-F]{4}$/.test(text.slice(i + 1, i + 5))) fail();
+          i += 5;
+          continue;
+        }
+        if (e === undefined || !ESCAPABLE.includes(e)) fail();
+        i++;
+        continue;
+      }
+      if (c < 0x20) fail();
+      i++;
+    }
+    fail();
+  };
+  const parseValue = (): void => {
+    skipWhitespace();
+    if (i >= n) fail();
+    const c = text[i]!;
+    if (c === '{') {
+      i++;
+      skipWhitespace();
+      if (text[i] === '}') {
+        i++;
+        return;
+      }
+      for (;;) {
+        skipWhitespace();
+        if (text[i] !== '"') fail();
+        parseString();
+        skipWhitespace();
+        if (text[i] !== ':') fail();
+        i++;
+        parseValue();
+        skipWhitespace();
+        if (text[i] === ',') {
+          i++;
+          continue;
+        }
+        if (text[i] === '}') {
+          i++;
+          return;
+        }
+        fail();
+      }
+    }
+    if (c === '[') {
+      i++;
+      skipWhitespace();
+      if (text[i] === ']') {
+        i++;
+        return;
+      }
+      for (;;) {
+        parseValue();
+        skipWhitespace();
+        if (text[i] === ',') {
+          i++;
+          continue;
+        }
+        if (text[i] === ']') {
+          i++;
+          return;
+        }
+        fail();
+      }
+    }
+    if (c === '"') {
+      parseString();
+      return;
+    }
+    if (c === '-' || (c >= '0' && c <= '9')) {
+      const m = NUMBER_RE.exec(text.slice(i, i + 512));
+      if (!m) fail();
+      i += m![0].length;
+      return;
+    }
+    for (const literal of ['true', 'false', 'null']) {
+      if (text.startsWith(literal, i)) {
+        i += literal.length;
+        return;
+      }
+    }
+    fail();
+  };
+
+  try {
+    parseValue();
+    skipWhitespace();
+    if (i < n) fail();
+    return -1;
+  } catch (err) {
+    return err instanceof Stop ? err.offset : -1; // RangeError on absurd nesting
+  }
 }

@@ -1,0 +1,3 @@
+# Copy to .dev.vars for `npm run cf:dev` / `npm run preview:cf`.
+# Cloudflare's documented always-pass test secret; real secrets live in the dashboard.
+TURNSTILE_SECRET=1x0000000000000000000000000000000AA

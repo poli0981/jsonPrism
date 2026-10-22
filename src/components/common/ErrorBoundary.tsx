@@ -1,5 +1,8 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { ErrorState, errorActionPrimary } from '@/components/common/ErrorState';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('error-boundary');
 
 interface Props {
   children: ReactNode;
@@ -19,7 +22,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
-    console.error('JSONPrism error boundary caught:', error, info);
+    log.error(error, info.componentStack ?? '');
   }
 
   override render(): ReactNode {

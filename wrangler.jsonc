@@ -1,0 +1,64 @@
+// Cloudflare Worker for https://jsonprism.poli0981.dev
+//
+// Workers Builds (configured in the Cloudflare dashboard) runs
+// `npx wrangler deploy` on every push to `main`; the "build" section below runs
+// `npm run build` first. The Worker serves the Vite build from ./dist as static
+// assets (SPA fallback to index.html) and only runs code for /api/* — today
+// the Turnstile verification endpoint and a health check.
+//
+// Secrets (set in the dashboard, never committed):
+//   TURNSTILE_SECRET  — Turnstile widget secret for jsonprism.poli0981.dev
+// Local development: copy .dev.vars.example to .dev.vars (uses Cloudflare's
+// always-pass test secret).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "jsonprism",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-19",
+  // Build before every deploy, versions upload and dev session, so Workers Builds
+  // works whether or not a build command is set in the dashboard.
+  "build": { "command": "npm run build" },
+  "workers_dev": false,
+  "routes": [{ "pattern": "jsonprism.poli0981.dev", "custom_domain": true }],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "vars": {
+    // Comma-separated hostnames a Turnstile token may have been issued on.
+    "ALLOWED_HOSTNAMES": "jsonprism.poli0981.dev"
+  },
+  "ratelimits": [
+    {
+      // Per-IP throttle for /api/turnstile/verify.
+      "name": "VERIFY_LIMITER",
+      "namespace_id": "4201",
+      "simple": { "limit": 30, "period": 60 }
+    }
+  ],
+  // Workers Builds runs `npx wrangler preview` for non-production branches.
+  // Previews inherit no vars or bindings, so they are declared again here:
+  // a separate rate-limit counter, and no hostnames for the human check —
+  // previews get no TURNSTILE_SECRET either, so the check reports
+  // "unavailable" and lets testers continue. Web Analytics only loads on the
+  // production hostname.
+  "previews": {
+    "vars": {
+      "ALLOWED_HOSTNAMES": ""
+    },
+    "ratelimits": [
+      {
+        "name": "VERIFY_LIMITER",
+        "namespace_id": "4202",
+        "simple": { "limit": 30, "period": 60 }
+      }
+    ]
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "upload_source_maps": false
+}

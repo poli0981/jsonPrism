@@ -1,13 +1,13 @@
 {
   "app": {
-    "name": "JSONPrism",
-    "tagline": "Disperse JSON into many formats",
-    "description": "One JSON input. Multi-target formats. Fully in your browser."
+    "description": "One JSON input, twelve formats — and back. Conversion runs on your device."
   },
   "nav": {
     "home": "Convert",
     "about": "About",
-    "github": "GitHub"
+    "github": "GitHub",
+    "label": "Main",
+    "home_brand": "JSONPrism home"
   },
   "home": {
     "input_label": "Input JSON",
@@ -19,17 +19,21 @@
     "output_label": "Output",
     "output_empty": "Output will appear here once you provide valid JSON.",
     "output_empty_format": "Output will appear here once you provide valid {{ext}}.",
-    "drop_zone": "Drop JSON files here",
     "drop_zone_active": "Drop to load",
-    "drop_zone_hint": "Up to 500 files. Everything runs in your browser — nothing leaves your device.",
+    "drop_zone_hint": "Up to 500 files at once. Files and text are converted on your device and never uploaded.",
     "load_sample": "Sample",
     "open_file": "Open",
     "clear": "Clear",
     "format_picker_label": "Target format",
-    "convert": "Convert",
     "copy": "Copy",
     "download": "Download",
-    "options": "Options"
+    "options": "Options",
+    "kicker": "JSON → 12 formats · and back",
+    "title_accent": "Disperse",
+    "title_rest": "JSON.",
+    "copied": "Copied",
+    "error_position": "Ln {{line}}, Col {{column}}",
+    "output_aria": "{{format}} output (read-only)"
   },
   "formats": {
     "jsonl": "JSONL",
@@ -48,7 +52,7 @@
   "format_status": {
     "ready": "Ready",
     "suggested": "Suggested for the detected shape",
-    "planned": "Coming in Phase {{phase}}",
+    "not_suggested": "Not suggested for the detected shape",
     "no_reverse": "Reverse parse not supported for this format"
   },
   "direction": {
@@ -71,7 +75,9 @@
       "nested_strategy": "Nested values",
       "nested_strategy_desc": "How to handle nested objects/arrays inside cells.",
       "nested_json": "JSON-stringify",
-      "nested_flatten": "Flatten keys (alpha)"
+      "nested_flatten": "Flatten keys (alpha)",
+      "escape_formulae": "Protect against formula injection",
+      "escape_formulae_desc": "Prefix cells starting with = + - @ with ' so spreadsheet apps don't run them as formulas. Changes the data, so it's off by default."
     },
     "yaml": {
       "indent": "Indent (spaces)",
@@ -90,7 +96,11 @@
     },
     "toml": {
       "sort_keys": "Sort keys alphabetically",
-      "sort_keys_desc": "Recursive — applies at every nesting level. Useful for stable diffs."
+      "sort_keys_desc": "Recursive — applies at every nesting level. Useful for stable diffs.",
+      "null_handling": "Null values",
+      "null_handling_desc": "TOML has no null. Omit drops null keys and array items; Error stops and shows where the null is.",
+      "null_omit": "Omit",
+      "null_error": "Error"
     },
     "markdown": {
       "alignment": "Column alignment",
@@ -114,13 +124,14 @@
       "chunk_size": "Chunk size",
       "chunk_size_desc": "Maximum rows per INSERT when multi-row is on.",
       "include_create": "Include CREATE TABLE",
-      "include_create_desc": "Infer column types from the first row and emit a CREATE TABLE statement."
+      "include_create_desc": "Infer column types from every row and emit a CREATE TABLE statement.",
+      "table_name_desc": "Use schema.table for a qualified name (e.g. dbo.Users)."
     },
     "resx": {
       "comment_key": "Comment key",
       "comment_key_desc": "When an entry is shaped as { value, _comment }, this key supplies the <comment> element.",
       "include_schema": "Include xsd:schema header",
-      "include_schema_desc": "Visual Studio expects this. Disable only if you're generating diffs.",
+      "include_schema_desc": "Visual Studio expects this. The required resheader entries are always written.",
       "sort_keys": "Sort entries alphabetically",
       "sort_keys_desc": "Useful for stable diffs across locale files."
     },
@@ -150,15 +161,23 @@
     "array": "array",
     "flat-object": "flat object",
     "array-of-objects": "array of objects",
-    "unknown": "unknown"
+    "unknown": "unknown",
+    "detected_value": "Detected: {{shape}}"
   },
   "status": {
     "in": "in",
     "out": "out",
-    "time": "parse"
+    "state": {
+      "idle": "idle",
+      "working": "working",
+      "ok": "ok",
+      "error": "error"
+    },
+    "time_value": "{{ms}} ms",
+    "precision": "precision loss",
+    "precision_hint": "Integers beyond ±2^53 can't be represented exactly in JSON numbers and were rounded. Quote them as strings to keep every digit."
   },
   "shortcut": {
-    "clear": "Clear",
     "download": "Download",
     "settings": "Settings"
   },
@@ -166,7 +185,7 @@
     "title": "Options",
     "description": "Adjust how this format is generated. Settings persist per format.",
     "no_options": "No options for this format yet.",
-    "no_options_long": "This converter doesn't expose any options yet. Once Phase 2 lands, you'll find dialect, indent, and other knobs here.",
+    "no_options_long": "This converter doesn't have any options.",
     "reset": "Reset to defaults"
   },
   "toast": {
@@ -177,30 +196,31 @@
     "files_loaded": "{{count}} file loaded",
     "files_loaded_other": "{{count}} files loaded",
     "file_failed": "Failed to load file: {{message}}",
-    "options_reset": "Options reset to defaults"
+    "options_reset": "Options reset to defaults",
+    "download_failed": "Download failed: {{message}}"
   },
   "batch": {
     "trigger": "Batch",
     "title": "Batch queue",
-    "description": "Process multiple {{from}} files into {{to}} at once. All processing happens in your browser.",
-    "drop_idle": "Drop JSON files here",
+    "description": "Process multiple {{from}} files into {{to}} at once. All processing happens on your device.",
     "drop_idle_format": "Drop {{format}} files here",
     "drop_active": "Release to add files",
     "browse": "or click to browse…",
-    "empty": "No files queued yet. Drop JSON files above to begin.",
     "empty_format": "No files queued yet. Drop {{format}} files above to begin.",
     "stat": {
       "queued": "queued",
       "done": "done",
-      "failed": "failed"
+      "failed": "failed",
+      "processing": "processing",
+      "error": "failed"
     },
     "process": "Process",
     "cancel": "Cancel",
     "clear": "Clear",
     "download_zip": "Download .zip",
     "row": {
-      "out": "out",
-      "remove": "Remove from queue"
+      "remove": "Remove {{name}} from queue",
+      "out_value": "out: {{size}}"
     },
     "toast": {
       "added": "Added {{count}} file to the queue",
@@ -220,6 +240,12 @@
       "zipped_other": "Packed {{count}} files into a .zip",
       "zip_failed": "Could not build .zip: {{message}}",
       "nothing_to_process": "Nothing queued to process."
+    },
+    "queue_label": "Batch queue",
+    "error": {
+      "empty_file": "The file is empty.",
+      "no_reverse": "This format can't be converted back to JSON.",
+      "read_failed": "Couldn't read or convert this file."
     }
   },
   "theme": {
@@ -228,25 +254,16 @@
     "system": "System"
   },
   "errors": {
-    "invalid_json": "Invalid JSON: {{message}}",
-    "empty_input": "Input is empty.",
-    "converter_not_ready": "This converter is not implemented yet.",
-    "converter_not_ready_phase": "This converter lands in Phase {{phase}}. See the roadmap for status.",
-    "batch_limit": "Batch limit reached ({{max}} files). Remove some files first.",
-    "unknown": "Something went wrong. {{message}}"
+    "conversion_failed": "Conversion failed: {{message}}"
   },
   "error_page": {
-    "generic": {
-      "title": "Something went wrong",
-      "message": "An unexpected error occurred. Try reloading the page."
+    "403": {
+      "title": "Forbidden",
+      "message": "You don't have permission to view this."
     },
     "404": {
       "title": "Page not found",
       "message": "The prism only refracts what's here — this route doesn't exist."
-    },
-    "403": {
-      "title": "Forbidden",
-      "message": "You don't have permission to view this."
     },
     "419": {
       "title": "Session expired",
@@ -256,9 +273,12 @@
       "title": "Server error",
       "message": "Something broke on the way back. Try again in a moment."
     },
+    "generic": {
+      "title": "Something went wrong",
+      "message": "An unexpected error occurred. Try reloading the page."
+    },
     "offline": {
-      "title": "You're offline",
-      "message": "You're offline — JSONPrism keeps working; only web fonts may not load."
+      "message": "You're offline — JSONPrism keeps working; conversion never needs the network."
     },
     "chunk": {
       "title": "Couldn't load part of the app",
@@ -266,15 +286,14 @@
     },
     "actions": {
       "home": "Back to Convert",
-      "reload": "Reload",
-      "retry": "Retry"
+      "reload": "Reload"
     }
   },
   "about": {
     "title": "About JSONPrism",
     "lead": "A refracting tool for developers.",
-    "p1": "JSONPrism takes a single JSON input and disperses it into many target formats — like white light through a prism. Everything runs client-side, so your data never leaves your device.",
-    "p2": "Built with React 19, Vite 8, Tailwind CSS v4, and shadcn/ui. Source on GitHub.",
+    "p1": "JSONPrism takes a single JSON input and disperses it into many target formats — like white light through a prism — and parses six of them back. Conversion runs entirely on your device, so the data you paste or drop never leaves it.",
+    "p2": "Built with React 19, TypeScript 7, Vite 8, Tailwind CSS v4 and shadcn/ui. The web version is served by Cloudflare Workers; the desktop and Android apps are built with Tauri 2. Source on GitHub.",
     "version": "Version {{version}}",
     "donate": {
       "title": "Support the project",
@@ -304,36 +323,61 @@
       "build": "Build & tooling",
       "tauri": "Desktop (Tauri)",
       "i18n": "Internationalization",
-      "see_full_list": "See the full list →"
+      "see_full_list": "See the full list →",
+      "web": "Web (Cloudflare)"
     },
     "build": {
       "title": "Build info",
       "version": "Version",
       "commit": "Commit",
-      "date": "Built on"
+      "date": "Built on",
+      "platform": "Platform",
+      "platform_web": "Web",
+      "platform_desktop": "Desktop app",
+      "platform_android": "Android app",
+      "copy_diagnostics": "Copy diagnostics",
+      "diagnostics_copied": "Diagnostics copied — paste them into your bug report."
     },
     "links": {
       "title": "Links",
       "repo": "Source code",
       "issues": "Report a bug",
       "discussions": "Discussions",
-      "demo": "Live demo",
-      "license": "License (Apache 2.0)"
+      "demo": "Web app",
+      "license": "License (Apache 2.0)",
+      "releases": "Releases & downloads"
     },
     "disclaimer": {
       "title": "Disclaimer",
       "body": "JSONPrism is a one-person, AI-assisted project. No warranty. Translations are AI-generated. See DISCLAIMER.md for details."
+    },
+    "kicker": "About",
+    "privacy": {
+      "title": "Your data",
+      "web": "Conversion happens in your browser; files and text you paste are never uploaded. This website is hosted on Cloudflare, uses Turnstile for a quick human check, and counts anonymous page views with Cloudflare Web Analytics (no cookies) unless you turn it off under Appearance.",
+      "desktop": "This desktop app works fully offline: no analytics, no human check, and no network requests except links you open yourself.",
+      "android": "This Android app works fully offline: no analytics, no human check, and no network requests except links you open yourself.",
+      "read_policy": "Read the full Privacy Policy →"
+    },
+    "contact": {
+      "title": "Contact",
+      "lead": "For bugs and feature ideas, GitHub Issues is fastest. For private matters, write to:",
+      "code": "Project & conduct",
+      "security": "Security reports",
+      "privacy": "Privacy requests",
+      "legal": "Legal & licensing",
+      "sponsor": "Sponsorship"
     }
   },
   "common": {
     "loading": "Loading…",
-    "error": "Error",
-    "retry": "Retry",
-    "scroll_to_top": "Back to top"
+    "scroll_to_top": "Back to top",
+    "close": "Close",
+    "notifications": "Notifications"
   },
   "consent": {
     "title": "Before you start",
-    "intro": "JSONPrism runs entirely on your device — your data never leaves it. Please review and accept the terms:",
+    "intro": "JSONPrism converts everything on your device — the files and text you work with never leave it. Please review and accept the terms:",
     "agree": "I have read and agree to the License, Terms (EULA), Privacy Policy, and Disclaimer.",
     "continue": "Continue",
     "links": {
@@ -341,17 +385,65 @@
       "terms": "Terms (EULA)",
       "privacy": "Privacy Policy",
       "disclaimer": "Disclaimer"
-    }
-  },
-  "disclaimer": {
-    "translation": "Non-English translations are AI-generated. Accuracy is not guaranteed."
+    },
+    "web_services": "On this website, Cloudflare hosts the app, runs a quick human check (Turnstile) and — unless you turn it off under Appearance — counts anonymous page views (Web Analytics, no cookies). The desktop and Android apps use none of these."
   },
   "social": {
     "discord": "Discord",
     "x": "X (Twitter)",
-    "bluesky": "Bluesky",
-    "mastodon": "Mastodon",
-    "telegram": "Telegram",
-    "youtube": "YouTube"
+    "bluesky": "Bluesky"
+  },
+  "file_dialog": {
+    "json": "JSON",
+    "text": "Text",
+    "zip": "Zip archive"
+  },
+  "footer": {
+    "built_by": "Built by"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "theme": "Theme",
+    "display": "Display & privacy",
+    "hide_scrollbars": "Hide scrollbars",
+    "analytics": "Anonymous usage analytics",
+    "analytics_hint": "Cloudflare Web Analytics, no cookies. Turning it off applies from your next visit."
+  },
+  "human_check": {
+    "title": "Quick check",
+    "recheck_intro": "Cloudflare Turnstile confirms you're human about once a week. It usually takes a second.",
+    "loading": "Checking that you're human…",
+    "verifying": "Verifying…",
+    "verified": "Verified — thanks!",
+    "rejected": "Verification failed. Please try the check again.",
+    "unavailable": "The human check is unavailable right now.",
+    "unavailable_hint": "This happens offline or when a blocker stops Cloudflare. JSONPrism converts on your device, so you can continue.",
+    "continue_anyway": "Continue without the check"
+  },
+  "editor": {
+    "phrases": {
+      "find": "Find",
+      "replace": "Replace",
+      "next": "next",
+      "previous": "previous",
+      "all": "all",
+      "match_case": "match case",
+      "regexp": "regexp",
+      "by_word": "by word",
+      "replace_one": "replace",
+      "replace_all": "replace all",
+      "close": "close",
+      "go_to_line": "Go to line",
+      "go": "go",
+      "fold_line": "Fold line",
+      "unfold_line": "Unfold line",
+      "folded_code": "folded code",
+      "unfold": "unfold",
+      "diagnostics": "Diagnostics",
+      "no_diagnostics": "No diagnostics"
+    }
   }
 }

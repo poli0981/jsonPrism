@@ -4,16 +4,16 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  JSONPrism — "Prism Spectrum" theme
-  Editorial-meets-technical: deep midnight backdrop, off-white foreground,
-  three signature accents (violet / cyan / amber) inspired by light dispersion.
+  JSONPrism — "Prism Spectrum" theme, technical edition (v2)
+  Blueprint grid backdrop, hairline borders, mono labels, and four spectral
+  accents (violet / cyan / amber / rose) that split light the way the app
+  splits JSON. Every color is a token — no hex outside this file.
 */
 
 @theme inline {
-  /* Fonts — self-hosted via @fontsource (imported in src/main.tsx).
-     Family names match the @fontsource packages: variable fonts expose the
-     "… Variable" family; the static Instrument Serif keeps its plain name. */
-  --font-display: 'Instrument Serif', ui-serif, Georgia, serif;
+  /* Fonts — self-hosted via @fontsource (imported in src/main.tsx). Geist has
+     a Vietnamese subset, so headings render in one face in every locale. */
+  --font-display: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, sans-serif;
   --font-mono:
     'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
@@ -35,62 +35,136 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* Prism signature spectrum */
-  --color-prism-violet: oklch(0.74 0.18 290);
-  --color-prism-cyan: oklch(0.82 0.13 200);
-  --color-prism-amber: oklch(0.82 0.16 80);
-  --color-prism-rose: oklch(0.74 0.18 5);
+  /* Prism signature spectrum — per theme so text stays legible in light mode */
+  --color-prism-violet: var(--prism-violet);
+  --color-prism-cyan: var(--prism-cyan);
+  --color-prism-amber: var(--prism-amber);
+  --color-prism-rose: var(--prism-rose);
 
   --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+
+  /* Motion — only ever used behind `motion-safe:` */
+  --animate-nudge: nudge 0.6s ease-in-out;
+  --animate-bob: bob 1s ease-in-out infinite;
+  --animate-pop: pop 0.25s ease-out;
+  --animate-refract: refract 0.45s ease-out;
+  --animate-pulse-dot: pulse-dot 1.6s ease-in-out infinite;
+
+  @keyframes nudge {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(3px);
+    }
+  }
+  @keyframes bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-3px);
+    }
+  }
+  @keyframes pop {
+    0% {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes refract {
+    0% {
+      transform: rotate(-180deg) scale(0.8);
+      opacity: 0.4;
+    }
+    100% {
+      transform: rotate(0) scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
 }
 
 /* ---- Light theme ---- */
 :root {
-  --background: oklch(0.99 0.005 270);
-  --foreground: oklch(0.18 0.02 270);
+  color-scheme: light;
+
+  --background: oklch(0.985 0.004 270);
+  --foreground: oklch(0.2 0.02 270);
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 270);
+  --card-foreground: oklch(0.2 0.02 270);
 
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.02 270);
+  --popover-foreground: oklch(0.2 0.02 270);
 
-  --primary: oklch(0.55 0.18 290); /* violet */
+  --primary: oklch(0.52 0.2 290); /* violet */
   --primary-foreground: oklch(0.99 0 0);
 
   --secondary: oklch(0.95 0.01 270);
   --secondary-foreground: oklch(0.22 0.02 270);
 
-  --muted: oklch(0.96 0.005 270);
-  --muted-foreground: oklch(0.48 0.02 270);
+  --muted: oklch(0.955 0.006 270);
+  --muted-foreground: oklch(0.45 0.02 270);
 
   --accent: oklch(0.94 0.03 200); /* cyan tint */
   --accent-foreground: oklch(0.22 0.02 270);
 
-  --destructive: oklch(0.62 0.22 25);
+  --destructive: oklch(0.55 0.21 25);
   --destructive-foreground: oklch(0.99 0 0);
+  --success: oklch(0.5 0.13 150);
+  --warning: oklch(0.55 0.13 65);
 
-  --border: oklch(0.9 0.01 270);
-  --input: oklch(0.9 0.01 270);
-  --ring: oklch(0.55 0.18 290);
+  --border: oklch(0.89 0.01 270);
+  --input: oklch(0.89 0.01 270);
+  --ring: oklch(0.52 0.2 290);
+
+  /* Darker spectrum for white surfaces (≥ 4.5:1 as text) */
+  --prism-violet: oklch(0.52 0.2 290);
+  --prism-cyan: oklch(0.52 0.11 220);
+  --prism-amber: oklch(0.55 0.13 65);
+  --prism-rose: oklch(0.55 0.2 10);
+
+  --grid-line: oklch(0.45 0.03 270 / 0.07);
+  --tick: oklch(0.45 0.03 270 / 0.45);
+  --sb-thumb: oklch(0.45 0.02 270 / 0.35);
+  --sb-thumb-hover: oklch(0.45 0.02 270 / 0.6);
 }
 
-/* ---- Dark theme (default) ---- */
+/* ---- Dark theme ---- */
 .dark {
+  color-scheme: dark;
+
   --background: oklch(0.13 0.015 270);
   --foreground: oklch(0.96 0.005 270);
 
   --card: oklch(0.16 0.018 270);
   --card-foreground: oklch(0.96 0.005 270);
 
-  --popover: oklch(0.16 0.018 270);
+  --popover: oklch(0.17 0.018 270);
   --popover-foreground: oklch(0.96 0.005 270);
 
   --primary: oklch(0.78 0.16 290); /* brighter violet on dark */
@@ -100,17 +174,29 @@
   --secondary-foreground: oklch(0.96 0.005 270);
 
   --muted: oklch(0.2 0.018 270);
-  --muted-foreground: oklch(0.7 0.015 270);
+  --muted-foreground: oklch(0.72 0.015 270);
 
   --accent: oklch(0.24 0.05 210);
   --accent-foreground: oklch(0.96 0.005 270);
 
-  --destructive: oklch(0.65 0.22 25);
-  --destructive-foreground: oklch(0.96 0.005 270);
+  --destructive: oklch(0.68 0.2 25);
+  --destructive-foreground: oklch(0.13 0.015 270);
+  --success: oklch(0.78 0.15 150);
+  --warning: oklch(0.82 0.15 80);
 
-  --border: oklch(0.26 0.02 270);
-  --input: oklch(0.22 0.02 270);
+  --border: oklch(0.27 0.02 270);
+  --input: oklch(0.24 0.02 270);
   --ring: oklch(0.78 0.16 290);
+
+  --prism-violet: oklch(0.74 0.18 290);
+  --prism-cyan: oklch(0.82 0.13 200);
+  --prism-amber: oklch(0.82 0.16 80);
+  --prism-rose: oklch(0.74 0.18 5);
+
+  --grid-line: oklch(0.9 0.02 270 / 0.045);
+  --tick: oklch(0.9 0.02 270 / 0.35);
+  --sb-thumb: oklch(0.72 0.015 270 / 0.3);
+  --sb-thumb-hover: oklch(0.72 0.015 270 / 0.55);
 }
 
 @layer base {
@@ -130,11 +216,12 @@
   }
 
   ::selection {
-    background: var(--color-prism-violet);
-    color: var(--background);
+    background: color-mix(in oklch, var(--color-prism-violet) 35%, transparent);
+    color: var(--foreground);
   }
 
-  /* Atmospheric backdrop — barely-there mesh gradient + grain */
+  /* Blueprint backdrop — a 24px grid fading out from the top, plus a faint
+     violet glow. Fixed and non-interactive. */
   body::before {
     content: '';
     position: fixed;
@@ -143,22 +230,19 @@
     z-index: -1;
     background:
       radial-gradient(
-        ellipse 80% 50% at 20% 0%,
-        color-mix(in oklch, var(--color-prism-violet) 8%, transparent),
-        transparent 60%
+        ellipse 70% 40% at 50% 0%,
+        color-mix(in oklch, var(--color-prism-violet) 9%, transparent),
+        transparent 70%
       ),
-      radial-gradient(
-        ellipse 60% 50% at 100% 100%,
-        color-mix(in oklch, var(--color-prism-cyan) 6%, transparent),
-        transparent 60%
-      );
+      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 24px 24px,
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 24px 24px;
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 35%, transparent 90%);
   }
 
   h1,
   h2,
   h3 {
     @apply font-display tracking-tight;
-    font-feature-settings: 'liga', 'dlig';
   }
 
   code,
@@ -166,18 +250,105 @@
   kbd {
     @apply font-mono;
   }
-}
 
-@layer utilities {
-  /* Hide native scrollbars on internal panels while preserving scroll. */
-  .scrollbar-hide {
-    scrollbar-width: none; /* Firefox + modern Chromium */
-    -ms-overflow-style: none; /* legacy Edge */
+  /* ---- Scrollbars ----
+     Thin, themed scrollbars everywhere (standard properties for Chromium and
+     Firefox; ::-webkit-scrollbar for Safari, WKWebView and WebKitGTK, which
+     only Chromium ignores once scrollbar-color is set). */
+  html {
+    scrollbar-color: var(--sb-thumb) transparent;
   }
-  .scrollbar-hide::-webkit-scrollbar {
+  * {
+    scrollbar-width: thin;
+  }
+  @supports not (scrollbar-color: auto) {
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--sb-thumb);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--sb-thumb-hover);
+    }
+  }
+
+  /* "Hide scrollbars" preference (Appearance menu). Content still scrolls by
+     wheel, touch and keyboard; scroll containers stay focusable. */
+  [data-scrollbars='hidden'],
+  [data-scrollbars='hidden'] * {
+    scrollbar-width: none;
+  }
+  [data-scrollbars='hidden'] ::-webkit-scrollbar {
     display: none;
   }
 
+  /* Respect the OS "reduce motion" setting everywhere, including tw-animate-css. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Uppercase mono section label: "INPUT · JSON" */
+  .label-mono {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+
+  /* Hairline corner ticks, like registration marks on a drawing sheet. */
+  .corner-ticks {
+    position: relative;
+  }
+  .corner-ticks::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    pointer-events: none;
+    border-radius: inherit;
+    background:
+      linear-gradient(var(--tick) 0 0) top left / 10px 1px no-repeat,
+      linear-gradient(var(--tick) 0 0) top left / 1px 10px no-repeat,
+      linear-gradient(var(--tick) 0 0) top right / 10px 1px no-repeat,
+      linear-gradient(var(--tick) 0 0) top right / 1px 10px no-repeat,
+      linear-gradient(var(--tick) 0 0) bottom left / 10px 1px no-repeat,
+      linear-gradient(var(--tick) 0 0) bottom left / 1px 10px no-repeat,
+      linear-gradient(var(--tick) 0 0) bottom right / 10px 1px no-repeat,
+      linear-gradient(var(--tick) 0 0) bottom right / 1px 10px no-repeat;
+  }
+
+  .kbd {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: var(--radius-sm);
+    background: var(--muted);
+    padding: 0 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    line-height: 1.1rem;
+    color: var(--foreground);
+  }
+}
+
+@layer utilities {
   .text-spectrum {
     background: linear-gradient(
       90deg,
@@ -191,15 +362,14 @@
     color: transparent;
   }
 
-  .border-spectrum {
-    border-image: linear-gradient(
-        90deg,
-        var(--color-prism-violet),
-        var(--color-prism-cyan),
-        var(--color-prism-amber),
-        var(--color-prism-rose)
-      )
-      1;
+  .bg-spectrum {
+    background: linear-gradient(
+      90deg,
+      var(--color-prism-violet),
+      var(--color-prism-cyan),
+      var(--color-prism-amber),
+      var(--color-prism-rose)
+    );
   }
 
   /* Expand the Sonner close-button hit-test radius for touch.

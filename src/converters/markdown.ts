@@ -1,4 +1,5 @@
 import type { Converter } from './types';
+import { errorMessage } from '@/lib/errors';
 
 type Alignment = 'left' | 'center' | 'right' | 'none';
 
@@ -12,6 +13,7 @@ export const markdownConverter: Converter<MarkdownOptions> = {
     id: 'markdown',
     labelKey: 'formats.markdown',
     extension: 'md',
+    altExtensions: ['markdown'],
     mimeType: 'text/markdown',
     phase: 2,
     ready: true,
@@ -54,7 +56,7 @@ export const markdownConverter: Converter<MarkdownOptions> = {
       if (row === null || typeof row !== 'object' || Array.isArray(row)) {
         return {
           ok: false,
-          error: `Row ${i} is not an object — Markdown table requires objects.`,
+          error: `Row ${i + 1} is not an object — Markdown table requires objects.`,
         };
       }
     }
@@ -70,18 +72,24 @@ export const markdownConverter: Converter<MarkdownOptions> = {
         }
       }
     }
+    if (keys.length === 0) {
+      return { ok: false, error: 'The rows have no keys, so there are no columns to build.' };
+    }
 
-    const headerCells = keys.map((k) => formatCell(k, opts.escapePipes));
-    const header = `| ${headerCells.join(' | ')} |`;
-    const sep = alignmentSeparator(opts.alignment);
-    const alignRow = `| ${keys.map(() => sep).join(' | ')} |`;
-    const dataRows = data.map((row) => {
-      const obj = row as Record<string, unknown>;
-      const cells = keys.map((k) => formatCell(obj[k], opts.escapePipes));
-      return `| ${cells.join(' | ')} |`;
-    });
-
-    return { ok: true, output: [header, alignRow, ...dataRows].join('\n') + '\n' };
+    try {
+      const headerCells = keys.map((k) => formatCell(k, opts.escapePipes));
+      const header = `| ${headerCells.join(' | ')} |`;
+      const sep = alignmentSeparator(opts.alignment);
+      const alignRow = `| ${keys.map(() => sep).join(' | ')} |`;
+      const dataRows = data.map((row) => {
+        const obj = row as Record<string, unknown>;
+        const cells = keys.map((k) => formatCell(obj[k], opts.escapePipes));
+        return `| ${cells.join(' | ')} |`;
+      });
+      return { ok: true, output: [header, alignRow, ...dataRows].join('\n') + '\n' };
+    } catch (err) {
+      return { ok: false, error: errorMessage(err) };
+    }
   },
 };
 
@@ -100,14 +108,9 @@ function alignmentSeparator(alignment: Alignment): string {
 
 function formatCell(value: unknown, escapePipes: boolean): string {
   if (value === undefined || value === null) return '';
-  let str: string;
-  if (typeof value === 'object') {
-    str = JSON.stringify(value);
-  } else {
-    str = String(value);
-  }
-  // GFM convention: line breaks inside cells become <br>.
-  str = str.replace(/\r?\n/g, '<br>');
+  let str = typeof value === 'object' ? JSON.stringify(value) : String(value);
+  // GFM convention: line breaks inside cells become <br> (CRLF, LF or lone CR).
+  str = str.replace(/\r\n|\r|\n/g, '<br>');
   if (escapePipes) {
     str = str.replace(/\|/g, '\\|');
   }

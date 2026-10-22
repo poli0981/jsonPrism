@@ -1,13 +1,18 @@
-import { zip } from 'fflate';
+import { Zip, ZipDeflate } from 'fflate';
 import { getConverter } from '@/converters/registry';
-import type { FormatId } from '@/converters/types';
-import { parseJsonInput } from './detect';
-import type { BatchItem } from '@/stores/batchStore';
-import type { Direction } from '@/components/converter/DirectionToggle';
+import type { Direction, FormatId } from '@/converters/types';
+import { decodeBytes, type Encoding } from './bytes';
+import { convertFile } from './convert-client';
+import type { ConversionOutcome } from './conversion';
+import { errorMessage } from './errors';
+import { createLogger } from './logger';
+import type { BatchItem, BatchErrorCode } from '@/stores/batchStore';
+
+const log = createLogger('batch');
 
 export interface ProcessingCallbacks {
   onUpdate(id: string, patch: Partial<BatchItem>): void;
-  /** Optional progress hook called after each item (for UI yield). */
+  /** Optional progress hook called after each item. */
   onProgress?(processed: number, total: number): void;
 }
 
@@ -22,109 +27,74 @@ function yieldToUI(): Promise<void> {
   });
 }
 
-async function readFileText(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result ?? ''));
-    reader.onerror = () => reject(new Error(`Cannot read ${file.name}`));
-    reader.readAsText(file);
-  });
+function errorPatch(errorCode: BatchErrorCode | undefined, error: string): Partial<BatchItem> {
+  return { status: 'error', error, ...(errorCode ? { errorCode } : {}) };
+}
+
+function patchFor(outcome: ConversionOutcome): Partial<BatchItem> {
+  switch (outcome.kind) {
+    case 'ok':
+      return { status: 'done', output: outcome.output, outputSize: outcome.outputBytes };
+    case 'empty':
+      return errorPatch('empty_file', 'Empty file.');
+    case 'no-reverse':
+      return errorPatch('no_reverse', 'This format has no reverse conversion.');
+    case 'input-error':
+    case 'output-error':
+      return errorPatch(undefined, outcome.message);
+  }
 }
 
 /**
  * Process a batch of queued items through the chosen converter.
  *
- * - Each item is read, parsed, converted, and reported back via callbacks
+ * - Each file is read and converted in the conversion worker (main thread as
+ *   a fallback) and reported back via callbacks
  * - Errors per item don't stop the rest
- * - Yields to the UI after every item
- * - Cooperatively cancellable via AbortSignal
+ * - Cooperatively cancellable via AbortSignal; an item interrupted mid-flight
+ *   goes back to `queued` so the next run picks it up again
  */
 export async function processBatch(
   items: BatchItem[],
   format: FormatId,
-  options: unknown,
+  options: Record<string, unknown>,
   callbacks: ProcessingCallbacks,
   signal: AbortSignal,
   direction: Direction = 'forward',
 ): Promise<void> {
   const converter = getConverter(format);
-  if (!converter.meta.ready) {
-    for (const item of items) {
-      callbacks.onUpdate(item.id, {
-        status: 'error',
-        error: `Converter "${format}" is not implemented yet.`,
-      });
-    }
-    return;
-  }
-
-  const isReverse = direction === 'reverse';
-  if (isReverse && typeof converter.reverse !== 'function') {
-    for (const item of items) {
-      callbacks.onUpdate(item.id, {
-        status: 'error',
-        error: `Converter "${format}" does not support reverse parsing.`,
-      });
-    }
+  if (direction === 'reverse' && typeof converter.reverse !== 'function') {
+    for (const item of items) callbacks.onUpdate(item.id, patchFor({ kind: 'no-reverse' }));
     return;
   }
 
   let processed = 0;
-
   for (const item of items) {
     if (signal.aborted) return;
-
     callbacks.onUpdate(item.id, { status: 'processing' });
 
+    let patch: Partial<BatchItem>;
     try {
-      const text = await readFileText(item.file);
-      if (signal.aborted) return;
-
-      if (isReverse) {
-        // Reverse mode: skip JSON parsing entirely — feed the raw text into
-        // the format's parser.
-        const result = converter.reverse!(
-          { text, sourceName: item.filename },
-          options as Parameters<NonNullable<typeof converter.reverse>>[1],
-        );
-        if (result.ok) {
-          const outputSize = new TextEncoder().encode(result.output).length;
-          callbacks.onUpdate(item.id, {
-            status: 'done',
-            output: result.output,
-            outputSize,
-          });
-        } else {
-          callbacks.onUpdate(item.id, { status: 'error', error: result.error });
-        }
-      } else {
-        const parsed = parseJsonInput(text);
-        if (!parsed.ok) {
-          callbacks.onUpdate(item.id, {
-            status: 'error',
-            error: parsed.error === 'empty' ? 'Empty file.' : parsed.error,
-          });
-        } else {
-          const result = converter.convert(
-            { data: parsed.value, rawText: text, sourceName: item.filename },
-            options as Parameters<typeof converter.convert>[1],
-          );
-          if (result.ok) {
-            const outputSize = new TextEncoder().encode(result.output).length;
-            callbacks.onUpdate(item.id, {
-              status: 'done',
-              output: result.output,
-              outputSize,
-            });
-          } else {
-            callbacks.onUpdate(item.id, { status: 'error', error: result.error });
-          }
-        }
-      }
+      const { outcome } = await convertFile(
+        item.file,
+        { format, direction, options, sourceName: item.filename },
+        signal,
+      );
+      patch = patchFor(outcome);
     } catch (err) {
-      callbacks.onUpdate(item.id, { status: 'error', error: (err as Error).message });
+      if (signal.aborted) {
+        callbacks.onUpdate(item.id, { status: 'queued' });
+        return;
+      }
+      log.warn(`Could not convert ${item.filename}:`, err);
+      patch = errorPatch('read_failed', errorMessage(err));
     }
 
+    if (signal.aborted) {
+      callbacks.onUpdate(item.id, { status: 'queued' });
+      return;
+    }
+    callbacks.onUpdate(item.id, patch);
     processed += 1;
     callbacks.onProgress?.(processed, items.length);
     await yieldToUI();
@@ -132,9 +102,8 @@ export async function processBatch(
 }
 
 /**
- * Strip the .json (or .txt) extension from a source filename and replace it
- * with the converter's output extension. Falls back to appending if there
- * is no extension to strip.
+ * Replace the source extension with the output extension. Falls back to
+ * appending if there is no extension to strip.
  */
 export function outputFilename(sourceName: string, outputExt: string): string {
   const dot = sourceName.lastIndexOf('.');
@@ -142,68 +111,85 @@ export function outputFilename(sourceName: string, outputExt: string): string {
   return `${base}.${outputExt}`;
 }
 
-/** De-duplicate filenames inside the zip by appending `_2`, `_3`, etc. */
+/**
+ * De-duplicate filenames inside the zip by appending `_2`, `_3`, etc. Checks
+ * every generated name against all names already used, so
+ * `['a.csv', 'a.csv', 'a_2.csv']` can't produce two `a_2.csv` entries.
+ */
 export function uniquifyFilenames(names: string[]): string[] {
-  const seen = new Map<string, number>();
-  const out: string[] = [];
-  for (const name of names) {
-    const count = seen.get(name) ?? 0;
-    if (count === 0) {
-      out.push(name);
-      seen.set(name, 1);
-    } else {
+  const used = new Set<string>();
+  const counters = new Map<string, number>();
+  const taken = (name: string) => used.has(name.toLowerCase());
+  return names.map((name) => {
+    let candidate = name;
+    if (taken(candidate)) {
       const dot = name.lastIndexOf('.');
       const base = dot > 0 ? name.slice(0, dot) : name;
       const ext = dot > 0 ? name.slice(dot) : '';
-      out.push(`${base}_${count + 1}${ext}`);
-      seen.set(name, count + 1);
+      let n = counters.get(name) ?? 1;
+      do {
+        n += 1;
+        candidate = `${base}_${n}${ext}`;
+      } while (taken(candidate));
+      counters.set(name, n);
     }
-  }
-  return out;
+    used.add(candidate.toLowerCase());
+    return candidate;
+  });
 }
 
-/** Bundle successful conversion outputs into a ZIP blob. */
+/**
+ * Bundle successful conversion outputs into a ZIP blob. Binary formats are
+ * decoded back to raw bytes so `.bson` / `.cbor` / `.msgpack` entries are real
+ * binary files, matching single-file downloads.
+ */
 export async function zipOutputs(
   items: BatchItem[],
   format: FormatId,
   direction: Direction = 'forward',
+  encoding: Encoding = 'base64',
 ): Promise<{ blob: Blob; fileCount: number }> {
   const converter = getConverter(format);
+  const isReverse = direction === 'reverse';
   // In reverse mode the outputs are JSON, so they get the .json extension
   // regardless of which source format the user dropped in.
-  const outputExt = direction === 'reverse' ? 'json' : converter.meta.extension;
+  const outputExt = isReverse ? 'json' : converter.meta.extension;
+  const binary = !isReverse && converter.meta.binary === true;
   const done = items.filter((i) => i.status === 'done' && i.output !== undefined);
-  const rawNames = done.map((i) => outputFilename(i.filename, outputExt));
-  const uniqueNames = uniquifyFilenames(rawNames);
+  const names = uniquifyFilenames(done.map((i) => outputFilename(i.filename, outputExt)));
 
-  const filesForZip: Record<string, Uint8Array> = {};
-  for (let i = 0; i < done.length; i++) {
-    const item = done[i]!;
-    const name = uniqueNames[i]!;
-    filesForZip[name] = new TextEncoder().encode(item.output!);
-  }
-
-  const zipped = await new Promise<Uint8Array>((resolve, reject) => {
-    zip(filesForZip, { level: 6 }, (err, data) => {
-      if (err) reject(err);
-      else resolve(data);
+  const chunks: Uint8Array[] = [];
+  const finished = new Promise<void>((resolve, reject) => {
+    const zip = new Zip((err, chunk, final) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      chunks.push(chunk);
+      if (final) resolve();
     });
+    const encoder = new TextEncoder();
+    void (async () => {
+      try {
+        for (let i = 0; i < done.length; i++) {
+          const output = done[i]!.output!;
+          const entry = new ZipDeflate(names[i]!, { level: 6 });
+          zip.add(entry);
+          entry.push(binary ? decodeBytes(output, encoding) : encoder.encode(output), true);
+          // Deflate runs synchronously per entry; let the UI breathe between files.
+          if (i % 8 === 7) await yieldToUI();
+        }
+        zip.end();
+      } catch (err) {
+        reject(err instanceof Error ? err : new Error(errorMessage(err)));
+      }
+    })();
   });
+  await finished;
 
-  // .slice() returns a fresh Uint8Array<ArrayBuffer> — narrows the BlobPart
-  // type so it satisfies the DOM lib's `ArrayBufferView<ArrayBuffer>` constraint.
   return {
-    blob: new Blob([zipped.slice()], { type: 'application/zip' }),
+    // fflate allocates plain ArrayBuffers; the cast avoids copying every chunk.
+    blob: new Blob(chunks as unknown as BlobPart[], { type: 'application/zip' }),
     fileCount: done.length,
   };
-}
-
-/** Trigger a browser download of a Blob. */
-export function downloadBlob(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
 }

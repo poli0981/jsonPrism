@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 import { House, RotateCw } from 'lucide-react';
 import {
   ErrorState,

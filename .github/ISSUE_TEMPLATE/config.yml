@@ -5,7 +5,7 @@ contact_links:
     about: Ask about usage, share workflows, or propose ideas before opening an issue.
   - name: Security vulnerability
     url: https://github.com/poli0981/jsonPrism/security/advisories/new
-    about: Report security issues privately via GitHub Security Advisory (not in public issues).
+    about: Report security issues privately via a GitHub Security Advisory, or email security@poli0981.dev. Never in a public issue.
   - name: Live demo
-    url: https://poli0981.github.io/jsonPrism/
+    url: https://jsonprism.poli0981.dev
     about: Try the latest deployed build in your browser before filing a bug.

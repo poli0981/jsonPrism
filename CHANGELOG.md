@@ -8,6 +8,80 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond".
 
+## [2.0.0] — 2026-10-22
+
+A new home, a hardened toolchain and a full audit. The web app moves to **<https://jsonprism.poli0981.dev>** on Cloudflare Workers; the old GitHub Pages address redirects there, keeping the path. Because the website now uses Cloudflare services, the Privacy Policy and Terms are at version 2.0 and **everyone is asked to accept them again** (`CONSENT_VERSION` 2).
+
+### Added
+
+- **Cloudflare Workers hosting.** `wrangler.jsonc` serves `dist/` as static assets with an SPA fallback on the custom domain; only `/api/*` runs Worker code (`worker/`). Cloudflare Workers Builds deploys every push to `main` and publishes a Worker Preview for other branches (`previews` block). New scripts: `cf:types`, `cf:check` (deploy dry run, also in CI) and `preview:cf` (`wrangler dev` on port 8787; `wrangler.jsonc` builds first). See `docs/DEPLOYMENT.md`.
+- **Edge security headers** in `public/_headers`: a strict CSP, HSTS, `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, COOP, and immutable caching for hashed assets. `public/_redirects` 301s the old `/jsonPrism/*` paths. Also new: `robots.txt`, `sitemap.xml`, `/.well-known/security.txt`, an Open Graph image and canonical URLs.
+- **Cloudflare Turnstile human check (web only).** Runs inside the Consent Gate and is verified server-side by `POST /api/turnstile/verify` (same-origin check, JSON only, 4 KB body cap, per-client rate limit, siteverify with retry and hostname/action/age checks, no visitor IP sent). A pass is remembered for 7 days. A rejected token keeps the gate closed; if Cloudflare cannot be reached the user may continue after a warning, since conversion never needs the network. `GET /api/health` reports Worker health.
+- **Cloudflare Web Analytics (web only, cookieless).** Loaded only on the production hostname, after consent, while the new Appearance toggle is on; it starts off when the browser sends Global Privacy Control.
+- **Appearance menu** replacing the theme toggle: light / dark / system theme, **hide scrollbars** (scrolling still works) and, on the web, the analytics switch. Custom thin scrollbars everywhere, including the editors.
+- **Web Worker conversion.** Inputs over 256 KB and every batch job convert off the main thread (`src/lib/convert-worker.ts`, `convert-client.ts`), with cancellation and a main-thread fallback only if the worker cannot load.
+- **Logging and diagnostics.** `src/lib/logger.ts` keeps the last 200 log lines in memory (never sent anywhere) and catches global errors; About → **Copy diagnostics** copies version, commit, platform and recent logs for bug reports.
+- **CSV `escapeFormulae` option** (off by default) that prefixes cells starting with `=`, `+`, `-`, `@`, a tab or a carriage return with `'`, so spreadsheet apps don't run them as formulas.
+- **Precision warning** when the input contains integers beyond 2^53, which JavaScript cannot represent exactly.
+- **Release integrity.** Releases include `SHA256SUMS.txt` and GitHub build-provenance attestations (`gh attestation verify`).
+- **Production smoke workflow** that waits for each merge to go live and checks headers, routing, redirects and the API.
+- Per-route page titles, build commit in the header and About page, and the Android-friendly `viewport-fit=cover` with safe-area padding.
+
+### Changed
+
+- **Toolchain.** Node.js 26 (`.nvmrc`, `engines >=26`). **TypeScript 7** native compiler (`@typescript/native` provides `tsc`; `typescript` is an alias for the TS 6 API that typescript-eslint still needs), target ES2025 while app code keeps the ES2023 library so the Android WebView 111 / macOS 12 floors hold. Separate tsconfigs for app, tests, config files and the Worker. Vite 8 `codeSplitting.groups` replaces the deprecated `advancedChunks`.
+- **Dependencies to current majors**: React 19.3, React Router 8 (`react-router` only), i18next 26 / react-i18next 17, js-yaml 5, lucide-react 1, tailwind-merge 3, react-dropzone 20, Vitest 5, jsdom 30, ESLint 10, eslint-plugin-react-hooks 7 (React Compiler rules), wrangler 4, Tauri 2.12. `npm audit` reports no vulnerabilities.
+- **"Technical" UI refresh, same layout.** Blueprint grid, mono labels, corner ticks, separate light and dark prism colours (light-theme text now meets 4.5:1 contrast), success/warning tokens, a terminal-style status bar (state, bytes in → out, time, encoding), animated icons behind `prefers-reduced-motion`, and headings in Geist (Instrument Serif lacked Vietnamese glyphs). Format chips that don't suit the detected shape get a dashed border instead of faded text. The theme is applied before first paint (`public/theme-init.js`), so there is no flash.
+- **Consent Gate.** Also shown on macOS and Linux desktop (only the Windows installer has its own license page); legal links point at the exact commit of the build; the app renders behind the gate instead of a blank page.
+- **Faster typing.** One layout rendered at a time, stable editor extensions (no reconfiguration per keystroke), deferred live conversion, a virtualised read-only CodeMirror for output, batched batch-progress updates and streaming ZIP creation.
+- **Tauri bundles carry no web-only code.** The analytics beacon and the Turnstile widget are compiled out of desktop and Android builds instead of only being switched off at runtime.
+- **Tauri permissions narrowed.** The static file scope is now Documents, Downloads and Desktop (previously all of `$HOME`); files you pick or drop are added at runtime. Dotfiles never match scope globs, unused permissions (`os`, `set-title`, `write-text-file`, message dialogs) are gone, and the app CSP adds `object-src 'none'`, `base-uri`, `form-action` and `frame-ancestors`. The version now comes from `package.json`; Android `versionCode` 20000 and `allowBackup="false"`.
+- **Keyboard shortcuts.** Ctrl/⌘+S downloads, Ctrl/⌘+, opens settings; Ctrl/⌘+K (clear) is removed because it hijacked the browser's search. Shortcuts ignore key repeat, IME composition and open dialogs.
+- **Internationalisation.** Japanese and Simplified Chinese gained 27 missing strings, unused keys were removed, remaining hard-coded strings (including CodeMirror's search and lint panels) are translated, and a test keeps the four locales in sync.
+- **CI and releases.** Actions pinned to commit SHAs, least-privilege permissions, `npm ci --ignore-scripts`, a TypeScript 7 guard, coverage, a Rust `fmt`/`clippy` job and SonarQube Cloud analysis. Releases check that the tag matches the app version, run the tests first, build into a single draft and name the APK `JSONPrism_<version>_android-universal.apk`. Notification workflows pass only the secrets they need to pinned reusable workflows, and GitHub Discussions no longer receive a post for every deploy. Dependabot groups related packages (majors included) and waits a few days before proposing new releases.
+- **Documentation and legal.** Privacy Policy and Terms 2.0, refreshed Disclaimer, Security policy (2.x supported, Worker and edge in scope), Code of Conduct, contributing guide, third-party notices, new `docs/DEPLOYMENT.md`, and project contacts at `@poli0981.dev`.
+
+### Fixed
+
+- **CSV** used only the first row's keys as columns, silently dropping fields that appeared later; columns are now the union across rows. Reverse parsing turns only canonical numbers into numbers (no more `007` → `7` or dates guessed), and keys like `__proto__` are stored safely.
+- **Batch ZIP** stored base64 text for BSON, CBOR and MessagePack; it now contains the real bytes. Pressing *Process* a second time no longer wipes earlier results, cancelling returns unfinished files to the queue, and duplicate output names are made unique case-insensitively.
+- **SQL INSERT**: MySQL string literals escape backslashes (a `\'` payload could break out of the string), MSSQL uses `N'…'` and `NVARCHAR`, `CREATE TABLE` types are inferred from all rows (`BIGINT`, `DECIMAL(38, 0)` for huge integers), dotted table names are quoted per part, and MSSQL batches are capped at its 1000-row limit.
+- **RESX** reverse keeps values such as `"007"` as strings, validates the XML and rejects `DOCTYPE`; output always includes the resheaders, encodes carriage returns and replaces characters XML cannot carry.
+- **XML** produced invalid documents for keys that are not valid element names; names are now sanitised (the original kept in a `key` attribute), nested arrays are wrapped, control characters replaced, root/item names validated and every result checked with a validator.
+- **BSON** documents over 16 MiB were silently truncated; they now return a clear error.
+- **YAML** `quoteStyle` had no effect; it works again with js-yaml 5. Alias and merge-key bombs are capped, and empty input reports an error instead of `undefined`.
+- **TOML** reports `null` values with their path (or omits them, by option), keeps integers beyond 2^53 exact and sorts keys deterministically.
+- **JSONL** tolerates a BOM and reports real line numbers, blank lines included.
+- **JSON errors** show the correct line and column in Chromium, Firefox and WebKit.
+- The editor inserted the text of dropped files itself, racing the file loader; file drops now go only to the drop zone. An empty editor is no longer flagged as invalid JSON, JSONL typed in the → JSON direction is checked line by line instead of being marked invalid, and a leading byte-order mark is accepted like the converter accepts it.
+- File sizes just under 1 MiB showed as "1024.0 KB".
+- **Download** and Ctrl/⌘+S reported success on Android without saving; desktop and Android now use the native save dialog.
+- Native open dialogs filter by conversion direction and accept `.yml`, `.ndjson` and `.markdown`; a drag-and-drop listener could leak when the component unmounted early.
+- Route errors now reset when you navigate away, and a stale tab that fails to load a chunk after a deploy reloads once instead of breaking.
+- Stored options and formats are validated, so corrupt `localStorage` can no longer crash the app; blocked storage is tolerated everywhere.
+- Accessibility: live regions for errors, status and batch progress; accessible names for the editors; `aria-pressed` on toggle groups; touch targets of at least 24 px; `<html lang>` follows the interface language.
+
+### Removed
+
+- The GitHub Pages deployment (`deploy.yml`, `public/404.html` and the SPA redirect script). Pages now serves only a redirect page (`pages-redirect.yml`, run by hand).
+- `react-router-dom`, `@fontsource/instrument-serif`, `@types/js-yaml` and the unused `os` plugin (`@tauri-apps/plugin-os`, `tauri-plugin-os`).
+
+### Security
+
+- Fixed the MySQL backslash escaping flaw in the SQL converter (see Fixed) and the XML/RESX output issues that could yield malformed documents.
+- Narrowed the desktop file-system scope and permissions, disabled Android backups and tightened both CSPs (see Changed).
+- Resolved the open npm Dependabot alerts by upgrading react-router, js-yaml, undici, postcss, smol-toml, brace-expansion, source-map-js and vitest.
+
+### Tests
+
+- **864 tests in 92 files** (up from 215), 97% line and 91% branch coverage: regression tests for every fix above, a contract test that feeds hostile input to every converter, component tests for the whole UI (Testing Library + user-event, with a fake Turnstile widget and Tauri IPC mocks), hook, store and storage tests, the Web Worker client, locale parity, and Worker tests for the verify endpoint and router. Vitest runs two projects (`app` in jsdom, `worker` in Node) and reports coverage to SonarQube Cloud, whose quality gate now passes.
+
+## [1.7.2] — 2026-06-16
+
+### Fixed
+
+- **External links open on Android.** Links tapped in the Android app — the Consent Gate's legal links, the footer and About links — did nothing: `@tauri-apps/plugin-shell`'s `open()` has no URL handler on Android and failed with "os error 2". `openExternal()` now uses `@tauri-apps/plugin-opener`'s `openUrl()`, which hands the URL to the system browser through `Intent.ACTION_VIEW`. The shell plugin, its capability and its npm package were removed. Verified on an Android 13 emulator. `bundle.android.versionCode` 10702.
+
 ## [1.7.1] — 2026-06-16
 
 ### Fixed

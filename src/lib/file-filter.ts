@@ -1,18 +1,19 @@
-export type FileFilterDirection = 'forward' | 'reverse';
+import type { Direction } from '@/converters/types';
 
 /**
  * Allowed file extensions for a given direction × format combo.
- * Forward: JSON-only input. Reverse: the format's native extension.
+ * Forward: JSON-only input. Reverse: the format's own extensions (canonical
+ * first, then aliases such as `yml` or `ndjson`).
  * `.txt` is always accepted as a freeform escape hatch.
  *
  * Returned extensions are lowercase, without the leading dot.
  */
 export function getAllowedExtensions(
-  direction: FileFilterDirection,
-  formatExtension: string,
+  direction: Direction,
+  formatExtensions: readonly string[],
 ): string[] {
   if (direction === 'reverse') {
-    return [formatExtension.toLowerCase(), 'txt'];
+    return [...new Set([...formatExtensions.map((e) => e.toLowerCase()), 'txt'])];
   }
   return ['json', 'txt'];
 }

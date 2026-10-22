@@ -1,8 +1,8 @@
-name: Announce Release / Deploy in Discussions
+name: Announce Release in Discussions
 
-# Create a Discussion post in the "Announcements" category when:
-#   • a GitHub Release is published (tag-based deploys)
-#   • the Deploy to GitHub Pages workflow finishes successfully
+# Create a Discussion post in the "Announcements" category when a GitHub
+# Release is published, or by hand. (Per-deploy posts were dropped: web deploys
+# now happen on every merge through Cloudflare Workers Builds.)
 #
 # Prerequisites (one-time manual setup):
 #   1. Enable Discussions in the repo Settings → Features.
@@ -16,9 +16,6 @@ name: Announce Release / Deploy in Discussions
 on:
   release:
     types: [published]
-  workflow_run:
-    workflows: ["Deploy to GitHub Pages"]
-    types: [completed]
   workflow_dispatch:
     inputs:
       message:
@@ -26,9 +23,7 @@ on:
         required: true
         type: string
 
-permissions:
-  contents: read
-  discussions: write
+permissions: {}
 
 concurrency:
   group: announce-discussion-${{ github.event_name }}
@@ -37,12 +32,10 @@ concurrency:
 jobs:
   announce:
     name: Create Discussion post
-    runs-on: ubuntu-latest
-    # Skip when triggered by a failed deploy.
-    if: >
-      github.event_name == 'release'
-      || github.event_name == 'workflow_dispatch'
-      || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      discussions: write
     timeout-minutes: 5
     steps:
       - name: Resolve repository + category IDs
@@ -82,8 +75,6 @@ jobs:
           RELEASE_TAG: ${{ github.event.release.tag_name || '' }}
           RELEASE_URL: ${{ github.event.release.html_url || '' }}
           RELEASE_BODY: ${{ github.event.release.body || '' }}
-          DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || '' }}
-          DEPLOY_URL: ${{ github.event.workflow_run.html_url || '' }}
           DISPATCH_MSG: ${{ inputs.message || '' }}
         run: |
           set -euo pipefail
@@ -96,11 +87,6 @@ jobs:
             release)
               title="Release ${RELEASE_TAG}"
               body="## ${RELEASE_TAG}${NL}${NL}${RELEASE_BODY}${NL}${NL}[View release →](${RELEASE_URL})"
-              ;;
-            workflow_run)
-              short_sha="${DEPLOY_SHA:0:7}"
-              title="Deploy succeeded — ${short_sha}"
-              body="Latest commit deployed to GitHub Pages.${NL}${NL}[Deploy run →](${DEPLOY_URL})"
               ;;
             workflow_dispatch)
               title="Announcement"

@@ -1,11 +1,16 @@
 /**
- * Persists the user's acceptance of the legal terms (web only). Mirrors the
- * defensive pattern in {@link file://./options-storage.ts}: SSR-safe, never
- * throws (private-mode / quota errors degrade to "not accepted" → re-prompt).
+ * Persists the user's acceptance of the legal terms (web + Android + desktop
+ * builds without an installer license page). SSR-safe and never throws —
+ * private-mode / blocked-storage errors degrade to "not accepted" → re-prompt.
  */
 
-/** Bump when the referenced terms change to re-prompt previously-consented users. */
-export const CONSENT_VERSION = 1;
+import { safeGetJson, safeSetItem } from './safe-storage';
+
+/**
+ * Bump when the referenced terms change to re-prompt previously-consented users.
+ * v2 (2.0.0): new domain on Cloudflare, Web Analytics + Turnstile on the web build.
+ */
+export const CONSENT_VERSION = 2;
 
 const KEY = 'jsonprism.consent';
 
@@ -16,22 +21,15 @@ export interface StoredConsent {
 }
 
 export function loadConsent(): StoredConsent | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = window.localStorage.getItem(KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as StoredConsent;
-  } catch {
-    return null;
-  }
+  const value = safeGetJson(KEY);
+  if (value === null || typeof value !== 'object') return null;
+  const { accepted, version, acceptedAt } = value as Partial<StoredConsent>;
+  if (typeof accepted !== 'boolean' || typeof version !== 'number') return null;
+  return { accepted, version, acceptedAt: typeof acceptedAt === 'number' ? acceptedAt : 0 };
 }
 
 export function saveConsent(consent: StoredConsent): void {
-  try {
-    window.localStorage.setItem(KEY, JSON.stringify(consent));
-  } catch {
-    /* quota / serialization / private-mode write errors are non-fatal */
-  }
+  safeSetItem(KEY, JSON.stringify(consent));
 }
 
 export function isConsentValid(consent: StoredConsent | null): boolean {

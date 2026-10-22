@@ -45,7 +45,6 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
-        .plugin(tauri_plugin_os::init())
         .invoke_handler(tauri::generate_handler![host_info])
         .on_window_event(|window, event| {
             // Ensure the main window doesn't hold up the runtime on close.
@@ -53,7 +52,7 @@ pub fn run() {
             // process alive when the webview is the last live handle.
             if let WindowEvent::CloseRequested { .. } = event {
                 if window.label() == "main" {
-                    let _ = window.app_handle().exit(0);
+                    window.app_handle().exit(0);
                 }
             }
         })
@@ -76,9 +75,8 @@ pub fn run() {
 
     app.run(|app_handle, event| {
         if let RunEvent::ExitRequested { .. } = event {
-            // Let Tauri's default exit path proceed — plugins clean up on drop.
-            // Explicitly request cleanup so any spawned shell children are
-            // sent SIGTERM/TerminateProcess before the process exits.
+            // Let Tauri's default exit path proceed, but release plugin and
+            // window resources first so nothing outlives the process.
             app_handle.cleanup_before_exit();
         }
     });

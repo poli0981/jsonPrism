@@ -1,50 +1,55 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="color-scheme" content="dark light" />
-    <meta name="theme-color" content="#0a0b14" />
+    <meta name="theme-color" content="#0b0c14" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <!--
-      Restores a deep-link path that public/404.html encoded into the query
-      string on GitHub Pages (see that file). Must run before the SPA router
-      reads the URL. No-op everywhere else (including Tauri) since `?/` is only
-      ever present right after the 404 redirect.
+      Applies the saved theme + display preferences before first paint (no
+      flash of the wrong theme). External and blocking on purpose: an inline
+      script would need 'unsafe-inline' in the web CSP, and Tauri hashes inline
+      scripts into its CSP, which would disable 'unsafe-inline' for styles.
     -->
-    <script type="text/javascript">
-      (function (l) {
-        if (l.search[1] === '/') {
-          var decoded = l.search
-            .slice(1)
-            .split('&')
-            .map(function (s) {
-              return s.replace(/~and~/g, '&');
-            })
-            .join('?');
-          window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash);
-        }
-      })(window.location);
-    </script>
+    <script src="/theme-init.js"></script>
 
-    <meta name="description" content="JSONPrism — disperse JSON into many formats. Convert to JSONL, CSV, YAML, XML, TOML, RESX, Markdown, SQL. Fully client-side, batch up to 500 files." />
-    <meta name="keywords" content="JSON, converter, JSONL, YAML, CSV, XML, TOML, RESX, Markdown, SQL, batch, offline" />
+    <title>JSONPrism · Disperse JSON into 12 formats</title>
+    <meta
+      name="description"
+      content="JSONPrism converts JSON to JSONL, CSV, TSV, YAML, XML, TOML, RESX, Markdown, SQL, BSON, CBOR and MessagePack, and six of them back to JSON. Conversion runs on your device; batch up to 500 files."
+    />
+    <meta
+      name="keywords"
+      content="JSON converter, JSONL, NDJSON, CSV, YAML, XML, TOML, RESX, Markdown table, SQL INSERT, BSON, CBOR, MessagePack, batch, offline"
+    />
+    <!-- Updated per route by Layout (useCanonicalUrl). -->
+    <link rel="canonical" href="https://jsonprism.poli0981.dev/" />
 
-    <!-- Open Graph -->
-    <meta property="og:title" content="JSONPrism — Disperse JSON into many formats" />
-    <meta property="og:description" content="A refracting tool for developers. One JSON input, eight target formats, fully in-browser." />
+    <!-- Open Graph / link previews (Discord, X, Bluesky) -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="JSONPrism" />
+    <meta property="og:title" content="JSONPrism — Disperse JSON into 12 formats" />
+    <meta
+      property="og:description"
+      content="A refracting tool for developers: one JSON input, twelve target formats, six of them reversible. Runs on your device."
+    />
+    <meta property="og:url" content="https://jsonprism.poli0981.dev/" />
+    <meta property="og:image" content="https://jsonprism.poli0981.dev/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="JSONPrism — a prism splitting JSON into many formats" />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <!--
-      Fonts: Instrument Serif (display) + Geist (body) + JetBrains Mono (code).
-      Self-hosted via @fontsource and imported in src/main.tsx so the app works
-      fully offline (desktop + Android sideload) with no third-party requests.
+      Fonts: Geist (UI + headings) and JetBrains Mono (code), self-hosted via
+      @fontsource and imported in src/main.tsx so the app works fully offline
+      (desktop + Android) with no third-party font requests.
     -->
-
-    <title>JSONPrism · Disperse JSON</title>
   </head>
   <body>
+    <noscript>JSONPrism needs JavaScript to convert files in your browser.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

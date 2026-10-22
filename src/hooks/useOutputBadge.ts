@@ -1,23 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
-// Tracks an "unread output" badge for the mobile Output tab: set when output
-// changes while the user is on a different tab, cleared once they navigate over.
+/**
+ * "Unread output" badge for the mobile Output tab: on while the output changed
+ * since the user last looked at that tab.
+ *
+ * Derived during render (React's "store information from previous renders"
+ * pattern) instead of syncing state in effects.
+ */
 export function useOutputBadge(output: string, activeTab: 'input' | 'output'): boolean {
-  const [hasUnreadOutput, setHasUnreadOutput] = useState(false);
-  const prevOutputRef = useRef('');
-
-  useEffect(() => {
-    if (output !== prevOutputRef.current) {
-      prevOutputRef.current = output;
-      if (output && activeTab !== 'output') {
-        setHasUnreadOutput(true);
-      }
-    }
-  }, [output, activeTab]);
-
-  useEffect(() => {
-    if (activeTab === 'output') setHasUnreadOutput(false);
-  }, [activeTab]);
-
-  return hasUnreadOutput;
+  const [seenOutput, setSeenOutput] = useState(output);
+  if (activeTab === 'output' && seenOutput !== output) {
+    setSeenOutput(output);
+  }
+  return activeTab !== 'output' && output !== '' && output !== seenOutput;
 }

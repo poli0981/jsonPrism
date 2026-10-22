@@ -2,20 +2,16 @@ name: Notify CI Failures
 
 on:
   workflow_run:
-    # Subscribe only to the workflow we actually want failure notifications
-    # for. The previous catch-all ("*") triggered this workflow on every
-    # completion (deploy, release, notify itself), most of which immediately
-    # skipped — adding noise to the Actions tab.
-    workflows: ["CI"]
+    workflows: ["CI", "Production smoke"]
     types: [completed]
 
-# REQUIRED: declare permissions matching the reusable workflow's needs.
-# Reusable needs `actions: read` to inspect workflow_run details.
-permissions:
-  contents: read
-  actions: read
+permissions: {}
 
 jobs:
   notify:
-    uses: poli0981/.github/.github/workflows/notify-ci-failure.yml@main
-    secrets: inherit
+    permissions:
+      contents: read
+      actions: read
+    uses: poli0981/.github/.github/workflows/notify-ci-failure.yml@c3e118a01d40e95b36b2c3466dc206638c11eb5a # main 2026-07-06
+    secrets:
+      DISCORD_CI_WEBHOOK: ${{ secrets.DISCORD_CI_WEBHOOK }}

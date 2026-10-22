@@ -1,28 +1,33 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from 'react';
+import { safeGetItem, safeSetItem } from './safe-storage';
+import {
+  applyTheme,
+  isTheme,
+  subscribeSystemTheme,
+  systemTheme,
+  THEME_STORAGE_KEY,
+  type ResolvedTheme,
+  type Theme,
+} from './theme-dom';
 
-export type Theme = 'dark' | 'light' | 'system';
+export type { Theme } from './theme-dom';
 
 interface ThemeContextValue {
   theme: Theme;
-  resolvedTheme: 'dark' | 'light';
+  resolvedTheme: ResolvedTheme;
   setTheme: (t: Theme) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
-
-const STORAGE_KEY = 'jsonprism.theme';
-
-function getSystemTheme(): 'dark' | 'light' {
-  if (typeof window === 'undefined') return 'dark';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-
-function readStored(): Theme {
-  if (typeof window === 'undefined') return 'system';
-  const raw = window.localStorage.getItem(STORAGE_KEY);
-  if (raw === 'dark' || raw === 'light' || raw === 'system') return raw;
-  return 'system';
-}
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -30,42 +35,31 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children, defaultTheme = 'system' }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(() => readStored() ?? defaultTheme);
-  const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>(() =>
-    theme === 'system' ? getSystemTheme() : theme,
-  );
+  const [theme, setThemeState] = useState<Theme>(() => {
+    const stored = safeGetItem(THEME_STORAGE_KEY);
+    return isTheme(stored) ? stored : defaultTheme;
+  });
+  // The OS preference is an external store; deriving from it avoids syncing
+  // state inside effects.
+  const system = useSyncExternalStore(subscribeSystemTheme, systemTheme, () => 'dark' as const);
+  const resolvedTheme: ResolvedTheme = theme === 'system' ? system : theme;
 
-  // Apply class to <html>
-  useEffect(() => {
-    const root = document.documentElement;
-    const next = theme === 'system' ? getSystemTheme() : theme;
-    root.classList.toggle('dark', next === 'dark');
-    setResolvedTheme(next);
-  }, [theme]);
+  // Layout effect: runs before paint, so a theme change never flashes.
+  useLayoutEffect(() => {
+    applyTheme(resolvedTheme);
+  }, [resolvedTheme]);
 
-  // Listen for system changes when theme === 'system'
-  useEffect(() => {
-    if (theme !== 'system') return;
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const handler = () => {
-      const next = mq.matches ? 'dark' : 'light';
-      document.documentElement.classList.toggle('dark', next === 'dark');
-      setResolvedTheme(next);
-    };
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, [theme]);
-
-  const setTheme = (t: Theme) => {
-    window.localStorage.setItem(STORAGE_KEY, t);
+  const setTheme = useCallback((t: Theme) => {
+    safeSetItem(THEME_STORAGE_KEY, t);
     setThemeState(t);
-  };
+  }, []);
 
-  return (
-    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
+  const value = useMemo(
+    () => ({ theme, resolvedTheme, setTheme }),
+    [theme, resolvedTheme, setTheme],
   );
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
