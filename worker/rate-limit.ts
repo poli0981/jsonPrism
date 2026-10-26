@@ -4,9 +4,11 @@
  * files count against SITE_LIMITER, /api/* against API_LIMITER, and the
  * human-check endpoint also against its own VERIFY_LIMITER.
  *
- * Cloudflare counts per data centre and updates the counters asynchronously,
- * so a burst can overshoot slightly before the 429s start. The limits stop
- * floods and scrapers; people never get near them.
+ * Cloudflare's counts are approximate: each edge machine checks a locally
+ * cached per-data-centre count that syncs in the background, so a burst
+ * spread over many fresh connections can pass well beyond the limit before
+ * the 429s start (see docs/DEPLOYMENT.md). The limits throttle browsers,
+ * crawlers and simple scripts; people never get near them.
  */
 
 import { json, logEvent, text } from './http';

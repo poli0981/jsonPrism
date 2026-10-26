@@ -243,10 +243,16 @@ Three [Rate Limiting bindings](https://developers.cloudflare.com/workers/runtime
   gets a JSON 429 `{"ok":false,"error":"rate_limited"}`; both carry
   `Retry-After: 60` and `Cache-Control: no-store`. The app treats a 429 from
   the verify endpoint as "check unavailable" and lets the user continue.
-- Counters live per Cloudflare data centre and update asynchronously, so a
-  burst can overshoot slightly before the 429s start. If the limiter itself
-  fails the request goes through (`ratelimit.error` in the logs): a broken
-  counter must not take the site down.
+- The limits are approximate. Counts are kept per Cloudflare data centre, and
+  each edge machine checks a locally cached count that syncs in the
+  background. Measured on production (2026-10-27): on one keep-alive
+  connection they hold almost exactly (120 pages, then 429s), but 300
+  requests on fresh parallel connections in 13 s all passed, because they
+  spread over many machines before the counts caught up. They throttle
+  browsers, crawlers and simple scripts; a strict cap would need a Durable
+  Object or a WAF rule (below).
+- If the limiter itself fails the request goes through (`ratelimit.error` in
+  the logs): a broken counter must not take the site down.
 - Every request that reaches the Worker is billed as a Worker request,
   refused ones included. The limits keep floods off the API and slow scrapers;
   volumetric attacks are Cloudflare's DDoS protection's job, in front of the
@@ -258,7 +264,10 @@ Three [Rate Limiting bindings](https://developers.cloudflare.com/workers/runtime
   `namespace_id` unique within the Cloudflare account.
 - To see it work locally, run `npm run preview:cf` and then
   `for i in $(seq 70); do curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8787/api/health; done | sort | uniq -c`
-  — 60 × 200, then 429s for the rest of the minute.
+  — 60 × 200, then 429s for the rest of the minute. Against production, send
+  the burst over one connection so it reaches one machine, e.g.
+  `curl -s -w '%{http_code}\n' $(printf -- '-o /dev/null https://jsonprism.poli0981.dev/api/health %.0s' $(seq 100)) | sort | uniq -c`
+  (this throttles your own address for a minute).
 
 ## Workers Logs
 
