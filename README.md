@@ -70,7 +70,7 @@ Details: [`PRIVACY.md`](PRIVACY.md).
 - **i18next** for translations, **Zustand** for state, **React Router 8** for routing, **Sonner** for toasts
 - **Vitest** + Testing Library for tests
 - **Node.js 26** for the toolchain
-- **Cloudflare Workers** hosts the web app (static assets plus a small Worker for `/api/*`)
+- **Cloudflare Workers** hosts the web app (static assets behind a small Worker that rate limits requests and serves `/api/*`)
 - **Tauri 2.12** for the desktop (Windows, macOS, Linux) and Android apps
 
 ## Quick start

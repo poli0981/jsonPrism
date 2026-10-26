@@ -6,14 +6,14 @@ Guidance for Claude (and other AI assistants) working on this repository.
 
 **JSONPrism** converts one JSON input into 12 formats (JSONL, CSV, TSV, YAML, XML, TOML, .NET RESX, Markdown table, SQL INSERT, BSON, CBOR, MessagePack) and parses six of them (JSONL, CSV, TSV, YAML, TOML, RESX) back. Conversion always runs on the user's device. It ships as:
 
-- a web app at <https://jsonprism.poli0981.dev>, served by the Cloudflare Worker `jsonprism` (static assets + a tiny `/api/*` Worker), deployed by Cloudflare Workers Builds on every push to `main`;
+- a web app at <https://jsonprism.poli0981.dev>, served by the Cloudflare Worker `jsonprism` (static assets behind a tiny Worker that rate limits requests and answers `/api/*`), deployed by Cloudflare Workers Builds on every push to `main`;
 - native apps built with Tauri 2: Windows, macOS, Linux and Android (sideload APK).
 
 GitHub Pages (`poli0981.github.io/jsonPrism`) now only redirects to the new domain.
 
 The maintainer is **Kokone** ([@poli0981](https://github.com/poli0981)). Audience: the developer community on the open-source Discord server plus YouTube viewers who watch indie/visual-novel gameplay and occasionally want a quick devtool.
 
-**Current release**: 2.0.0. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what is next.
+**Current release**: 2.0.2. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what is next.
 
 ## Stack — exact versions matter
 
@@ -33,7 +33,7 @@ Do not propose downgrading or "modernizing" to deprecated patterns.
 
 ## Web platform (Cloudflare)
 
-- `wrangler.jsonc`: static assets from `dist/` with SPA fallback; only `/api/*` runs the Worker (`run_worker_first`). Bindings: `ASSETS`, `VERIFY_LIMITER` (rate limit), var `ALLOWED_HOSTNAMES`, secret `TURNSTILE_SECRET` (dashboard; locally `.dev.vars`, copied from `.dev.vars.example`).
+- `wrangler.jsonc`: static assets from `dist/` with SPA fallback. Every request except the hashed `/assets/*` bundles runs the Worker first (`run_worker_first`): it rate limits per client (`worker/rate-limit.ts`), then passes pages to `env.ASSETS.fetch()` (which still applies `_headers`, `_redirects` and the SPA fallback) or answers `/api/*`. Bindings: `ASSETS`, `SITE_LIMITER` / `API_LIMITER` / `VERIFY_LIMITER` (rate limits; each needs a preview twin with its own `namespace_id` under `previews`), var `ALLOWED_HOSTNAMES`, secret `TURNSTILE_SECRET` (dashboard; locally `.dev.vars`, copied from `.dev.vars.example`).
 - `worker/index.ts` may only have a **default export** — workerd treats every named export of the entry module as an entrypoint and refuses to start. Put shared code in other modules (`worker/verify.ts`, `worker/turnstile.ts`, `worker/http.ts`).
 - Worker logs are structured (`logEvent`) and must never contain IPs, tokens or user content.
 - `public/_headers` holds the CSP and security headers; `public/_redirects` maps the old `/jsonPrism/*` paths. Adding any third-party script, style, font or connection means updating the CSP there (and the Tauri CSP in `tauri.conf.json` if it applies to the apps).

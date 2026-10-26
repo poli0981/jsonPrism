@@ -7,17 +7,10 @@
  * public static files, so there is no server resource it unlocks.
  */
 
+import type { WorkerEnv } from './env';
 import { json, logEvent } from './http';
+import { clientKey } from './rate-limit';
 import { MAX_TOKEN_LENGTH, TEST_SECRET, verifyTurnstileToken } from './turnstile';
-
-export interface WorkerEnv {
-  ASSETS: Fetcher;
-  /** Comma-separated hostnames a token may have been issued on. */
-  ALLOWED_HOSTNAMES: string;
-  /** Secret set in the Cloudflare dashboard (.dev.vars locally). */
-  TURNSTILE_SECRET?: string | undefined;
-  VERIFY_LIMITER?: RateLimit;
-}
 
 /** Keep in sync with src/lib/turnstile.ts (TURNSTILE_ACTION). */
 const TURNSTILE_ACTION = 'gate';
@@ -109,9 +102,8 @@ export async function handleVerify(request: Request, env: WorkerEnv): Promise<Re
   }
 
   if (env.VERIFY_LIMITER) {
-    // Generous per-client throttle; shared IPs (NAT, mobile carriers) still fit.
-    const key = request.headers.get('CF-Connecting-IP') ?? 'unknown';
-    const { success } = await env.VERIFY_LIMITER.limit({ key });
+    // Stricter than API_LIMITER, still generous: shared IPs (NAT, mobile carriers) fit.
+    const { success } = await env.VERIFY_LIMITER.limit({ key: clientKey(request) });
     if (!success) return finish(429, { ok: false, error: 'rate_limited' }, 'rate-limited');
   }
 

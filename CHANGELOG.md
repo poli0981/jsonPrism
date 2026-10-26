@@ -8,6 +8,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond".
 
+## [2.0.2] — 2026-10-27
+
+### Added
+
+- **Rate limiting for the whole website, not just the human check.** The Worker now runs first for every request except the content-hashed bundles under `/assets/` (`run_worker_first: ["/*", "!/assets/*"]`) and counts it against a per-client limit before serving it: pages and public files 120 requests a minute (`SITE_LIMITER`, about 40 page loads), every `/api/*` request 60 a minute (`API_LIMITER`), and `/api/turnstile/verify` keeps its own 30 a minute on top. Over the limit, pages get a plain-text `429 Too Many Requests` in English, Vietnamese, Japanese and Chinese, and the API gets `{"ok":false,"error":"rate_limited"}`; both carry `Retry-After: 60`. Clients are keyed on their IPv4 address or the /64 network of their IPv6 address, which is never logged. Pages are still served through the assets binding, so the security headers, the old-path redirects and the SPA fallback are unchanged. If the limiter itself fails, requests go through rather than taking the site down. Preview deployments get their own counters.
+
+### Changed
+
+- The Privacy Policy describes the rate limit for page requests too. Nothing new is collected, so you are not asked to accept it again.
+
 ## [2.0.1] — 2026-10-22
 
 ### Fixed
