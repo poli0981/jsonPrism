@@ -117,16 +117,20 @@ Cloudflare's runtime and is not bound by this rule.
 ## Cloudflare Worker (web build)
 
 The website is served by a Cloudflare Worker configured in
-[`wrangler.jsonc`](wrangler.jsonc). Only `/api/*` runs Worker code;
-everything else is static files from `dist/`. The code lives in
+[`wrangler.jsonc`](wrangler.jsonc). Every request except the hashed bundles
+under `/assets/` runs the Worker first: it applies a per-client rate limit,
+then serves pages from `dist/` through the `ASSETS` binding or answers
+`/api/*`. The code lives in
 [`worker/`](worker/):
 
 | File | Role |
 |---|---|
-| `worker/index.ts` | Router. The entry module must only have a **default export**: workerd treats named exports as entrypoints. |
+| `worker/index.ts` | Router: rate limit, then the `ASSETS` binding for pages or the API handlers. The entry module must only have a **default export**: workerd treats named exports as entrypoints. |
+| `worker/rate-limit.ts` | Per-client limits (`SITE_LIMITER`, `API_LIMITER`), IPv4 / IPv6-/64 keys, 429 responses |
+| `worker/env.ts` | The bindings and variables the Worker reads |
 | `worker/verify.ts` | `POST /api/turnstile/verify`: same-origin check, JSON only, body size cap, rate limit |
 | `worker/turnstile.ts` | Cloudflare siteverify call: timeout, one retry, hostname / action / age checks |
-| `worker/http.ts` | JSON responses with strict headers, structured logs |
+| `worker/http.ts` | JSON and plain-text responses with strict headers, structured logs |
 
 Worker logs must never contain IP addresses, tokens or user content.
 

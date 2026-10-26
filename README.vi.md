@@ -70,7 +70,7 @@ Chi tiết: [`PRIVACY.md`](PRIVACY.md).
 - **i18next** cho dịch thuật, **Zustand** cho state, **React Router 8** cho routing, **Sonner** cho toast
 - **Vitest** + Testing Library cho test
 - **Node.js 26** cho toolchain
-- **Cloudflare Workers** host bản web (static assets kèm một Worker nhỏ cho `/api/*`)
+- **Cloudflare Workers** host bản web (static assets phía sau một Worker nhỏ giới hạn tần suất request và phục vụ `/api/*`)
 - **Tauri 2.12** cho app desktop (Windows, macOS, Linux) và Android
 
 ## Bắt đầu nhanh

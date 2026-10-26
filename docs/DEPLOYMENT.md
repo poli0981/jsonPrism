@@ -19,16 +19,23 @@ in [dev_env.md](dev_env.md), Tauri details in [TAURI-NOTES.md](TAURI-NOTES.md).
 
 ```
 browser ──► jsonprism.poli0981.dev  (Cloudflare Worker "jsonprism")
-              ├─ /api/*        → worker/index.ts ──► Turnstile siteverify
-              └─ everything    → static assets from dist/
-                 else            (_headers, _redirects, SPA fallback to index.html)
+              ├─ /assets/*     → static assets from dist/ (hashed bundles, no Worker)
+              └─ everything    → worker/index.ts: per-client rate limit, then
+                 else            ├─ /api/*  → answered here ──► Turnstile siteverify
+                                 └─ pages   → ASSETS binding: dist/ with _headers,
+                                              _redirects, SPA fallback to index.html
 ```
 
 - One Cloudflare Worker, **`jsonprism`** (Workers Paid plan), configured in
   `wrangler.jsonc`.
 - **Static assets**: the Vite build in `dist/`, served by Workers Static Assets
   with `not_found_handling: "single-page-application"`.
-- **Worker code** runs only for `/api/*` (`run_worker_first: ["/api/*"]`).
+- **Worker code** runs first for every request except `/assets/*`
+  (`run_worker_first: ["/*", "!/assets/*"]`). It counts the request against a
+  per-client [rate limit](#rate-limiting), hands pages and public files to the
+  `ASSETS` binding — which still applies `_headers`, `_redirects` and the SPA
+  fallback — and answers `/api/*` itself. `/assets/*` holds the content-hashed
+  bundles, most of each page load, and stays on the Worker-free path.
   Conversion never happens on the server.
 
   | Route | Code | Response |
@@ -39,8 +46,9 @@ browser ──► jsonprism.poli0981.dev  (Cloudflare Worker "jsonprism")
 
 - `worker/index.ts` may only have a default export: workerd treats every named
   export of the entry module as an entrypoint. Put helpers in other modules.
-- API responses set their own headers (`worker/http.ts`: `no-store`,
-  `nosniff`, `default-src 'none'`); assets get theirs from `public/_headers`.
+- Responses the Worker builds itself (API answers, 429s) set their own headers
+  (`worker/http.ts`: `no-store`, `nosniff`, `default-src 'none'`); pages and
+  assets get theirs from `public/_headers`.
 - The Worker has its own `tsconfig.worker.json`; its runtime and binding types
   come from `npm run cf:types` (`wrangler types` → gitignored
   `worker-configuration.d.ts`).
@@ -78,8 +86,8 @@ after the branch (`<branch>-jsonprism.<subdomain>.workers.dev` when workers.dev
 is enabled) and reports it on the pull request.
 
 - Previews inherit no production vars or bindings. `wrangler.jsonc` → `previews`
-  declares them again: a separate rate-limit counter (`namespace_id` 4202) and
-  an empty `ALLOWED_HOSTNAMES`. Any binding added at the top level needs a
+  declares them again: separate rate-limit counters (`namespace_id` 4202, 4204,
+  4206) and an empty `ALLOWED_HOSTNAMES`. Any binding added at the top level needs a
   preview-safe twin there, or `wrangler preview` fails with "missing a
   `previews` block".
 - Previews get no `TURNSTILE_SECRET` (set one with
@@ -117,7 +125,7 @@ is enabled) and reports it on the pull request.
 | --- | --- | --- |
 | `TURNSTILE_SECRET` | Secret | Worker → **Settings → Variables and Secrets**, or `npx wrangler secret put TURNSTILE_SECRET`. Never in the repo. |
 | `ALLOWED_HOSTNAMES` | Variable | `wrangler.jsonc` → `vars`: comma-separated hostnames a Turnstile token may be issued on. |
-| `VERIFY_LIMITER` | Binding | `wrangler.jsonc` → `ratelimits` — see [Rate limiting](#rate-limiting). |
+| `SITE_LIMITER`, `API_LIMITER`, `VERIFY_LIMITER` | Bindings | `wrangler.jsonc` → `ratelimits` — see [Rate limiting](#rate-limiting). |
 
 - Plain variables added in the dashboard are replaced by `wrangler.jsonc` `vars`
   on every deploy (`keep_vars` is off); secrets are kept. The sitekey needs no
@@ -216,13 +224,41 @@ Vite copies `public/` into `dist/`; Workers Static Assets applies `_headers` and
 
 ## Rate limiting
 
-- Binding `VERIFY_LIMITER` (`ratelimits` in `wrangler.jsonc`, `namespace_id`
-  `4201`): 30 requests per 60 s per client, keyed on `CF-Connecting-IP`. The IP
-  is only the key; it is never logged.
-- Over the limit → 429 `rate_limited` with `Retry-After: 60`. The app treats
-  that as "check unavailable" and lets the user continue.
-- To change it, edit `simple.limit` / `simple.period` and deploy. Keep
+Three [Rate Limiting bindings](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)
+(`ratelimits` in `wrangler.jsonc`), applied in `worker/rate-limit.ts`:
+
+| Binding | Counts | Limit | `namespace_id` (production / preview) |
+| --- | --- | --- | --- |
+| `SITE_LIMITER` | pages and public files: everything outside `/api/` and `/assets/` | 120 requests / 60 s | 4205 / 4206 |
+| `API_LIMITER` | every `/api/*` request | 60 requests / 60 s | 4203 / 4204 |
+| `VERIFY_LIMITER` | `/api/turnstile/verify`, on top of `API_LIMITER` | 30 requests / 60 s | 4201 / 4202 |
+
+- The key is the client's IPv4 address, or the /64 network of an IPv6 address
+  (one subscriber usually holds a whole /64), from `CF-Connecting-IP`. It is
+  only the key; it is never logged.
+- A page load makes about three counted requests (`index.html`,
+  `theme-init.js`, `favicon.svg`); the hashed bundles under `/assets/` are not
+  counted. 120 per minute is about 40 page loads a minute from one address.
+- Over the limit: pages get a plain-text 429 in the four UI languages, the API
+  gets a JSON 429 `{"ok":false,"error":"rate_limited"}`; both carry
+  `Retry-After: 60` and `Cache-Control: no-store`. The app treats a 429 from
+  the verify endpoint as "check unavailable" and lets the user continue.
+- Counters live per Cloudflare data centre and update asynchronously, so a
+  burst can overshoot slightly before the 429s start. If the limiter itself
+  fails the request goes through (`ratelimit.error` in the logs): a broken
+  counter must not take the site down.
+- Every request that reaches the Worker is billed as a Worker request,
+  refused ones included. The limits keep floods off the API and slow scrapers;
+  volumetric attacks are Cloudflare's DDoS protection's job, in front of the
+  Worker. For a zone-level limit that also covers `/assets/*` and runs before
+  the Worker, add a WAF rate limiting rule for the hostname in the dashboard
+  (**Security → WAF → Rate limiting rules**).
+- To change a limit, edit `simple.limit` / `simple.period` (10 or 60 s) for
+  production and its twin under `previews`, then deploy. Keep every
   `namespace_id` unique within the Cloudflare account.
+- To see it work locally, run `npm run preview:cf` and then
+  `for i in $(seq 70); do curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8787/api/health; done | sort | uniq -c`
+  — 60 × 200, then 429s for the rest of the minute.
 
 ## Workers Logs
 
@@ -235,6 +271,9 @@ Vite copies `public/` into `dist/`; Workers Static Assets applies `_headers` and
   Outcomes: `verified`, `rejected`, `bad-origin`, `bad-method`,
   `bad-content-type`, `too-large`, `rate-limited`, `bad-json`, `bad-token`,
   `misconfigured`, `unavailable`.
+- Rate limiting writes `{"event":"ratelimit.exceeded","scope":"site"|"api","colo":…}`
+  for each refused request, and `ratelimit.error` with a `detail` if the
+  limiter binding fails.
 - Never log IPs, tokens or user content (`logEvent()` in `worker/http.ts`).
   Source maps are not uploaded (`upload_source_maps: false`).
 

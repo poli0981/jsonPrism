@@ -35,13 +35,14 @@ Privacy questions and requests: **privacy@poli0981.dev**.
 Cloudflare, Inc. serves the website and processes the data every web
 request carries (IP address, user agent, requested URL, time, TLS details)
 to deliver pages and protect the service against abuse. JSONPrism's own
-server code handles only the human-check API (`/api/turnstile/verify`)
-and a health check. For that API it records structured events — outcome,
-HTTP status, the Cloudflare data centre code, duration and Turnstile error
-codes — in Cloudflare Workers Logs, kept for 7 days. These events never
-contain IP addresses, Turnstile tokens or anything you convert. The API is
-rate limited per client by Cloudflare; the client key is not stored by
-JSONPrism.
+server code answers only the human-check API (`/api/turnstile/verify`) and
+a health check, and counts page and API requests against a per-client rate
+limit before serving them. It records structured events — outcome, HTTP
+status, the Cloudflare data centre code, duration, Turnstile error codes
+and refused over-limit requests — in Cloudflare Workers Logs, kept for 7
+days. These events never contain IP addresses, Turnstile tokens or anything
+you convert. The rate-limit counters are kept by Cloudflare, keyed on your
+IP address (for IPv6, its /64 network); JSONPrism does not store the key.
 
 ### Human check (website)
 

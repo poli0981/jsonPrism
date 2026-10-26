@@ -50,8 +50,9 @@ website's edge configuration.
 In scope:
 
 - `src/` — the React app, converters and batch processor.
-- `worker/` — the Cloudflare Worker (`/api/turnstile/verify`,
-  `/api/health`): origin checks, rate limiting, request validation.
+- `worker/` — the Cloudflare Worker (per-client rate limits for the whole
+  site, `/api/turnstile/verify`, `/api/health`): rate limiting, origin
+  checks, request validation.
 - Website edge configuration: `public/_headers` (CSP and security
   headers), `public/_redirects`, `wrangler.jsonc`.
 - `src-tauri/` — the Rust shell, capabilities, file-system scope and CSP.

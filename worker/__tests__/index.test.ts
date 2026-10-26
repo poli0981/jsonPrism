@@ -1,14 +1,20 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { WorkerEnv } from '../env';
 import worker from '../index';
-import { handleVerify, VERIFIED_TTL_MS, type WorkerEnv } from '../verify';
+import { handleVerify, VERIFIED_TTL_MS } from '../verify';
 import { TEST_SECRET } from '../turnstile';
+
+/** What the runtime hands the Worker: a Request carrying Cloudflare's `cf` properties. */
+type IncomingRequest = Parameters<typeof worker.fetch>[0];
 
 const ORIGIN = 'https://jsonprism.poli0981.dev';
 const URL_VERIFY = `${ORIGIN}/api/turnstile/verify`;
 
+const assetsFetch = vi.fn(async () => new Response('<!doctype html>'));
+
 function env(overrides: Partial<WorkerEnv> = {}): WorkerEnv {
   return {
-    ASSETS: {} as Fetcher,
+    ASSETS: { fetch: assetsFetch } as unknown as Fetcher,
     ALLOWED_HOSTNAMES: 'jsonprism.poli0981.dev',
     TURNSTILE_SECRET: 'real-secret',
     ...overrides,
@@ -17,7 +23,7 @@ function env(overrides: Partial<WorkerEnv> = {}): WorkerEnv {
 
 function verifyRequest(
   init: { body?: string; headers?: Record<string, string>; method?: string } = {},
-) {
+): IncomingRequest {
   return new Request(URL_VERIFY, {
     method: init.method ?? 'POST',
     headers: { Origin: ORIGIN, 'Content-Type': 'application/json', ...init.headers },
@@ -26,6 +32,13 @@ function verifyRequest(
 }
 
 const call = (request: Request, e: WorkerEnv = env()) => handleVerify(request, e);
+
+/** A limiter that allows the first `allowed` calls, like Cloudflare's binding once a client is over. */
+function limiter(allowed = Infinity) {
+  let calls = 0;
+  const limit = vi.fn(async (_options: RateLimitOptions) => ({ success: ++calls <= allowed }));
+  return { limit } as RateLimit & { limit: typeof limit };
+}
 
 let siteverify: ReturnType<typeof vi.fn<typeof fetch>>;
 
@@ -150,5 +163,81 @@ describe('router', () => {
     expect(await health.json()).toEqual({ ok: true, service: 'jsonprism' });
     const missing = await worker.fetch(new Request(`${ORIGIN}/api/nope`), env());
     expect(missing.status).toBe(404);
+  });
+
+  it('hands pages and public files to the ASSETS binding', async () => {
+    const page: IncomingRequest = new Request(`${ORIGIN}/about`);
+    const res = await worker.fetch(page, env());
+    expect(await res.text()).toBe('<!doctype html>');
+    expect(assetsFetch).toHaveBeenCalledWith(page);
+  });
+});
+
+describe('rate limiting', () => {
+  const fromClient = (path: string): IncomingRequest =>
+    new Request(`${ORIGIN}${path}`, { headers: { 'CF-Connecting-IP': '203.0.113.9' } });
+
+  it('counts pages against SITE_LIMITER and answers 429 in plain text once over', async () => {
+    const site = limiter(2);
+    const api = limiter();
+    const e = env({ SITE_LIMITER: site, API_LIMITER: api });
+    expect((await worker.fetch(fromClient('/'), e)).status).toBe(200);
+    expect((await worker.fetch(fromClient('/theme-init.js'), e)).status).toBe(200);
+    const res = await worker.fetch(fromClient('/'), e);
+    expect(res.status).toBe(429);
+    expect(res.headers.get('Retry-After')).toBe('60');
+    expect(res.headers.get('Cache-Control')).toBe('no-store');
+    expect(res.headers.get('Content-Type')).toBe('text/plain; charset=utf-8');
+    expect(await res.text()).toContain('Too many requests');
+    expect(assetsFetch).toHaveBeenCalledTimes(2);
+    expect(site.limit).toHaveBeenCalledWith({ key: '203.0.113.9' });
+    expect(api.limit).not.toHaveBeenCalled();
+  });
+
+  it('counts every /api/* request against API_LIMITER and answers JSON 429', async () => {
+    const site = limiter();
+    const api = limiter(1);
+    const e = env({ SITE_LIMITER: site, API_LIMITER: api });
+    expect((await worker.fetch(fromClient('/api/health'), e)).status).toBe(200);
+    for (const path of ['/api/health', '/api/nope', '/api/turnstile/verify']) {
+      const res = await worker.fetch(fromClient(path), e);
+      expect(res.status).toBe(429);
+      expect(res.headers.get('Retry-After')).toBe('60');
+      expect(await res.json()).toEqual({ ok: false, error: 'rate_limited' });
+    }
+    expect(siteverify).not.toHaveBeenCalled();
+    expect(site.limit).not.toHaveBeenCalled();
+  });
+
+  it('applies VERIFY_LIMITER on top of API_LIMITER', async () => {
+    const api = limiter();
+    const verify = limiter(0);
+    const res = await worker.fetch(
+      verifyRequest({ headers: { 'CF-Connecting-IP': '203.0.113.9' } }),
+      env({ API_LIMITER: api, VERIFY_LIMITER: verify }),
+    );
+    expect(res.status).toBe(429);
+    expect(api.limit).toHaveBeenCalledOnce();
+    expect(verify.limit).toHaveBeenCalledWith({ key: '203.0.113.9' });
+  });
+
+  it('lets requests through when the limiter itself fails', async () => {
+    const broken = {
+      limit: vi.fn().mockRejectedValue(new Error('backend down')),
+    } as unknown as RateLimit;
+    const res = await worker.fetch(fromClient('/'), env({ SITE_LIMITER: broken }));
+    expect(res.status).toBe(200);
+  });
+
+  it('never logs the client address', async () => {
+    const log = vi.mocked(console.log);
+    await worker.fetch(fromClient('/'), env({ SITE_LIMITER: limiter(0) }));
+    await worker.fetch(fromClient('/api/health'), env({ API_LIMITER: limiter(0) }));
+    const lines = log.mock.calls.map((args) => String(args[0]));
+    expect(lines).toHaveLength(2);
+    for (const line of lines) {
+      expect(JSON.parse(line)).toMatchObject({ event: 'ratelimit.exceeded' });
+      expect(line).not.toContain('203.0.113.9');
+    }
   });
 });

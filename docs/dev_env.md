@@ -56,7 +56,7 @@ npm run preview:cf               # wrangler dev on http://localhost:8787 (builds
 - `.dev.vars` holds the Worker secret `TURNSTILE_SECRET` for local runs. It is
   gitignored; never put the production secret in it.
 - `npm run preview:cf` serves `dist/` the way production does (`_headers`,
-  `_redirects`, SPA fallback) together with the `/api/*` Worker. On localhost
+  `_redirects`, SPA fallback) behind the Worker (rate limits, `/api/*`). On localhost
   the app uses Cloudflare's test sitekey, so the Consent Gate's Turnstile check
   passes on its own.
 - `npm run cf:types` — regenerates `worker-configuration.d.ts` (gitignored)

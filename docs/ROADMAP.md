@@ -4,7 +4,7 @@ This document is the **single source of truth** for what's done, what's next, an
 
 Update it as work lands — keep the project status honest.
 
-**Current release: v2.0.0 (2026-10-22).** The web app runs at https://jsonprism.poli0981.dev (Cloudflare Workers); desktop and Android builds are on [GitHub Releases](https://github.com/poli0981/jsonPrism/releases).
+**Current release: v2.0.2 (2026-10-27).** The web app runs at https://jsonprism.poli0981.dev (Cloudflare Workers); desktop and Android builds are on [GitHub Releases](https://github.com/poli0981/jsonPrism/releases).
 
 ---
 
@@ -302,6 +302,7 @@ A platform release: a new home for the web app, a human check and analytics conf
 - [x] Web app served by the Cloudflare Worker `jsonprism` (Workers Static Assets, SPA fallback) at **https://jsonprism.poli0981.dev**; config in `wrangler.jsonc`, operations in [`docs/DEPLOYMENT.md`](DEPLOYMENT.md)
 - [x] Cloudflare Workers Builds deploys every push to `main`; the GitHub Pages deploy workflow and `public/404.html` are gone
 - [x] `/api/*` Worker in `worker/`: `POST /api/turnstile/verify` (same-origin only, 4 KB body cap, 30 requests / 60 s rate limit) and `GET /api/health`; structured Workers Logs without IPs, tokens or user content
+- [x] 2.0.2: per-client rate limits for the whole site — the Worker runs first for everything except the hashed `/assets/*` bundles; pages 120 / 60 s, API 60 / 60 s, verify 30 / 60 s; IPv6 keyed on its /64; 429 with `Retry-After`
 - [x] Static headers in `public/_headers` (CSP, HSTS, COOP, Permissions-Policy, immutable `/assets/*`), `/jsonPrism/*` → 301 in `public/_redirects`, `robots.txt`, `sitemap.xml`, `.well-known/security.txt`, Open Graph image
 - [x] GitHub Pages keeps only a path-preserving redirect to the new domain (`pages-redirect.yml`, run by hand)
 - [x] `production-smoke.yml` waits for each pushed commit to go live, then checks headers, routes, redirects and the API

@@ -1,7 +1,6 @@
-/** JSON responses for the API routes, with defensive headers (assets get theirs from public/_headers). */
+/** Responses the Worker builds itself, with defensive headers (assets get theirs from public/_headers). */
 
-const API_HEADERS: Record<string, string> = {
-  'Content-Type': 'application/json; charset=utf-8',
+const BASE_HEADERS: Record<string, string> = {
   'Cache-Control': 'no-store',
   'X-Content-Type-Options': 'nosniff',
   'Referrer-Policy': 'no-referrer',
@@ -16,7 +15,22 @@ export function json(
 ): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...API_HEADERS, ...extraHeaders },
+    headers: {
+      ...BASE_HEADERS,
+      'Content-Type': 'application/json; charset=utf-8',
+      ...extraHeaders,
+    },
+  });
+}
+
+export function text(
+  body: string,
+  status: number,
+  extraHeaders: Record<string, string> = {},
+): Response {
+  return new Response(body, {
+    status,
+    headers: { ...BASE_HEADERS, 'Content-Type': 'text/plain; charset=utf-8', ...extraHeaders },
   });
 }
 
