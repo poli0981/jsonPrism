@@ -208,7 +208,7 @@ See the **"Adding a new converter — checklist"** section in [`CLAUDE.md`](CLAU
 
 Briefly:
 
-1. New file `src/converters/myformat.ts` implementing `Converter<TOptions>` (pure, errors as values)
+1. New file `src/converters/myformat.ts` implementing `Converter<TOptions>` (pure, errors as values; an input-only format such as JSONC sets `meta.inputOnly`)
 2. Add the ID to `FormatId` in `types.ts` and register the converter in `registry.ts`
 3. Add `formats.myformat` labels to all four locales
 4. Add tests in `src/converters/__tests__/` (`contract.test.ts` already runs every registered converter against the errors-as-values contract)

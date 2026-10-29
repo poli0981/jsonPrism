@@ -4,7 +4,7 @@ This document is the **single source of truth** for what's done, what's next, an
 
 Update it as work lands — keep the project status honest.
 
-**Current release: v2.0.2 (2026-10-27).** The web app runs at https://jsonprism.poli0981.dev (Cloudflare Workers); desktop and Android builds are on [GitHub Releases](https://github.com/poli0981/jsonPrism/releases).
+**Current release: v2.1.0 (2026-10-29).** The web app runs at https://jsonprism.poli0981.dev (Cloudflare Workers); desktop and Android builds are on [GitHub Releases](https://github.com/poli0981/jsonPrism/releases).
 
 ---
 
@@ -353,6 +353,25 @@ JSONPrism 2.0.0 on its own domain, with the human check and analytics confined t
 
 ---
 
+## Phase 9 — 2.1.0: JSONC → JSON ✅
+
+**Status**: complete (shipped in v2.1.0, 2026-10-29)
+
+The most common "this isn't valid JSON" paste — config files with comments — now converts in one step.
+
+- [x] `src/converters/jsonc.ts`: hand-written, no dependency. Comments and trailing commas become spaces at the same offsets (error line/column match the input), `JSON.parse` validates, then a token-level printer lays the result out without building JS values — big integers, number spelling, duplicate and `__proto__` keys survive. Iterative, with an output-size guard for pathological nesting.
+- [x] Input-only formats: `ConverterMeta.inputOnly`; the chip is disabled in the JSON → direction, switching to JSON → falls back to JSONL, and a stored input-only format opens in → JSON.
+- [x] Reverse errors carry an optional line/column (`ConversionFailure`), shown like JSON input errors.
+- [x] JSONC input editor: legacy JSON mode for comment highlighting plus a linter that shares the converter's parser.
+- [x] JSON → input that is valid JSONC gets a one-click "Convert JSONC → JSON" hint.
+- [x] Accepts `.jsonc` and `.json` (plus `.txt`) in the single-file and batch flows; strings in all four locales.
+
+### Deliverable
+
+13 chips — 12 target formats plus JSONC as an input. **932 tests in 94 files.**
+
+---
+
 ## Beyond — Ideas (no commitment)
 
 ### Deferred from 2.0.0
@@ -365,6 +384,7 @@ JSONPrism 2.0.0 on its own domain, with the human check and analytics confined t
 - **End-to-end tests** — Playwright (web), tauri-driver (desktop)
 - **JSON tools** — JSON Schema, JSONPath and diff features
 - **More formats** — INI, `.env`, Java `.properties`, Excel `.xlsx`
+- **JSONC as input for every target** — accept comments in the JSON → direction (e.g. `tsconfig.json` straight to YAML) instead of converting to JSON first; changes the strict `parseJsonInput` contract, so it needs its own design
 - **Streaming NDJSON** for very large files
 - **Community translation workflow** (ja and zh-CN are AI-translated today)
 - **Drop the TypeScript 6 alias** once TypeScript 7 ships an API that typescript-eslint supports

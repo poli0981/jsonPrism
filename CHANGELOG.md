@@ -8,6 +8,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond".
 
+## [2.1.0] — 2026-10-29
+
+### Added
+
+- **JSONC → JSON.** A new input-only format for JSON with comments, such as `tsconfig.json`, VS Code `settings.json`, `.code-workspace` and `deno.jsonc` files. Pick **JSONC** in the **→ JSON** direction, paste or drop `.jsonc` and `.json` files (batches included), and get standard JSON back: `//` and `/* */` comments and trailing commas are removed. Values are copied token by token rather than through JavaScript numbers, so integers beyond 2^53, `1.0`, `1e3`, duplicate keys and `__proto__` come out exactly as written. Output layout: 2 spaces (default), 4 spaces, tab or minified. The parser is hand-written and runs on your device; there is no new dependency.
+- **"This looks like JSONC" hint.** In the JSON → direction, when the input fails only because of comments or trailing commas, the input panel offers **Convert JSONC → JSON**, which switches the direction and format in one click.
+- The JSONC input editor highlights comments and marks errors in the gutter at the same line and column the converter reports.
+
+### Changed
+
+- Converting back to JSON can now report the line and column of an error. JSONC uses it, so its errors show `Ln …, Col …` like JSON input errors do.
+- The JSONC chip is disabled in the JSON → direction with an "Input only" note. Switching to JSON → while JSONC is selected moves to JSONL.
+
 ## [2.0.2] — 2026-10-27
 
 ### Added

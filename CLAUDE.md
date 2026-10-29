@@ -4,7 +4,7 @@ Guidance for Claude (and other AI assistants) working on this repository.
 
 ## Project context
 
-**JSONPrism** converts one JSON input into 12 formats (JSONL, CSV, TSV, YAML, XML, TOML, .NET RESX, Markdown table, SQL INSERT, BSON, CBOR, MessagePack) and parses six of them (JSONL, CSV, TSV, YAML, TOML, RESX) back. Conversion always runs on the user's device. It ships as:
+**JSONPrism** converts one JSON input into 12 formats (JSONL, CSV, TSV, YAML, XML, TOML, .NET RESX, Markdown table, SQL INSERT, BSON, CBOR, MessagePack) and parses six of them (JSONL, CSV, TSV, YAML, TOML, RESX) back, plus the input-only JSONC → JSON. Conversion always runs on the user's device. It ships as:
 
 - a web app at <https://jsonprism.poli0981.dev>, served by the Cloudflare Worker `jsonprism` (static assets behind a tiny Worker that rate limits requests and answers `/api/*`), deployed by Cloudflare Workers Builds on every push to `main`;
 - native apps built with Tauri 2: Windows, macOS, Linux and Android (sideload APK).
@@ -13,7 +13,7 @@ GitHub Pages (`poli0981.github.io/jsonPrism`) now only redirects to the new doma
 
 The maintainer is **Kokone** ([@poli0981](https://github.com/poli0981)). Audience: the developer community on the open-source Discord server plus YouTube viewers who watch indie/visual-novel gameplay and occasionally want a quick devtool.
 
-**Current release**: 2.0.2. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what is next.
+**Current release**: 2.1.0. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what is next.
 
 ## Stack — exact versions matter
 
@@ -118,7 +118,7 @@ If you find yourself wanting another top-level folder, stop and reconsider.
 ## Adding a new converter — checklist
 
 1. Create `src/converters/myformat.ts` exporting `myFormatConverter`.
-2. Implement `Converter<MyFormatOptions>`, including `meta.extension` (plus `altExtensions` for aliases such as `yml`, and `binary` for byte formats). Return errors as values.
+2. Implement `Converter<MyFormatOptions>`, including `meta.extension` (plus `altExtensions` for aliases such as `yml`, `binary` for byte formats, and `inputOnly` for formats that only convert to JSON, like JSONC — their `convert()` returns an error). Return errors as values.
 3. Add the ID to the `FormatId` union in `src/converters/types.ts`.
 4. Register it in `src/converters/registry.ts` (`CONVERTERS` and `ALL_FORMATS`).
 5. Add `formats.myformat` (and any option labels) to all four locale files.

@@ -20,22 +20,23 @@ JSONPrism là công cụ "tán sắc" cho developer. Nhận một JSON đầu v�
 
 ## Định dạng hỗ trợ
 
-| Định dạng         | Phần mở rộng | Trạng thái     | Đảo (→ JSON) |
-| ----------------- | ------------ | -------------- | ------------ |
-| JSONL             | `.jsonl`     | ✅ Phase 1      | ✅            |
-| CSV               | `.csv`       | ✅ Phase 1      | ✅            |
-| TSV               | `.tsv`       | ✅ Phase 1      | ✅            |
-| YAML              | `.yaml`      | ✅ Phase 1      | ✅            |
-| XML               | `.xml`       | ✅ Phase 2      | —            |
-| TOML              | `.toml`      | ✅ Phase 2      | ✅            |
-| Bảng Markdown     | `.md`        | ✅ Phase 2      | —            |
-| SQL `INSERT`      | `.sql`       | ✅ Phase 2      | —            |
-| RESX (.NET)       | `.resx`      | ✅ Phase 3      | ✅            |
-| BSON              | `.bson`      | ✅ Phase 4      | —            |
-| CBOR              | `.cbor`      | ✅ Phase 4      | —            |
-| MessagePack       | `.msgpack`   | ✅ Phase 4      | —            |
+| Định dạng           | Phần mở rộng      | Trạng thái | Đảo (→ JSON)      |
+| ------------------- | ----------------- | ---------- | ----------------- |
+| JSONL               | `.jsonl`          | ✅ Phase 1  | ✅                 |
+| JSONC (chỉ đầu vào) | `.jsonc`, `.json` | ✅ 2.1.0    | ✅ (chỉ chiều này) |
+| CSV                 | `.csv`            | ✅ Phase 1  | ✅                 |
+| TSV                 | `.tsv`            | ✅ Phase 1  | ✅                 |
+| YAML                | `.yaml`           | ✅ Phase 1  | ✅                 |
+| XML                 | `.xml`            | ✅ Phase 2  | —                 |
+| TOML                | `.toml`           | ✅ Phase 2  | ✅                 |
+| Bảng Markdown       | `.md`             | ✅ Phase 2  | —                 |
+| SQL `INSERT`        | `.sql`            | ✅ Phase 2  | —                 |
+| RESX (.NET)         | `.resx`           | ✅ Phase 3  | ✅                 |
+| BSON                | `.bson`           | ✅ Phase 4  | —                 |
+| CBOR                | `.cbor`           | ✅ Phase 4  | —                 |
+| MessagePack         | `.msgpack`        | ✅ Phase 4  | —                 |
 
-Tổng cộng 12 định dạng. Sáu trong số đó — JSONL, CSV, TSV, YAML, TOML và RESX — còn chuyển ngược được về JSON; ở chiều này app cũng nhận file `.ndjson`, `.tab` và `.yml`. SQL `INSERT` hỗ trợ SQL chuẩn, PostgreSQL, MySQL, SQLite và MSSQL. BSON, CBOR và MessagePack là định dạng nhị phân: panel output hiển thị chúng dưới dạng text base64 hoặc hex, còn file tải về là binary thật.
+Tổng cộng 12 định dạng đích. Sáu trong số đó — JSONL, CSV, TSV, YAML, TOML và RESX — còn chuyển ngược được về JSON; ở chiều này app cũng nhận file `.ndjson`, `.tab` và `.yml`. **JSONC** (JSON có comment: `tsconfig.json`, settings của VS Code) là định dạng chỉ-đầu-vào: biến file `.jsonc` và `.json` thành JSON thuần, bỏ comment và dấu phẩy thừa nhưng giữ nguyên mọi giá trị, con số và key như bạn viết. Dán JSONC ở chiều JSON → thì app sẽ gợi ý chuyển sang. SQL `INSERT` hỗ trợ SQL chuẩn, PostgreSQL, MySQL, SQLite và MSSQL. BSON, CBOR và MessagePack là định dạng nhị phân: panel output hiển thị chúng dưới dạng text base64 hoặc hex, còn file tải về là binary thật.
 
 ## Tính năng
 
@@ -294,6 +295,8 @@ export const myFormatConverter: Converter<MyFormatOptions> = {
   // Optional: reverse({ text }, options) parses the format back to JSON.
 };
 ```
+
+Định dạng chỉ-đầu-vào (như JSONC) đặt `meta.inputOnly: true`, cài `reverse()`, còn `convert()` trả lỗi; UI sẽ disable nó ở chiều JSON →.
 
 Sau đó thêm id vào union `FormatId` trong `src/converters/types.ts`, đăng ký converter trong `src/converters/registry.ts` (`CONVERTERS` và `ALL_FORMATS`), và thêm label key vào cả bốn file trong `src/i18n/locales/` — test parity sẽ fail nếu một ngôn ngữ thiếu key.
 

@@ -20,22 +20,23 @@ JSONPrism is a refracting tool for developers. It takes a single JSON input and 
 
 ## Target formats
 
-| Format            | Extension   | Status        | Reverse (→ JSON) |
-| ----------------- | ----------- | ------------- | ---------------- |
-| JSONL             | `.jsonl`    | ✅ Phase 1     | ✅                |
-| CSV               | `.csv`      | ✅ Phase 1     | ✅                |
-| TSV               | `.tsv`      | ✅ Phase 1     | ✅                |
-| YAML              | `.yaml`     | ✅ Phase 1     | ✅                |
-| XML               | `.xml`      | ✅ Phase 2     | —                |
-| TOML              | `.toml`     | ✅ Phase 2     | ✅                |
-| Markdown table    | `.md`       | ✅ Phase 2     | —                |
-| SQL `INSERT`      | `.sql`      | ✅ Phase 2     | —                |
-| RESX (.NET)       | `.resx`     | ✅ Phase 3     | ✅                |
-| BSON              | `.bson`     | ✅ Phase 4     | —                |
-| CBOR              | `.cbor`     | ✅ Phase 4     | —                |
-| MessagePack       | `.msgpack`  | ✅ Phase 4     | —                |
+| Format             | Extension         | Status    | Reverse (→ JSON) |
+| ------------------ | ----------------- | --------- | ---------------- |
+| JSONL              | `.jsonl`          | ✅ Phase 1 | ✅                |
+| JSONC (input only) | `.jsonc`, `.json` | ✅ 2.1.0   | ✅ (only)         |
+| CSV                | `.csv`            | ✅ Phase 1 | ✅                |
+| TSV                | `.tsv`            | ✅ Phase 1 | ✅                |
+| YAML               | `.yaml`           | ✅ Phase 1 | ✅                |
+| XML                | `.xml`            | ✅ Phase 2 | —                |
+| TOML               | `.toml`           | ✅ Phase 2 | ✅                |
+| Markdown table     | `.md`             | ✅ Phase 2 | —                |
+| SQL `INSERT`       | `.sql`            | ✅ Phase 2 | —                |
+| RESX (.NET)        | `.resx`           | ✅ Phase 3 | ✅                |
+| BSON               | `.bson`           | ✅ Phase 4 | —                |
+| CBOR               | `.cbor`           | ✅ Phase 4 | —                |
+| MessagePack        | `.msgpack`        | ✅ Phase 4 | —                |
 
-Twelve formats. Six of them — JSONL, CSV, TSV, YAML, TOML and RESX — also convert back to JSON; in that direction `.ndjson`, `.tab` and `.yml` files are accepted too. SQL `INSERT` speaks standard SQL, PostgreSQL, MySQL, SQLite and MSSQL. BSON, CBOR and MessagePack are binary: the output panel shows them as base64 or hex text, and downloads are real binary files.
+Twelve target formats. Six of them — JSONL, CSV, TSV, YAML, TOML and RESX — also convert back to JSON; in that direction `.ndjson`, `.tab` and `.yml` files are accepted too. **JSONC** (JSON with comments: `tsconfig.json`, VS Code settings) is input only: it turns `.jsonc` and `.json` files into plain JSON, dropping comments and trailing commas while keeping every value, number and key exactly as written. Paste JSONC in the JSON → direction and the app offers to switch. SQL `INSERT` speaks standard SQL, PostgreSQL, MySQL, SQLite and MSSQL. BSON, CBOR and MessagePack are binary: the output panel shows them as base64 or hex text, and downloads are real binary files.
 
 ## Features
 
@@ -294,6 +295,8 @@ export const myFormatConverter: Converter<MyFormatOptions> = {
   // Optional: reverse({ text }, options) parses the format back to JSON.
 };
 ```
+
+An input-only format (like JSONC) sets `meta.inputOnly: true`, implements `reverse()`, and has `convert()` return an error; the UI then disables it in the JSON → direction.
 
 Then add the id to the `FormatId` union in `src/converters/types.ts`, register the converter in `src/converters/registry.ts` (`CONVERTERS` and `ALL_FORMATS`), and add its label keys to all four files in `src/i18n/locales/` — a parity test fails when a locale is missing a key.
 
