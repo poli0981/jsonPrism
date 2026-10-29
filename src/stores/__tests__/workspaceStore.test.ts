@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useWorkspaceStore } from '../workspaceStore';
 
 beforeEach(() => {
@@ -49,5 +49,28 @@ describe('workspaceStore', () => {
     useWorkspaceStore.getState().setFormat('csv');
     useWorkspaceStore.getState().setFormat('jsonl');
     expect(useWorkspaceStore.getState().optionsByFormat['jsonl']).toEqual({ pretty: true });
+  });
+});
+
+describe('workspaceStore initial state', () => {
+  /** The store reads storage once, at module load — import a fresh copy per scenario. */
+  async function loadStore() {
+    vi.resetModules();
+    const { useWorkspaceStore: store } = await import('../workspaceStore');
+    return store;
+  }
+
+  it('restores the stored format and direction', async () => {
+    window.localStorage.setItem('jsonprism.selected_format', 'yaml');
+    window.localStorage.setItem('jsonprism.direction', 'reverse');
+    const store = await loadStore();
+    expect(store.getState()).toMatchObject({ format: 'yaml', direction: 'reverse' });
+  });
+
+  it('opens an input-only format in the → JSON direction', async () => {
+    window.localStorage.setItem('jsonprism.selected_format', 'jsonc');
+    window.localStorage.setItem('jsonprism.direction', 'forward');
+    const store = await loadStore();
+    expect(store.getState()).toMatchObject({ format: 'jsonc', direction: 'reverse' });
   });
 });

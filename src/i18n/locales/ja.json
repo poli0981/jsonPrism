@@ -33,10 +33,13 @@
     "title_rest": "JSON。",
     "copied": "コピー済み",
     "error_position": "{{line}} 行 {{column}} 列",
+    "jsonc_hint": "JSONC（コメントや末尾カンマを含む JSON）のようです。",
+    "jsonc_switch": "JSONC → JSON に変換",
     "output_aria": "{{format}} の出力（読み取り専用）"
   },
   "formats": {
     "jsonl": "JSONL",
+    "jsonc": "JSONC",
     "csv": "CSV",
     "tsv": "TSV",
     "yaml": "YAML",
@@ -53,7 +56,8 @@
     "ready": "利用可能",
     "suggested": "検出されたデータ形状に適しています",
     "not_suggested": "検出されたデータ形状には推奨されません",
-    "no_reverse": "この形式は逆方向のパースに対応していません"
+    "no_reverse": "この形式は逆方向のパースに対応していません",
+    "input_only": "入力専用：→ JSON の方向で JSON に変換します"
   },
   "direction": {
     "forward": "JSON →",
@@ -65,6 +69,14 @@
     "jsonl": {
       "pretty": "各行を整形して出力",
       "pretty_desc": "標準の JSONL は 1 行 1 レコードです。人間が読みやすい複数行を希望する場合に有効化。"
+    },
+    "jsonc": {
+      "indent": "出力レイアウト",
+      "indent_desc": "コメントと末尾のカンマを取り除きます。値・数値・キーの順序は書かれたとおりに保たれます。",
+      "indent_2": "スペース 2 つ",
+      "indent_4": "スペース 4 つ",
+      "indent_tab": "タブ",
+      "indent_minify": "最小化"
     },
     "csv": {
       "header": "ヘッダー行を含める",
@@ -259,7 +271,7 @@
   "about": {
     "title": "JSONPrism について",
     "lead": "開発者のための分光ツール。",
-    "p1": "JSONPrism はひとつの JSON 入力を、プリズムを通る白色光のように多くの形式へ分光し、そのうち 6 形式は JSON に戻すこともできます。変換はすべて端末上で行われるため、貼り付けたりドロップしたデータが外部に出ることはありません。",
+    "p1": "JSONPrism はひとつの JSON 入力を、プリズムを通る白色光のように多くの形式へ分光し、そのうち 6 形式は JSON に戻すこともできます。JSONC（コメント付き JSON）も通常の JSON に変換できます。変換はすべて端末上で行われるため、貼り付けたりドロップしたデータが外部に出ることはありません。",
     "p2": "React 19、TypeScript 7、Vite 8、Tailwind CSS v4、shadcn/ui で構築。Web 版は Cloudflare Workers で配信され、デスクトップ版と Android 版は Tauri 2 で構築されています。ソースは GitHub にあります。",
     "version": "バージョン {{version}}",
     "donate": {

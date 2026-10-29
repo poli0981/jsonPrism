@@ -92,7 +92,7 @@ export function errorPosition(
   return offsetToLineColumn(text, offset);
 }
 
-function offsetToLineColumn(text: string, offset: number): { line: number; column: number } {
+export function offsetToLineColumn(text: string, offset: number): { line: number; column: number } {
   let line = 1;
   let column = 1;
   const end = Math.min(offset, text.length);

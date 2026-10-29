@@ -11,6 +11,8 @@ function languageOfFormat(format: FormatId): EditorLanguage {
       return 'xml';
     case 'jsonl':
       return 'jsonl';
+    case 'jsonc':
+      return 'jsonc';
     case 'markdown':
       return 'markdown';
     case 'sql':

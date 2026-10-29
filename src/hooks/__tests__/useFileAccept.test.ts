@@ -34,6 +34,15 @@ describe('useFileAccept', () => {
     expect(result.allowedExtensions).toEqual(['yaml', 'yml', 'txt']);
   });
 
+  it('accepts .jsonc and .json files for JSONC going back', () => {
+    const result = accept('jsonc', 'reverse');
+    expect(result.accept).toEqual({
+      'application/jsonc': ['.jsonc', '.json'],
+      'text/plain': ['.txt'],
+    });
+    expect(result.allowedExtensions).toEqual(['jsonc', 'json', 'txt']);
+  });
+
   it('keys the dropzone map by the format MIME type', () => {
     const result = accept('jsonl', 'reverse');
     expect(result.accept).toEqual({

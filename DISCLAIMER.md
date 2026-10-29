@@ -59,7 +59,8 @@ do not depend on these services.
   without checking it.
 - Do not assume that a round trip JSON → format → JSON is byte-perfect for
   lossy formats. Only JSONL, CSV, TSV, YAML, TOML and RESX convert back
-  to JSON at all.
+  to JSON at all. JSONC → JSON removes comments and trailing commas, so
+  they are not kept.
 - Pin a specific JSONPrism version if you depend on its behaviour; future
   releases may change defaults.
 

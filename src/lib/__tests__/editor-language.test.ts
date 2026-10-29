@@ -6,6 +6,7 @@ import { editorLanguageFor, outputLanguageFor } from '../editor-language';
 /** Expected CodeMirror language for text written in each format. */
 const FORMAT_LANGUAGE: Record<FormatId, string> = {
   jsonl: 'jsonl',
+  jsonc: 'jsonc',
   csv: 'plain',
   tsv: 'plain',
   yaml: 'yaml',

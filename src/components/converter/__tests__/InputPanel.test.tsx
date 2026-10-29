@@ -40,6 +40,7 @@ interface PanelProps {
   format?: FormatId;
   direction?: Direction;
   onMultiFileDrop?: (files: File[]) => void;
+  onReadAsJsonc?: () => void;
 }
 
 function renderPanel(props: PanelProps = {}) {
@@ -54,6 +55,7 @@ function renderPanel(props: PanelProps = {}) {
       format={props.format ?? 'csv'}
       direction={props.direction ?? 'forward'}
       {...(props.onMultiFileDrop ? { onMultiFileDrop: props.onMultiFileDrop } : {})}
+      {...(props.onReadAsJsonc ? { onReadAsJsonc: props.onReadAsJsonc } : {})}
     />,
   );
   const root = utils.container.firstElementChild as HTMLElement;
@@ -111,6 +113,15 @@ describe('InputPanel — layout', () => {
       'accept',
       '.toml,.txt,application/toml',
     );
+  });
+
+  it('highlights and accepts JSONC going back', () => {
+    const { fileInput } = renderPanel({ format: 'jsonc', direction: 'reverse' });
+    expect(screen.getByRole('textbox', { name: 'Input JSONC' })).toHaveAttribute(
+      'data-language',
+      'jsonc',
+    );
+    expect(fileInput).toHaveAttribute('accept', '.jsonc,.json,.txt,application/jsonc');
   });
 
   it('passes edits straight through', () => {
@@ -171,6 +182,38 @@ describe('InputPanel — error banner', () => {
     renderPanel({ error: 'Invalid CSV' });
     const status = screen.getByRole('status');
     expect(status).toHaveTextContent(/^Invalid CSV$/);
+  });
+});
+
+describe('InputPanel — JSONC hint', () => {
+  const jsonc = '{\n  // compiler options\n  "strict": true,\n}';
+  const error = "Expected property name or '}' in JSON";
+
+  it('offers JSONC → JSON when the JSON error is only comments or trailing commas', async () => {
+    const user = userEvent.setup();
+    const onReadAsJsonc = vi.fn();
+    renderPanel({ value: jsonc, error, onReadAsJsonc });
+
+    expect(
+      screen.getByText('This looks like JSONC — JSON with comments or trailing commas.'),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Convert JSONC → JSON' }));
+    expect(onReadAsJsonc).toHaveBeenCalledOnce();
+  });
+
+  it.each<[string, PanelProps]>([
+    ['the input is valid', { value: jsonc, error: null }],
+    ['the text is not valid JSONC either', { value: '{"a": }', error }],
+    ['already converting back', { value: jsonc, error, direction: 'reverse', format: 'jsonc' }],
+    ['the input is too big to check here', { value: jsonc + ' '.repeat(256 * 1024), error }],
+  ])('stays hidden when %s', (_case, props) => {
+    renderPanel({ ...props, onReadAsJsonc: vi.fn() });
+    expect(screen.queryByRole('button', { name: 'Convert JSONC → JSON' })).not.toBeInTheDocument();
+  });
+
+  it('stays hidden without a handler', () => {
+    renderPanel({ value: jsonc, error });
+    expect(screen.queryByRole('button', { name: 'Convert JSONC → JSON' })).not.toBeInTheDocument();
   });
 });
 

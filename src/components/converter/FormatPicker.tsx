@@ -13,7 +13,10 @@ interface FormatPickerProps {
   onChange: (id: FormatId) => void;
   /** Drives the subtle highlight ring on suggested chips. */
   shape?: JsonShape | null;
-  /** When reverse, formats without a reverse() implementation are disabled. */
+  /**
+   * When reverse, formats without a reverse() implementation are disabled;
+   * when forward, input-only formats (JSONC) are.
+   */
   direction?: Direction;
 }
 
@@ -30,7 +33,7 @@ export function FormatPicker({ value, onChange, shape, direction = 'forward' }: 
   return (
     <>
       {/* Mobile: compact Sheet trigger — saves ~50-80px of toolbar height when
-          the 12 chip grid would otherwise wrap to 2-3 rows on narrow viewports. */}
+          the chip grid would otherwise wrap to 2-3 rows on narrow viewports. */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetTrigger asChild>
           <button
@@ -70,7 +73,7 @@ export function FormatPicker({ value, onChange, shape, direction = 'forward' }: 
         </SheetContent>
       </Sheet>
 
-      {/* Desktop: 12 chips inline. */}
+      {/* Desktop: every chip inline. */}
       <div
         className="hidden flex-wrap gap-1 md:flex"
         role="group"
@@ -101,8 +104,9 @@ interface FormatChipProps {
   expanded?: boolean;
 }
 
-function chipStatus(noReverse: boolean, suggested: boolean, dimmed: boolean) {
+function chipStatus(noReverse: boolean, inputOnly: boolean, suggested: boolean, dimmed: boolean) {
   if (noReverse) return 'no_reverse';
+  if (inputOnly) return 'input_only';
   if (suggested) return 'suggested';
   return dimmed ? 'not_suggested' : 'ready';
 }
@@ -113,9 +117,10 @@ function FormatChip({ id, value, onChange, shape, direction, expanded }: FormatC
   const active = value === id;
   const suggested = direction === 'forward' && shape ? isFormatSuggested(id, shape) : false;
   const noReverse = direction === 'reverse' && typeof c.reverse !== 'function';
-  const enabled = c.meta.ready && !noReverse;
-  const dimmed = direction === 'forward' && !!shape && !suggested && c.meta.ready;
-  const status = chipStatus(noReverse, suggested, dimmed);
+  const inputOnly = direction === 'forward' && c.meta.inputOnly === true;
+  const enabled = c.meta.ready && !noReverse && !inputOnly;
+  const dimmed = direction === 'forward' && !!shape && !suggested && enabled;
+  const status = chipStatus(noReverse, inputOnly, suggested, dimmed);
 
   return (
     <button

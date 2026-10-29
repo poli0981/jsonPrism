@@ -1,6 +1,7 @@
 import type { ConversionInput, ConversionResult, Converter, FormatId, ReverseInput } from './types';
 import { errorMessage } from '@/lib/errors';
 import { jsonlConverter } from './jsonl';
+import { jsoncConverter } from './jsonc';
 import { csvConverter, tsvConverter } from './csv';
 import { yamlConverter } from './yaml';
 import { xmlConverter } from './xml';
@@ -15,6 +16,7 @@ import { msgpackConverter } from './msgpack';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const CONVERTERS: Record<FormatId, Converter<any>> = {
   jsonl: jsonlConverter,
+  jsonc: jsoncConverter,
   csv: csvConverter,
   tsv: tsvConverter,
   yaml: yamlConverter,
@@ -30,6 +32,7 @@ export const CONVERTERS: Record<FormatId, Converter<any>> = {
 
 export const ALL_FORMATS: FormatId[] = [
   'jsonl',
+  'jsonc',
   'csv',
   'tsv',
   'yaml',

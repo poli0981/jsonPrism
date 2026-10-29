@@ -156,6 +156,7 @@ describe('CodeEditor — languages', () => {
   it.each<[EditorLanguage, string | null]>([
     ['json', 'json'],
     ['jsonl', 'json'],
+    ['jsonc', 'json'],
     ['yaml', 'yaml'],
     ['xml', 'xml'],
     ['markdown', 'markdown'],
@@ -214,6 +215,26 @@ describe('CodeEditor — JSON linting', () => {
     const text = `${BOM}{"a":1}`;
     expect(parseJsonInput(text).ok).toBe(true);
     const { view } = renderEditor({ value: text });
+    expect(await lintNow(view)).toBe(0);
+  });
+});
+
+describe('CodeEditor — JSONC linting', () => {
+  const language = editorLanguageFor('jsonc', 'reverse');
+
+  it('accepts comments and trailing commas', async () => {
+    const { view } = renderEditor({
+      value: '{\n  // note\n  "a": [1, 2,], /* more */\n}',
+      language,
+    });
+    expect(await lintNow(view)).toBe(0);
+  });
+
+  it('flags JSONC errors where the converter does', async () => {
+    const { view } = renderEditor({ value: '{\n  "a": 1 /* open\n}', language });
+    expect(await lintNow(view)).toBe(1);
+
+    typeInto(view, '');
     expect(await lintNow(view)).toBe(0);
   });
 });

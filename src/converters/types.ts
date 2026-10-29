@@ -9,6 +9,7 @@
 
 export type FormatId =
   | 'jsonl'
+  | 'jsonc'
   | 'csv'
   | 'tsv'
   | 'yaml'
@@ -43,6 +44,11 @@ export interface ConverterMeta {
    * for display, but downloads decode back to raw bytes via the MIME type.
    */
   binary?: boolean;
+  /**
+   * Input-only formats (JSONC) only convert *to* JSON: `convert()` returns an
+   * error and the UI disables them in the JSON → direction.
+   */
+  inputOnly?: boolean;
 }
 
 export interface ConversionInput {
@@ -57,7 +63,15 @@ export interface ReverseInput {
   sourceName?: string;
 }
 
-export type ConversionResult = { ok: true; output: string } | { ok: false; error: string };
+export interface ConversionFailure {
+  ok: false;
+  error: string;
+  /** 1-based position of an input syntax error, when the parser knows it. */
+  line?: number;
+  column?: number;
+}
+
+export type ConversionResult = { ok: true; output: string } | ConversionFailure;
 
 /**
  * Schema describing a single option field, used by the settings UI
