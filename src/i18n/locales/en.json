@@ -33,10 +33,13 @@
     "title_rest": "JSON.",
     "copied": "Copied",
     "error_position": "Ln {{line}}, Col {{column}}",
+    "jsonc_hint": "This looks like JSONC — JSON with comments or trailing commas.",
+    "jsonc_switch": "Convert JSONC → JSON",
     "output_aria": "{{format}} output (read-only)"
   },
   "formats": {
     "jsonl": "JSONL",
+    "jsonc": "JSONC",
     "csv": "CSV",
     "tsv": "TSV",
     "yaml": "YAML",
@@ -53,7 +56,8 @@
     "ready": "Ready",
     "suggested": "Suggested for the detected shape",
     "not_suggested": "Not suggested for the detected shape",
-    "no_reverse": "Reverse parse not supported for this format"
+    "no_reverse": "Reverse parse not supported for this format",
+    "input_only": "Input only: converts to JSON in the → JSON direction"
   },
   "direction": {
     "forward": "JSON →",
@@ -65,6 +69,14 @@
     "jsonl": {
       "pretty": "Pretty-print each line",
       "pretty_desc": "Canonical JSONL is single-line. Enable for human-readable multi-line records."
+    },
+    "jsonc": {
+      "indent": "Output layout",
+      "indent_desc": "Comments and trailing commas are removed; values, numbers and key order stay exactly as written.",
+      "indent_2": "2 spaces",
+      "indent_4": "4 spaces",
+      "indent_tab": "Tab",
+      "indent_minify": "Minified"
     },
     "csv": {
       "header": "Include header row",
@@ -292,7 +304,7 @@
   "about": {
     "title": "About JSONPrism",
     "lead": "A refracting tool for developers.",
-    "p1": "JSONPrism takes a single JSON input and disperses it into many target formats — like white light through a prism — and parses six of them back. Conversion runs entirely on your device, so the data you paste or drop never leaves it.",
+    "p1": "JSONPrism takes a single JSON input and disperses it into many target formats — like white light through a prism — and parses six of them back, plus JSONC (JSON with comments) into plain JSON. Conversion runs entirely on your device, so the data you paste or drop never leaves it.",
     "p2": "Built with React 19, TypeScript 7, Vite 8, Tailwind CSS v4 and shadcn/ui. The web version is served by Cloudflare Workers; the desktop and Android apps are built with Tauri 2. Source on GitHub.",
     "version": "Version {{version}}",
     "donate": {

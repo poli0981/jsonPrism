@@ -1,12 +1,14 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDropzone, type FileRejection } from 'react-dropzone';
-import { Eraser, FileText, FolderOpen } from 'lucide-react';
+import { Eraser, FileText, FolderOpen, MessageSquareCode } from 'lucide-react';
 import { ToolbarButton } from '@/components/common/ToolbarButton';
 import { toast } from '@/components/ui/sonner';
+import { parseJsonc } from '@/converters/jsonc';
 import { extensionsFor } from '@/converters/registry';
 import type { Direction, FormatId } from '@/converters/types';
 import { useFileAccept } from '@/hooks/useFileAccept';
+import { WORKER_THRESHOLD_CHARS } from '@/lib/convert-client';
 import { editorLanguageFor } from '@/lib/editor-language';
 import { errorMessage } from '@/lib/errors';
 import { extOf } from '@/lib/file-filter';
@@ -28,6 +30,8 @@ interface InputPanelProps {
   direction: Direction;
   /** Called when 2+ files are dropped — workspace routes them into batch. */
   onMultiFileDrop?: (files: File[]) => void;
+  /** Switches to JSONC → JSON; offered when JSON → fails on valid JSONC. */
+  onReadAsJsonc?: () => void;
 }
 
 export function InputPanel({
@@ -39,6 +43,7 @@ export function InputPanel({
   format,
   direction,
   onMultiFileDrop,
+  onReadAsJsonc,
 }: InputPanelProps) {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -156,6 +161,13 @@ export function InputPanel({
     if (file) loadFile(file);
   };
 
+  // Comments or trailing commas make JSON → fail; if that is all that is wrong,
+  // offer JSONC. Inputs this big convert in the worker, so skip the extra parse.
+  const looksLikeJsonc = useMemo(
+    () => !isReverse && !!error && value.length < WORKER_THRESHOLD_CHARS && parseJsonc(value).ok,
+    [error, isReverse, value],
+  );
+
   const showOverlay = isDragActive || dragActive;
   const position =
     errorLine != null
@@ -218,6 +230,23 @@ export function InputPanel({
           </>
         ) : null}
       </div>
+
+      {looksLikeJsonc && onReadAsJsonc && (
+        <div className="border-border/70 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b px-3 py-1 text-xs">
+          <span className="text-muted-foreground">{t('home.jsonc_hint')}</span>
+          <button
+            type="button"
+            onClick={onReadAsJsonc}
+            className="group border-primary/40 text-foreground hover:bg-primary/10 focus-visible:ring-ring inline-flex min-h-6 items-center gap-1.5 rounded-md border px-2 font-mono font-medium transition outline-none focus-visible:ring-2"
+          >
+            <MessageSquareCode
+              className="h-3.5 w-3.5 transition-transform motion-safe:group-hover:-rotate-6"
+              aria-hidden
+            />
+            {t('home.jsonc_switch')}
+          </button>
+        </div>
+      )}
 
       <div className="relative min-h-0 flex-1">
         <CodeEditorLazy

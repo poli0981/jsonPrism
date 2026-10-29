@@ -33,10 +33,13 @@
     "title_rest": "JSON.",
     "copied": "Đã chép",
     "error_position": "Dòng {{line}}, Cột {{column}}",
+    "jsonc_hint": "Có vẻ đây là JSONC — JSON có comment hoặc dấu phẩy thừa.",
+    "jsonc_switch": "Chuyển JSONC → JSON",
     "output_aria": "Kết quả {{format}} (chỉ đọc)"
   },
   "formats": {
     "jsonl": "JSONL",
+    "jsonc": "JSONC",
     "csv": "CSV",
     "tsv": "TSV",
     "yaml": "YAML",
@@ -53,7 +56,8 @@
     "ready": "Sẵn sàng",
     "suggested": "Gợi ý cho shape phát hiện được",
     "not_suggested": "Không gợi ý cho shape phát hiện được",
-    "no_reverse": "Format này không hỗ trợ parse ngược"
+    "no_reverse": "Format này không hỗ trợ parse ngược",
+    "input_only": "Chỉ làm đầu vào: chuyển sang JSON ở chiều → JSON"
   },
   "direction": {
     "forward": "JSON →",
@@ -65,6 +69,14 @@
     "jsonl": {
       "pretty": "Pretty-print mỗi dòng",
       "pretty_desc": "JSONL chuẩn là một dòng một record. Bật cái này nếu muốn dạng dễ đọc nhiều dòng."
+    },
+    "jsonc": {
+      "indent": "Bố cục output",
+      "indent_desc": "Comment và dấu phẩy thừa bị bỏ; giá trị, số và thứ tự key giữ nguyên như bạn viết.",
+      "indent_2": "2 dấu cách",
+      "indent_4": "4 dấu cách",
+      "indent_tab": "Tab",
+      "indent_minify": "Thu gọn (minify)"
     },
     "csv": {
       "header": "Bao gồm dòng header",
@@ -292,7 +304,7 @@
   "about": {
     "title": "Về JSONPrism",
     "lead": "Một công cụ tán sắc cho developer.",
-    "p1": "JSONPrism nhận một đầu vào JSON và tán nó ra nhiều định dạng đích — như ánh sáng trắng đi qua lăng kính — và đọc ngược được sáu trong số đó. Mọi chuyển đổi chạy hoàn toàn trên thiết bị của bạn, nên dữ liệu bạn dán hoặc thả vào không bao giờ rời khỏi máy.",
+    "p1": "JSONPrism nhận một đầu vào JSON và tán nó ra nhiều định dạng đích — như ánh sáng trắng đi qua lăng kính — và đọc ngược được sáu trong số đó, cùng với JSONC (JSON có comment) thành JSON thuần. Mọi chuyển đổi chạy hoàn toàn trên thiết bị của bạn, nên dữ liệu bạn dán hoặc thả vào không bao giờ rời khỏi máy.",
     "p2": "Xây dựng với React 19, TypeScript 7, Vite 8, Tailwind CSS v4 và shadcn/ui. Bản web chạy trên Cloudflare Workers; ứng dụng desktop và Android được xây dựng bằng Tauri 2. Mã nguồn trên GitHub.",
     "version": "Phiên bản {{version}}",
     "donate": {

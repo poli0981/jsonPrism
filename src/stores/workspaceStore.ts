@@ -45,13 +45,15 @@ function readInitialFormat(): FormatId {
   return isFormatId(stored) ? stored : DEFAULT_FORMAT;
 }
 
-function readInitialDirection(): Direction {
+function readInitialDirection(format: FormatId): Direction {
+  // An input-only format (JSONC) has no JSON → direction.
+  if (getConverter(format).meta.inputOnly) return 'reverse';
   return safeGetItem(STORAGE_DIRECTION_KEY) === 'reverse' ? 'reverse' : 'forward';
 }
 
 export const useWorkspaceStore = create<WorkspaceState>((set, get) => {
   const initialFormat = readInitialFormat();
-  const initialDirection = readInitialDirection();
+  const initialDirection = readInitialDirection(initialFormat);
   const initialOptions: Record<string, Record<string, unknown>> = {
     [initialFormat]: loadOptions(initialFormat, getConverter(initialFormat)),
   };

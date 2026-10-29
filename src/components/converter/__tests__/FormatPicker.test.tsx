@@ -7,6 +7,7 @@ import { FormatPicker } from '../FormatPicker';
 
 const LABELS: Record<FormatId, string> = {
   jsonl: 'JSONL',
+  jsonc: 'JSONC',
   csv: 'CSV',
   tsv: 'TSV',
   yaml: 'YAML',
@@ -34,7 +35,7 @@ describe('FormatPicker — inline chips', () => {
     render(<FormatPicker value="yaml" onChange={() => {}} />);
     const buttons = within(inlineGroup()).getAllByRole('button');
     expect(buttons.map((b) => b.textContent)).toEqual(Object.values(LABELS));
-    for (const button of buttons) {
+    for (const button of buttons.filter((b) => b.textContent !== 'JSONC')) {
       expect(button).toHaveAttribute(
         'aria-pressed',
         button.textContent === 'YAML' ? 'true' : 'false',
@@ -42,6 +43,23 @@ describe('FormatPicker — inline chips', () => {
       expect(button).toBeEnabled();
       expect(button).toHaveAttribute('title', 'Ready');
     }
+  });
+
+  it('disables input-only formats going forward', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<FormatPicker value="jsonl" onChange={onChange} shape="object" />);
+
+    expect(chip('jsonc')).toBeDisabled();
+    expect(chip('jsonc')).toHaveAttribute(
+      'title',
+      'Input only: converts to JSON in the → JSON direction',
+    );
+    // Disabled, not "not suggested": no dashed border.
+    expect(chip('jsonc')).not.toHaveClass('border-dashed');
+
+    await user.click(chip('jsonc'));
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   it('reports the picked format', async () => {
@@ -84,8 +102,9 @@ describe('FormatPicker — inline chips', () => {
       expect(chip(format)).toBeDisabled();
       expect(chip(format)).toHaveAttribute('title', 'Reverse parse not supported for this format');
     }
-    for (const format of ['jsonl', 'csv', 'tsv', 'yaml', 'toml', 'resx'] as const) {
+    for (const format of ['jsonl', 'jsonc', 'csv', 'tsv', 'yaml', 'toml', 'resx'] as const) {
       expect(chip(format)).toBeEnabled();
+      expect(chip(format)).toHaveAttribute('title', 'Ready');
     }
 
     await user.click(chip('xml'));
@@ -107,7 +126,7 @@ describe('FormatPicker — compact sheet (mobile)', () => {
     await user.click(screen.getByRole('button', { name: /Target format\s*JSONL/ }));
     const dialog = await screen.findByRole('dialog', { name: 'Target format' });
     const sheetGroup = within(dialog).getByRole('group', { name: 'Target format' });
-    expect(within(sheetGroup).getAllByRole('button')).toHaveLength(12);
+    expect(within(sheetGroup).getAllByRole('button')).toHaveLength(13);
     expect(chip('jsonl', sheetGroup)).toHaveAttribute('aria-pressed', 'true');
     expect(chip('yaml', sheetGroup)).toHaveAttribute('title', 'Suggested for the detected shape');
 

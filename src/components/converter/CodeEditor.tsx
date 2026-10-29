@@ -12,15 +12,18 @@ import { xml } from '@codemirror/lang-xml';
 import { markdown } from '@codemirror/lang-markdown';
 import { sql } from '@codemirror/lang-sql';
 import { HighlightStyle, StreamLanguage, syntaxHighlighting } from '@codemirror/language';
+import { json as jsonStream } from '@codemirror/legacy-modes/mode/javascript';
 import { toml } from '@codemirror/legacy-modes/mode/toml';
 import { lintGutter, linter, type Diagnostic } from '@codemirror/lint';
 import { tags as t } from '@lezer/highlight';
-import { parseJsonInput } from '@/lib/detect';
+import { parseJsonc } from '@/converters/jsonc';
+import type { ConversionFailure } from '@/converters/types';
+import { parseJsonInput, type ParseFailure } from '@/lib/detect';
 import { useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 
 export type EditorLanguage =
-  'json' | 'jsonl' | 'plain' | 'yaml' | 'xml' | 'markdown' | 'sql' | 'toml';
+  'json' | 'jsonl' | 'jsonc' | 'plain' | 'yaml' | 'xml' | 'markdown' | 'sql' | 'toml';
 
 export interface CodeEditorProps {
   value: string;
@@ -76,15 +79,23 @@ const yieldFileDrops = EditorView.domEventHandlers({
 const LINT_LIMIT_CHARS = 2_000_000;
 const MAX_JSONL_DIAGNOSTICS = 100;
 
+type Check = (text: string) => { ok: true } | ParseFailure | ConversionFailure;
+
 /**
  * Lints `text` (starting at document offset `start`) with the converter's own
  * parser, so the editor and the conversion agree — a leading byte-order mark
  * is fine, and error positions match on every engine. Blank text is a
  * prompt, not an error.
  */
-function parseDiagnostic(view: EditorView, text: string, start: number): Diagnostic | null {
-  const result = parseJsonInput(text);
-  if (result.ok || result.error === 'empty') return null;
+function parseDiagnostic(
+  view: EditorView,
+  text: string,
+  start: number,
+  check: Check = parseJsonInput,
+): Diagnostic | null {
+  if (!text.trim()) return null;
+  const result = check(text);
+  if (result.ok) return null;
   const { doc } = view.state;
   let from = start;
   if (result.line !== undefined && result.column !== undefined) {
@@ -97,6 +108,17 @@ function parseDiagnostic(view: EditorView, text: string, start: number): Diagnos
 const jsonLint = linter((view) => {
   if (view.state.doc.length > LINT_LIMIT_CHARS) return [];
   const diagnostic = parseDiagnostic(view, view.state.doc.toString(), 0);
+  return diagnostic ? [diagnostic] : [];
+});
+
+// @lezer/json has no comment tokens, so JSONC uses the legacy JSON mode, which
+// highlights them. It calls true/false/null "atom"; colour them like JSON's.
+const jsoncLanguage = StreamLanguage.define({ ...jsonStream, tokenTable: { atom: t.bool } });
+
+// JSONC: comments and trailing commas are fine; the rest must be JSON.
+const jsoncLint = linter((view) => {
+  if (view.state.doc.length > LINT_LIMIT_CHARS) return [];
+  const diagnostic = parseDiagnostic(view, view.state.doc.toString(), 0, parseJsonc);
   return diagnostic ? [diagnostic] : [];
 });
 
@@ -134,6 +156,8 @@ function languageExtensions(language: EditorLanguage, readOnly: boolean) {
       return readOnly ? [json()] : [json(), lintGutter(), jsonLint];
     case 'jsonl':
       return readOnly ? [json()] : [json(), lintGutter(), jsonlLint];
+    case 'jsonc':
+      return readOnly ? [jsoncLanguage] : [jsoncLanguage, lintGutter(), jsoncLint];
     case 'yaml':
       return [yaml()];
     case 'xml':

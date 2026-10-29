@@ -195,6 +195,39 @@ describe('ConverterWorkspace — direction', () => {
     expect(useWorkspaceStore.getState()).toMatchObject({ direction: 'forward', format: 'csv' });
     expect(inputBox()).toBeInTheDocument();
   });
+
+  it('converts JSONC back to JSON and places errors in the original text', () => {
+    useWorkspaceStore.setState({ format: 'jsonc', direction: 'reverse' });
+    render(<ConverterWorkspace />);
+
+    type('{\n  // comment\n  "a": [1, 2,],\n}', 'Input JSONC');
+    expect(outputBox('JSON output (read-only)')).toHaveValue('{\n  "a": [\n    1,\n    2\n  ]\n}');
+
+    type('{\n  /* comment */\n  "a": 1\n  "b": 2\n}', 'Input JSONC');
+    expect(screen.getByRole('status')).toHaveTextContent(/^Ln 4, Col 3/);
+    expect(screen.getByText('error')).toBeInTheDocument();
+  });
+
+  it('leaves an input-only format when switching to JSON →', async () => {
+    const user = userEvent.setup();
+    useWorkspaceStore.setState({ format: 'jsonc', direction: 'reverse' });
+    render(<ConverterWorkspace />);
+
+    await user.click(screen.getByRole('button', { name: 'JSON →' }));
+    expect(useWorkspaceStore.getState()).toMatchObject({ direction: 'forward', format: 'jsonl' });
+    expect(within(chips()).getByRole('button', { name: 'JSONC' })).toBeDisabled();
+  });
+
+  it('offers to read JSON with comments as JSONC', async () => {
+    const user = userEvent.setup();
+    render(<ConverterWorkspace />);
+    type('[1, /* two */ 2]');
+
+    await user.click(screen.getByRole('button', { name: 'Convert JSONC → JSON' }));
+    expect(useWorkspaceStore.getState()).toMatchObject({ direction: 'reverse', format: 'jsonc' });
+    expect(inputBox('Input JSONC')).toHaveValue('[1, /* two */ 2]');
+    expect(outputBox('JSON output (read-only)')).toHaveValue('[\n  1,\n  2\n]');
+  });
 });
 
 describe('ConverterWorkspace — options', () => {

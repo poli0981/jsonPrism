@@ -23,6 +23,8 @@ import { StatusBar, type ConversionState } from './StatusBar';
 import { BatchPanel } from './BatchPanel';
 
 const REVERSIBLE_FALLBACKS: FormatId[] = ['jsonl', 'csv', 'yaml', 'toml', 'resx'];
+/** Where the JSON → direction lands when the current format is input-only. */
+const FORWARD_FALLBACK: FormatId = 'jsonl';
 
 export function ConverterWorkspace() {
   const { t } = useTranslation();
@@ -74,15 +76,23 @@ export function ConverterWorkspace() {
     (next: Direction) => {
       setDirection(next);
       // If the current format doesn't support the new direction, switch to one that does.
-      if (next === 'reverse' && typeof getConverter(format).reverse !== 'function') {
+      const converter = getConverter(format);
+      if (next === 'reverse' && typeof converter.reverse !== 'function') {
         const fallback = REVERSIBLE_FALLBACKS.find(
           (id) => typeof getConverter(id).reverse === 'function',
         );
         if (fallback) setFormat(fallback);
       }
+      if (next === 'forward' && converter.meta.inputOnly) setFormat(FORWARD_FALLBACK);
     },
     [format, setDirection, setFormat],
   );
+
+  // Offered by the input panel when JSON → fails on text that is valid JSONC.
+  const readAsJsonc = useCallback(() => {
+    setDirection('reverse');
+    setFormat('jsonc');
+  }, [setDirection, setFormat]);
 
   const currentOptions = useMemo(
     () => storedOptions ?? { ...getConverter(format).defaultOptions },
@@ -130,6 +140,7 @@ export function ConverterWorkspace() {
       format={format}
       direction={direction}
       onMultiFileDrop={handleMultiFileDrop}
+      onReadAsJsonc={readAsJsonc}
     />
   );
   const outputPanel = (
