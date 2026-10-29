@@ -71,15 +71,21 @@ function convertOnce({
   if (direction === 'reverse') {
     if (typeof converter.reverse !== 'function') return { kind: 'no-reverse' };
     const result = safeReverse(converter, { text, ...(sourceName ? { sourceName } : {}) }, options);
-    return result.ok
-      ? {
-          kind: 'ok',
-          output: result.output,
-          shape: null,
-          precisionLoss: false,
-          outputBytes: utf8ByteLength(result.output),
-        }
-      : { kind: 'input-error', message: result.error };
+    if (!result.ok) {
+      return {
+        kind: 'input-error',
+        message: result.error,
+        ...(result.line !== undefined ? { line: result.line } : {}),
+        ...(result.column !== undefined ? { column: result.column } : {}),
+      };
+    }
+    return {
+      kind: 'ok',
+      output: result.output,
+      shape: null,
+      precisionLoss: false,
+      outputBytes: utf8ByteLength(result.output),
+    };
   }
 
   const parsed = parseCached(text);

@@ -162,6 +162,18 @@ describe('useConversionResult — small inputs (main thread)', () => {
     expect(result.current.inputErrorColumn).toBeNull();
   });
 
+  it('surfaces the position of a JSONC error', () => {
+    const { result } = setup({
+      input: '[\n  1, /* two */\n  2 3\n]',
+      format: 'jsonc',
+      direction: 'reverse',
+      options: { indent: '2' },
+    });
+    expect(result.current.inputError).toEqual(expect.any(String));
+    expect(result.current.inputErrorLine).toBe(3);
+    expect(result.current.inputErrorColumn).toBe(5);
+  });
+
   it('re-converts when the options change', () => {
     const { result, rerender } = setup({
       input: '[{"a":1}]',

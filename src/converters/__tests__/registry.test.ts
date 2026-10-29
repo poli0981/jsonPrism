@@ -3,11 +3,12 @@ import { ALL_FORMATS, CONVERTERS, getConverter } from '../registry';
 import type { FormatId } from '../types';
 
 describe('converter registry', () => {
-  it('exposes all 12 format IDs', () => {
-    expect(ALL_FORMATS).toHaveLength(12);
+  it('exposes all 13 format IDs', () => {
+    expect(ALL_FORMATS).toHaveLength(13);
     expect(new Set(ALL_FORMATS)).toEqual(
       new Set<FormatId>([
         'jsonl',
+        'jsonc',
         'csv',
         'tsv',
         'yaml',
@@ -42,7 +43,7 @@ describe('converter registry', () => {
     }
   });
 
-  it('all 12 converters are marked ready', () => {
+  it('all 13 converters are marked ready', () => {
     for (const id of ALL_FORMATS) {
       expect(getConverter(id).meta.ready).toBe(true);
     }
@@ -50,7 +51,13 @@ describe('converter registry', () => {
 
   it('phase metadata covers all expected phases', () => {
     const phases = ALL_FORMATS.map((id) => getConverter(id).meta.phase);
-    // P1 jsonl/csv/tsv/yaml, P2 xml/toml/markdown/sql, P3 resx, P4 bson/cbor/msgpack.
+    // P1 jsonl/csv/tsv/yaml, P2 xml/toml/markdown/sql, P3 resx, P4 bson/cbor/msgpack/jsonc.
     expect(new Set(phases)).toEqual(new Set([1, 2, 3, 4]));
+  });
+
+  it('only JSONC is input-only, and it parses back to JSON', () => {
+    const inputOnly = ALL_FORMATS.filter((id) => getConverter(id).meta.inputOnly);
+    expect(inputOnly).toEqual(['jsonc']);
+    expect(typeof getConverter('jsonc').reverse).toBe('function');
   });
 });

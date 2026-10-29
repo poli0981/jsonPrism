@@ -62,6 +62,16 @@ describe('runConversion', () => {
     ).toBe('input-error');
   });
 
+  it('passes a reverse error position through when the parser knows it', () => {
+    const { outcome } = runConversion({
+      text: '// config\n{"a": 1 "b": 2}',
+      format: 'jsonc',
+      direction: 'reverse',
+      options: { indent: '2' },
+    });
+    expect(outcome).toMatchObject({ kind: 'input-error', line: 2, column: 9 });
+  });
+
   it('flags precision loss on huge integers', () => {
     const { outcome } = runConversion({
       text: '{"id": 12345678901234567890}',

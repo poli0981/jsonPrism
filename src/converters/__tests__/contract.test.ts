@@ -37,6 +37,12 @@ const ADVERSARIAL_TEXT = [
   '\u0000\u0001\u0002',
   'key = = value',
   '<root><data name="x"><value>1</value></data></root>',
+  // JSONC-shaped: comments, stray commas, a string cut off mid-escape.
+  '/*',
+  '//',
+  '[,]',
+  '{"a": 1,} // ok',
+  '"\\',
 ];
 
 describe('converter contract', () => {
