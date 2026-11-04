@@ -13,7 +13,7 @@ GitHub Pages (`poli0981.github.io/jsonPrism`) now only redirects to the new doma
 
 The maintainer is **Kokone** ([@poli0981](https://github.com/poli0981)). Audience: the developer community on the open-source Discord server plus YouTube viewers who watch indie/visual-novel gameplay and occasionally want a quick devtool.
 
-**Current release**: 2.1.0. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what is next.
+**Current release**: 2.1.1. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what is next.
 
 ## Stack — exact versions matter
 

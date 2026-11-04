@@ -4,7 +4,7 @@ This document is the **single source of truth** for what's done, what's next, an
 
 Update it as work lands — keep the project status honest.
 
-**Current release: v2.1.0 (2026-10-29).** The web app runs at https://jsonprism.poli0981.dev (Cloudflare Workers); desktop and Android builds are on [GitHub Releases](https://github.com/poli0981/jsonPrism/releases).
+**Current release: v2.1.1 (2026-11-04).** The web app runs at https://jsonprism.poli0981.dev (Cloudflare Workers); desktop and Android builds are on [GitHub Releases](https://github.com/poli0981/jsonPrism/releases).
 
 ---
 
@@ -365,6 +365,7 @@ The most common "this isn't valid JSON" paste — config files with comments —
 - [x] JSONC input editor: legacy JSON mode for comment highlighting plus a linter that shares the converter's parser.
 - [x] JSON → input that is valid JSONC gets a one-click "Convert JSONC → JSON" hint.
 - [x] Accepts `.jsonc` and `.json` (plus `.txt`) in the single-file and batch flows; strings in all four locales.
+- [x] 2.1.1 (2026-11-04): every npm, Cargo and GitHub Actions dependency at its latest release within the current majors; `THIRD-PARTY.md` re-synced with the lockfiles
 
 ### Deliverable
 
