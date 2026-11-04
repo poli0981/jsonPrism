@@ -78,7 +78,7 @@
     },
     "android": {
       "minSdkVersion": 31,
-      "versionCode": 20100
+      "versionCode": 20101
     }
   },
   "plugins": {

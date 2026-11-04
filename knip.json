@@ -3,7 +3,7 @@
   "entry": ["src/lib/convert-worker.ts"],
   "project": ["src/**/*.{ts,tsx,css}", "worker/**/*.ts"],
   "ignore": ["src/components/ui/**"],
-  "ignoreDependencies": ["@radix-ui/react-slot", "@testing-library/user-event"],
+  "ignoreDependencies": ["@radix-ui/react-slot"],
   "rules": {
     "types": "off"
   }

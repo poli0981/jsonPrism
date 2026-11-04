@@ -8,6 +8,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond".
 
+## [2.1.1] — 2026-11-04
+
+A maintenance release: every dependency at its latest version, no feature or behavior change. It supersedes Dependabot PRs #163–#169. `bundle.android.versionCode` 20101.
+
+### Dependencies
+
+- **npm** (all minor/patch): react-router 8.5.1, i18next 26.7.1, react-i18next 17.1.12, i18next-browser-languagedetector 8.3.0, lucide-react 1.67.0, fast-xml-parser 5.12.0, cbor-x 1.6.9, `@tauri-apps/plugin-dialog` 2.8.4; dev: ESLint 10.14, typescript-eslint 8.72.1, globals 17.14, Vitest and `@vitest/coverage-v8` 5.1, `@vitejs/plugin-react` 6.2.1, Tailwind CSS and `@tailwindcss/vite` 4.3.4, knip 6.44.1, wrangler 4.157, `@types/node` 26.6.6. Transitive packages refreshed within their ranges; the lockfile is smaller because Vite and Tailwind now share one `lightningcss`. All 426 packages have verified registry signatures.
+- **Rust**: `cargo update` within semver — tauri-plugin-dialog 2.8.4 (rfd 0.17), tauri-plugin-single-instance 2.5.5, wry 0.57.1, tao 0.37.2 and 26 others.
+- **GitHub Actions**: SonarSource/sonarqube-scan-action 8.4.1 (scanner CLI 8.3.1). Every other action was already at its latest release.
+- knip 6.44 detects `@testing-library/user-event` on its own, so it left `ignoreDependencies`.
+- `THIRD-PARTY.md` lists the versions locked for 2.1.1 again; some rows had not been updated since 2.0.0.
+
+### Security
+
+- `npm audit` still lists minimatch < 11.0.1 (GHSA-g3hv-75wg-m249, moderate) through ESLint and typescript-eslint, which require minimatch 10 and have no release on 11 yet. It is a development-only dependency, and the amplification only runs at `optimizationLevel` 2 or higher; ESLint and typescript-eslint use the default level 1 with the glob patterns from this repository's own config. Forcing the new major with an override was rejected: minimatch 11 changes `partial` matching, which ESLint uses to decide which directories to walk.
+
 ## [2.1.0] — 2026-10-29
 
 ### Added
