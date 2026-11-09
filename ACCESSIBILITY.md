@@ -140,6 +140,7 @@ Tiếng Việt, 日本語 and 简体中文.
 | --- | --- | --- | --- | --- |
 | 2026-11 | 2.1.1 | Windows 11: website in Edge, Brave and Firefox; Windows app (WebView2) | Narrator; keyboard only, no mouse (maintainer) | No blocking issues |
 | 2026-11-09 | 2.2.0 | Chromium (development build) | Keyboard walk-through of the 2.2.0 changes: skip link, focus after navigation and consent, focus indicators | Pass |
+| 2026-11-09 | 2.2.0 | iPhone 14 Pro (real device), iOS 26: production website in Brave and Chrome | Manual touch check (maintainer) | Works as expected |
 | Every pull request | — | jsdom in CI | [axe-core](https://github.com/dequelabs/axe-core) on every page, the consent screen and each sheet; role and name assertions with Testing Library | Must pass |
 | 2026-10-22 | 2.0.0 | Chromium device emulation, 360 × 740 to 1280 × 800, light and dark | Visual layout check | See [tested viewports](docs/tested-viewports.md) |
 
