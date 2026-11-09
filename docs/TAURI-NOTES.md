@@ -157,7 +157,11 @@ Gatekeeper warnings on first launch. Signing is on the roadmap.
    draft; it refuses when the release is already published. (Parallel
    "find or create" calls used to race and split assets across drafts.)
 3. **desktop** — matrix: Windows (`windows-latest`), macOS universal
-   (`macos-14`, `--target universal-apple-darwin`), Linux (`ubuntu-22.04`).
+   (`macos-15`, Arm64, `--target universal-apple-darwin`), Linux (`ubuntu-22.04`).
+   GitHub retired the `macos-14` images on 2026-11-02; the v2.2.0 macOS job
+   was refused with "configuration … is not supported" and rebuilt on
+   `macos-15`. `minimumSystemVersion` 12.0 keeps the macOS 12 floor whatever
+   the runner's version.
    Each builds with `tauri-apps/tauri-action` v1 and uploads into the draft.
 4. **android** — Java 17 (Temurin), SDK platform 36 + NDK `27.2.12479018`,
    Rust Android targets; signs with the release keystore from secrets and
