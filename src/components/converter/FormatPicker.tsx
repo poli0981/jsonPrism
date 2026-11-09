@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { ALL_FORMATS, getConverter } from '@/converters/registry';
 import type { Direction, FormatId } from '@/converters/types';
 import type { JsonShape } from '@/lib/detect';
@@ -52,6 +59,9 @@ export function FormatPicker({ value, onChange, shape, direction = 'forward' }: 
         >
           <SheetHeader>
             <SheetTitle>{t('home.format_picker_label')}</SheetTitle>
+            <SheetDescription className="sr-only">
+              {t('home.format_picker_description')}
+            </SheetDescription>
           </SheetHeader>
           <div
             className="grid grid-cols-2 gap-1.5 p-4 pt-2 sm:grid-cols-3"

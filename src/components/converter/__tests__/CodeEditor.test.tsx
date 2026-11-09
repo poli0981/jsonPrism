@@ -111,6 +111,24 @@ describe('CodeEditor — editable', () => {
     typeInto(view, '{}');
     expect(view.state.doc.toString()).toBe('{}');
   });
+
+  it('says how to leave the editor and links the error description (WCAG 2.1.2)', () => {
+    const { content, rerender } = renderEditor({
+      value: '{',
+      ariaLabel: 'Input JSON',
+      ariaDescribedBy: 'input-error',
+      ariaInvalid: true,
+    });
+    const [hintId, errorId] = content.getAttribute('aria-describedby')!.split(' ');
+    expect(document.getElementById(hintId!)).toHaveTextContent(
+      'Tab indents. To leave the editor, press Escape, then Tab.',
+    );
+    expect(errorId).toBe('input-error');
+    expect(content).toHaveAttribute('aria-invalid', 'true');
+
+    rerender({ value: '{}', ariaLabel: 'Input JSON', ariaDescribedBy: 'input-error' });
+    expect(content).not.toHaveAttribute('aria-invalid');
+  });
 });
 
 describe('CodeEditor — sizing', () => {
@@ -141,6 +159,8 @@ describe('CodeEditor — read-only', () => {
     expect(scroller).toHaveAttribute('role', 'region');
     expect(scroller).toHaveAttribute('aria-label', 'YAML output (read-only)');
     expect(content).toHaveAttribute('aria-label', 'YAML output (read-only)');
+    // Nothing to indent, so no "leave the editor" hint.
+    expect(content).not.toHaveAttribute('aria-describedby');
     expect(container.querySelector('.cm-lineNumbers')).not.toBeNull();
     expect(container.querySelector('.cm-activeLine')).toBeNull();
     expect(container.querySelector('.cm-gutter-lint')).toBeNull();

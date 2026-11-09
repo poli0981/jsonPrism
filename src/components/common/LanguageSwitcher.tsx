@@ -27,7 +27,8 @@ export function LanguageSwitcher() {
             type="button"
             lang={lang.code}
             aria-pressed={current === lang.code}
-            aria-label={lang.name}
+            // Starts with the visible code so voice control ("click JA") works (WCAG 2.5.3).
+            aria-label={`${lang.label} ${lang.name}`}
             title={lang.name}
             onClick={() => change(lang.code)}
             className={cn(

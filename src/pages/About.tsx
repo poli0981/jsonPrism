@@ -163,8 +163,9 @@ export function About() {
       <div
         ref={scrollRef}
         tabIndex={0} // NOSONAR(S6845): scrollable region; keyboard users need focus to scroll it
+        role="region"
         aria-label={t('about.title')}
-        className="min-h-0 flex-1 overflow-y-auto outline-none"
+        className="focus-visible:ring-ring min-h-0 flex-1 overflow-y-auto outline-none focus-visible:ring-2 focus-visible:ring-inset"
       >
         <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
           <p className="label-mono mb-2">{t('about.kicker')}</p>
@@ -329,6 +330,10 @@ export function About() {
               <LinkRow href={SITE_URL} label={t('about.links.demo')} />
               <LinkRow href={`${REPO_URL}/releases`} label={t('about.links.releases')} />
               <LinkRow href={legalDocUrl('LICENSE')} label={t('about.links.license')} />
+              <LinkRow
+                href={legalDocUrl('ACCESSIBILITY.md')}
+                label={t('about.links.accessibility')}
+              />
             </ul>
           </Section>
 

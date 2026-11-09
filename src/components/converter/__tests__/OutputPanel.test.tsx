@@ -52,7 +52,8 @@ afterEach(() => {
   Reflect.deleteProperty(navigator, 'clipboard');
 });
 
-const copyButton = () => screen.getByRole('button', { name: 'Copy' });
+// The name follows the visible label: "Copy", then "Copied" for a moment.
+const copyButton = () => screen.getByRole('button', { name: /^Cop(y|ied)$/ });
 const downloadButton = () => screen.getByRole('button', { name: 'Download' });
 
 async function lastDownloaded(): Promise<{ blob: Blob; name: string; bytes: number[] }> {
@@ -132,8 +133,9 @@ describe('OutputPanel — copy', () => {
 
     expect(writeText).toHaveBeenCalledWith(CSV);
     expect(toast.success).toHaveBeenCalledWith('Copied CSV to clipboard');
-    // The visible label flips; the accessible name stays "Copy".
+    // The visible label and the accessible name flip together.
     expect(copyButton()).toHaveTextContent('Copied');
+    expect(copyButton()).toHaveAccessibleName('Copied');
   });
 
   it('reverts the "Copied" label after a moment, restarting on each copy', async () => {

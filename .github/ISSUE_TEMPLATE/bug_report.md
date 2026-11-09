@@ -10,6 +10,9 @@ assignees: []
 Security vulnerabilities do NOT belong in a public issue. Report them
 privately through https://github.com/poli0981/jsonPrism/security/advisories/new
 or by email to security@poli0981.dev.
+
+Something hard or impossible to use with a keyboard, screen reader, zoom or
+other assistive technology? Use the "Accessibility issue" template instead.
 -->
 
 ## Describe the bug
@@ -42,9 +45,10 @@ What actually happened. Include the error message and target format.
 ## Environment
 
 - Platform: [Web / Windows / macOS / Linux / Android]
-- JSONPrism version: [e.g. 2.0.0 — see About → Build info]
+- JSONPrism version: [e.g. 2.2.0 — see About → Build info]
 - Browser (web) or OS version (apps): [e.g. Firefox on Windows 11, Safari on macOS 15, Ubuntu 24.04, Android 15]
 - Where: [the website https://jsonprism.poli0981.dev / an installed release / a local dev build]
+- Assistive technology, if any: [e.g. NVDA 2026.3, VoiceOver, keyboard only, 200 % zoom]
 
 ## Diagnostics
 

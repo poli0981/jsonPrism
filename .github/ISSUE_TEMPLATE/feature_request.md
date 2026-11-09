@@ -22,7 +22,7 @@ Other approaches you thought about, and why this one fits better.
 
 Where would you use it? [All / Web / Windows / macOS / Linux / Android]
 
-Version you're on: [e.g. 2.0.0 — see About → Build info]
+Version you're on: [e.g. 2.2.0 — see About → Build info]
 
 ## Sample data (if applicable)
 

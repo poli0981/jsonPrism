@@ -20,6 +20,9 @@ merged PR.
   Cloudflare Workers Builds.
 - **Translations review** — the AI-generated Japanese and Simplified
   Chinese strings and the partly AI-generated Vietnamese ones.
+- **Accessibility** — triages reports labelled `accessibility`, runs the
+  manual checks before a release and keeps
+  [ACCESSIBILITY.md](ACCESSIBILITY.md) current.
 - **Community** — issues, Discussions and the Discord server, and
   enforcement of the [Code of Conduct](CODE_OF_CONDUCT.md). Vulnerability
   reports are triaged as described in [SECURITY.md](SECURITY.md).
@@ -27,6 +30,7 @@ merged PR.
 ## Contact
 
 - Bug reports & feature requests: [GitHub Issues](https://github.com/poli0981/jsonPrism/issues)
+- Accessibility barriers: the [Accessibility issue](https://github.com/poli0981/jsonPrism/issues/new?template=accessibility.md) template, or [code@poli0981.dev](mailto:code@poli0981.dev) — see [ACCESSIBILITY.md](ACCESSIBILITY.md)
 - Discussion / Q&A: [GitHub Discussions](https://github.com/poli0981/jsonPrism/discussions)
 - Community chat: [Discord](https://discord.gg/2aNR3aVt)
 - Project, maintainer & Code of Conduct: [code@poli0981.dev](mailto:code@poli0981.dev)

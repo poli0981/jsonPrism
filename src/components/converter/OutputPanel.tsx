@@ -5,6 +5,7 @@ import { toast } from '@/components/ui/sonner';
 import { ToolbarButton } from '@/components/common/ToolbarButton';
 import { getConverter } from '@/converters/registry';
 import type { Direction, FormatId } from '@/converters/types';
+import { ariaModShortcut } from '@/hooks/useKeyboardShortcuts';
 import { decodeBytes, type Encoding } from '@/lib/bytes';
 import { downloadBlob } from '@/lib/download';
 import { outputLanguageFor } from '@/lib/editor-language';
@@ -115,6 +116,7 @@ export function OutputPanel({
           {pending && (
             <LoaderCircle
               className="text-primary h-3.5 w-3.5 motion-safe:animate-spin"
+              role="img"
               aria-label={t('common.loading')}
             />
           )}
@@ -122,8 +124,8 @@ export function OutputPanel({
         <div className="flex items-center gap-0.5">
           <ToolbarButton
             onClick={() => void handleCopy()}
-            label={t('home.copy')}
-            visibleLabel={copied ? t('home.copied') : t('home.copy')}
+            // The name follows the visible label (WCAG 2.5.3).
+            label={copied ? t('home.copied') : t('home.copy')}
             icon={
               copied ? (
                 <Check className="text-success motion-safe:animate-pop h-3.5 w-3.5" />
@@ -136,6 +138,7 @@ export function OutputPanel({
           <ToolbarButton
             onClick={() => void handleDownload()}
             label={t('home.download')}
+            keyShortcuts={ariaModShortcut('S')}
             icon={<Download className="motion-safe:group-hover:animate-bob h-3.5 w-3.5" />}
             disabled={disabled}
           />

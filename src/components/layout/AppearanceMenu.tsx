@@ -80,7 +80,6 @@ export function AppearanceMenu() {
         onClick={() => setOpen((v) => !v)}
         className="group text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex h-9 w-9 items-center justify-center rounded-md transition outline-none focus-visible:ring-2"
         aria-label={t('appearance.title')}
-        aria-haspopup="true"
         aria-expanded={open}
         aria-controls={open ? panelId : undefined}
       >
@@ -111,7 +110,7 @@ export function AppearanceMenu() {
                   data-menu-item
                   onClick={() => setTheme(value)}
                   className={cn(
-                    'hover:bg-muted focus-visible:bg-muted flex min-h-9 w-full items-center gap-2 rounded-md px-2 text-left text-sm outline-none',
+                    'hover:bg-muted focus-visible:bg-muted focus-visible:ring-ring flex min-h-9 w-full items-center gap-2 rounded-md px-2 text-left text-sm outline-none focus-visible:ring-2 focus-visible:ring-inset',
                     active && 'text-primary',
                   )}
                 >

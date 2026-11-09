@@ -27,10 +27,14 @@ export function StatusBar({ state, inputBytes, outputBytes, ms, precisionLoss }:
 
   return (
     <div className="border-border/70 text-muted-foreground flex items-center justify-between gap-3 border-t px-3 py-1 font-mono text-[11px]">
-      <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5" aria-live="polite">
+      <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5">
         <span className="inline-flex items-center gap-1.5">
           <span aria-hidden className={cn('h-1.5 w-1.5 rounded-full', DOT_TONE[state])} />
-          <span className="text-foreground">{t(`status.state.${state}`)}</span>
+          {/* Only the state is announced; sizes and timing change on every
+              keystroke and would flood screen readers. */}
+          <span className="text-foreground" aria-live="polite">
+            {t(`status.state.${state}`)}
+          </span>
         </span>
         <span>
           {t('status.in')} <span className="text-foreground">{formatBytes(inputBytes)}</span>
@@ -54,14 +58,19 @@ export function StatusBar({ state, inputBytes, outputBytes, ms, precisionLoss }:
         <span>UTF-8</span>
         <Shortcut keys={`${modKey()}+S`} label={t('shortcut.download')} />
         <Shortcut keys={`${modKey()}+,`} label={t('shortcut.settings')} />
+        <Shortcut
+          keys="Esc, Tab"
+          label={t('shortcut.leave_editor')}
+          className="hidden lg:inline-flex"
+        />
       </div>
     </div>
   );
 }
 
-function Shortcut({ keys, label }: { keys: string; label: string }) {
+function Shortcut({ keys, label, className }: { keys: string; label: string; className?: string }) {
   return (
-    <span className="inline-flex items-center gap-1">
+    <span className={cn('inline-flex items-center gap-1', className)}>
       <kbd className="kbd">{keys}</kbd>
       <span>{label}</span>
     </span>

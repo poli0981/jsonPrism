@@ -12,6 +12,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { getConverter } from '@/converters/registry';
 import type { FormatId, OptionSchemaField } from '@/converters/types';
+import { ariaModShortcut } from '@/hooks/useKeyboardShortcuts';
 import { cn } from '@/lib/utils';
 
 interface SettingsPanelProps {
@@ -48,6 +49,7 @@ export function SettingsPanel({
       <SheetTrigger asChild>
         <button
           type="button"
+          aria-keyshortcuts={ariaModShortcut(',')}
           className="group text-muted-foreground hover:bg-muted hover:text-foreground border-border bg-card/60 inline-flex min-h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs transition"
         >
           <Settings2

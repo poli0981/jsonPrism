@@ -47,13 +47,15 @@ Cloudflare, Inc. phục vụ trang web và xử lý dữ liệu mà mọi yêu c
 tin TLS) để cung cấp các trang và bảo vệ dịch vụ trước hành vi lạm dụng.
 Phần mã phía máy chủ của riêng JSONPrism chỉ xử lý API xác minh con người
 (`/api/turnstile/verify`) và một điểm kiểm tra tình trạng hoạt động
-(health check). Với API đó, phần mã này ghi lại các sự kiện có cấu trúc —
-kết quả, trạng thái HTTP, mã trung tâm dữ liệu của Cloudflare, thời lượng
-và mã lỗi Turnstile — vào Cloudflare Workers Logs, được lưu giữ trong 7
-ngày. Các sự kiện này không bao giờ chứa địa chỉ IP, token Turnstile hay
-bất cứ nội dung nào bạn chuyển đổi. API này được Cloudflare giới hạn tần
-suất truy cập (rate limit) theo từng máy khách; JSONPrism không lưu trữ
-khoá máy khách (client key).
+(health check), đồng thời tính các yêu cầu tới trang và API vào giới hạn
+tần suất truy cập (rate limit) theo từng máy khách trước khi phục vụ.
+Phần mã này ghi lại các sự kiện có cấu trúc — kết quả, trạng thái HTTP,
+mã trung tâm dữ liệu của Cloudflare, thời lượng, mã lỗi Turnstile và các
+yêu cầu bị từ chối vì vượt giới hạn — vào Cloudflare Workers Logs, được
+lưu giữ trong 7 ngày. Các sự kiện này không bao giờ chứa địa chỉ IP, token
+Turnstile hay bất cứ nội dung nào bạn chuyển đổi. Bộ đếm giới hạn tần
+suất do Cloudflare lưu giữ, theo khoá là địa chỉ IP của bạn (với IPv6 là
+mạng /64 của địa chỉ đó); JSONPrism không lưu trữ khoá này.
 
 ### Xác minh con người (trang web)
 

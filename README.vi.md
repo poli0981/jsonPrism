@@ -62,6 +62,19 @@ Tổng cộng 12 định dạng đích. Sáu trong số đó — JSONL, CSV, TSV
 
 Chi tiết: [`PRIVACY.md`](PRIVACY.md).
 
+## Trợ năng (Accessibility)
+
+JSONPrism hướng tới **WCAG 2.2 AA** trên website lẫn các app:
+
+- **Bàn phím:** mọi thao tác dùng được chỉ bằng bàn phím, có skip link và chỉ báo focus rõ ràng.
+- **Trình đọc màn hình:** control có tên, lỗi và thay đổi trạng thái được đọc lên, đủ bốn ngôn ngữ.
+- **Hiển thị:** theme sáng, tối hoặc theo hệ thống với chữ tương phản từ 4.5:1, hỗ trợ giảm chuyển động và contrast theme của Windows.
+- **Phóng to:** dùng được trên website, và trong app desktop bằng Ctrl/⌘ + = và −.
+
+Maintainer kiểm thử bằng Narrator và chỉ dùng bàn phím, mỗi pull request đều chạy bài quét axe-core.
+
+Hạn chế đã biết và cách báo rào cản: [`ACCESSIBILITY.md`](ACCESSIBILITY.md) ([bản tiếng Việt](docs/i18n/vi/ACCESSIBILITY.md)).
+
 ## Tech stack
 
 - **Vite 8** + **React 19.3** + **TypeScript 7** (compiler native; dependency `typescript` là alias TS 6, chỉ giữ lại cho typescript-eslint)
@@ -328,6 +341,7 @@ Báo bug và đề xuất tính năng vui lòng gửi qua [GitHub Issues](https:
 | [`PRIVACY.md`](PRIVACY.md) | Những gì ở lại trên thiết bị, và các dịch vụ Cloudflare chỉ dùng cho website (hosting, Turnstile, Web Analytics). |
 | [`TERMS.md`](TERMS.md) | ToS / EULA — acceptable use, kế thừa giấy phép, quyền sở hữu dữ liệu. |
 | [`SECURITY.md`](SECURITY.md) | Cách report vulnerability, SLA. |
+| [`ACCESSIBILITY.md`](ACCESSIBILITY.md) · [`docs/i18n/vi/ACCESSIBILITY.md`](docs/i18n/vi/ACCESSIBILITY.md) | Mục tiêu trợ năng (WCAG 2.2 AA), những gì đã kiểm thử, hạn chế đã biết, cách báo rào cản. |
 | [`DISCLAIMER.md`](DISCLAIMER.md) | Project 1 người + AI-assisted, không bảo hành. |
 | [`THIRD-PARTY.md`](THIRD-PARTY.md) | Mỗi dependency: version, giấy phép, link. |
 | [`MAINTAINERS.md`](MAINTAINERS.md) | Ai chịu trách nhiệm gì. |
@@ -352,8 +366,8 @@ Trò chuyện, hỏi đáp, hoặc theo dõi cập nhật:
 ## Ghi nhận
 
 Phần lớn code, test, bản dịch và tài liệu của JSONPrism được draft với
-sự hỗ trợ của AI: **Claude Chat** và **Claude Code (Opus 4.7, 1M
-context)** cho v1.x, **Claude Code (Opus 5.5)** cho v2.0.0. Xem
+sự hỗ trợ của AI: **Claude Chat** và **Claude Code (Opus 4.7 và
+4.8)** cho v1.x, **Claude Code (Opus 5.5)** cho v2.x. Xem
 [DISCLAIMER.md](DISCLAIMER.md) để biết chi tiết về AI-assist. Bản dịch
 tiếng Nhật, tiếng Trung giản thể và một phần bản tiếng Việt do AI tạo,
 chất lượng ở mức best-effort — rất hoan nghênh đóng góp từ người bản ngữ.

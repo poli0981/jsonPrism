@@ -6,6 +6,8 @@ export function Home() {
 
   return (
     <div className="mx-auto flex min-h-0 w-full max-w-screen-2xl flex-1 flex-col gap-3 px-3 py-3 sm:gap-4 sm:px-6 sm:py-5">
+      {/* React 19 hoists this into <head>, ahead of index.html's English title. */}
+      <title>{t('home.document_title')}</title>
       <header className="flex flex-col gap-1.5 md:flex-row md:items-end md:justify-between md:gap-6">
         <div>
           <p className="label-mono mb-1">{t('home.kicker')}</p>

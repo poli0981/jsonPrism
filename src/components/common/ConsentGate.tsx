@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { HumanCheck } from '@/components/common/HumanCheck';
+import { focusMain } from '@/lib/focus';
 import { legalDocUrl } from '@/lib/links';
 import { isTurnstileEnabled } from '@/lib/turnstile';
 import { useConsentStore } from '@/stores/consentStore';
@@ -47,6 +48,11 @@ export function ConsentGate({ children }: { children: ReactNode }) {
             onEscapeKeyDown={(e) => e.preventDefault()}
             onPointerDownOutside={(e) => e.preventDefault()}
             onInteractOutside={(e) => e.preventDefault()}
+            // The gate has no trigger to return to, so Radix would leave focus
+            // on <body>; continue in the page content instead.
+            onCloseAutoFocus={(e) => {
+              if (focusMain()) e.preventDefault();
+            }}
             className="max-w-md"
           >
             {/* Tauri builds never run the human check, so the bundler drops it there. */}

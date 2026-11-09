@@ -68,5 +68,11 @@ Also checked in this round:
 3. Pick a device from the dropdown or set a custom viewport.
 4. Verify on the Home page: Header navigation visible, Input/Output Tabs accessible, FormatPicker trigger fits, no horizontal scroll on `<body>`.
 5. Repeat in light and dark (Appearance menu), pass the Consent Gate (the Turnstile test key passes on its own), and check the console for CSP violations.
+6. Run the accessibility checks in [`ACCESSIBILITY.md` → Manual check before a release](../ACCESSIBILITY.md#manual-check-before-a-release):
+   - keyboard only;
+   - a screen reader;
+   - 200 % and 400 % zoom;
+   - a Windows contrast theme;
+   - reduced motion.
 
 Test results contributed by the maintainer. PRs welcome to expand the matrix.

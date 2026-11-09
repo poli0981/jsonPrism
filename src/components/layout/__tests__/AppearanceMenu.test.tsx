@@ -36,7 +36,8 @@ afterEach(() => {
 describe('AppearanceMenu', () => {
   it('opens a labelled panel and focuses the current theme', async () => {
     const user = renderMenu();
-    expect(trigger()).toHaveAttribute('aria-haspopup', 'true');
+    // A disclosure, not a menu: no aria-haspopup.
+    expect(trigger()).not.toHaveAttribute('aria-haspopup');
     expect(trigger()).toHaveAttribute('aria-expanded', 'false');
     expect(trigger()).not.toHaveAttribute('aria-controls');
     expect(queryPanel()).not.toBeInTheDocument();

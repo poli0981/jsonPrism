@@ -63,3 +63,8 @@ export function useKeyboardShortcuts(shortcuts: ShortcutDef[]): void {
 export function modKey(): 'Cmd' | 'Ctrl' {
   return isMac() ? 'Cmd' : 'Ctrl';
 }
+
+/** `aria-keyshortcuts` value for Mod+`key` ("Control+S", or "Meta+S" on macOS). */
+export function ariaModShortcut(key: string): string {
+  return `${isMac() ? 'Meta' : 'Control'}+${key}`;
+}

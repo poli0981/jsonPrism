@@ -32,6 +32,12 @@ describe('StatusBar', () => {
     expect(live).toHaveAttribute('aria-live', 'polite');
   });
 
+  it('keeps sizes and timing out of the live region (they change on every keystroke)', () => {
+    renderBar({ state: 'ok', inputBytes: 2048, ms: 1.5 });
+    expect(screen.getByText('2.0 KB').closest('[aria-live]')).toBeNull();
+    expect(screen.getByText(/ ms$/).closest('[aria-live]')).toBeNull();
+  });
+
   it('shows input and output sizes in human units', () => {
     renderBar({ inputBytes: 2048, outputBytes: 3 * 1024 * 1024 });
     expect(screen.getByText('2.0 KB')).toBeInTheDocument();

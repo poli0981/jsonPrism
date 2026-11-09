@@ -7,6 +7,8 @@ interface ToolbarButtonProps {
   disabled?: boolean;
   /** Shown instead of `label` (visually) without changing the accessible name. */
   visibleLabel?: string;
+  /** `aria-keyshortcuts` value, e.g. "Control+S". */
+  keyShortcuts?: string;
   className?: string;
 }
 
@@ -21,6 +23,7 @@ export function ToolbarButton({
   icon,
   disabled,
   visibleLabel,
+  keyShortcuts,
   className,
 }: ToolbarButtonProps) {
   return (
@@ -29,6 +32,7 @@ export function ToolbarButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
+      aria-keyshortcuts={keyShortcuts}
       title={label}
       className={cn(
         'group text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring inline-flex min-h-8 items-center gap-1.5 rounded-md px-2 text-xs transition outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-40',

@@ -99,6 +99,18 @@ describe('ScrollToTop', () => {
     expect(scroll).toHaveBeenCalledWith({ top: 0, behavior });
   });
 
+  it('hands focus to a focusable container instead of the button it hides', async () => {
+    const user = userEvent.setup();
+    stubReducedMotion(true);
+    render(<ScrollArea initialScroll={1000} />);
+    const scroller = screen.getByTestId('scroller');
+    scroller.tabIndex = 0;
+    Object.defineProperty(scroller, 'scrollTo', { configurable: true, value: vi.fn() });
+
+    await user.click(screen.getByRole('button', { name: 'Back to top' }));
+    expect(scroller).toHaveFocus();
+  });
+
   it('does nothing without a scroll container', async () => {
     const user = userEvent.setup();
     const matchMedia = stubReducedMotion(false);

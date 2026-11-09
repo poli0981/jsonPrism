@@ -8,6 +8,79 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond".
 
+## [2.2.0] — 2026-11-09
+
+An accessibility release. JSONPrism now has an accessibility statement, [`ACCESSIBILITY.md`](ACCESSIBILITY.md), which targets WCAG 2.2 AA. The maintainer's keyboard-only and Narrator pass on 2.1.1 found no blocking issues; this release fixes the gaps an audit found beyond that pass. `bundle.android.versionCode` 20200.
+
+### Added
+
+- **Skip to content.** The first Tab stop on every page jumps past the header to the page content.
+- **Focus follows you.**
+  - After you move to another page, focus moves to its content.
+  - After you accept the consent screen, focus moves to the page instead of being lost.
+  - **Back to top** returns focus to the page it scrolled.
+- **Zoom in the desktop apps.** Ctrl/⌘ + = and Ctrl/⌘ + − zoom the window; on Windows, Ctrl + mouse wheel works too. This adds the `core:webview:allow-set-webview-zoom` permission, which macOS and Linux need for zooming.
+- **How to leave the input editor.** Tab still indents. Screen readers now hear "press Escape, then Tab, to leave the editor", and the status bar shows the same hint on wide screens.
+- **Screen-reader states for the input editor:**
+  - The input editor reports invalid input (`aria-invalid`).
+  - It is described by the current error message.
+  - **Download** and **Options** announce their keyboard shortcuts (`aria-keyshortcuts`).
+- **Accessibility statement.** [`ACCESSIBILITY.md`](ACCESSIBILITY.md) and its [Vietnamese translation](docs/i18n/vi/ACCESSIBILITY.md) cover:
+  - goals;
+  - what works;
+  - a keyboard reference;
+  - what has been tested;
+  - known limitations with workarounds;
+  - how to report a barrier, with severity levels and response times.
+
+  The About page links the statement, and there is a new **Accessibility issue** template.
+
+### Changed
+
+- **Focus is always visible.**
+  - Controls without their own ring now get a themed outline.
+  - Scroll areas, the editors, the narrow-screen tab panels and the theme choices now show a ring.
+  - Windows contrast themes keep focus, pressed and selected states, and switches visible.
+- **The status bar is quieter for screen readers.** Only the conversion state is announced, not the byte counts and timing that change on every keystroke.
+- **Accessible names match what you see** (WCAG 2.5.3):
+  - The language buttons are named "EN English", "JA 日本語" and so on.
+  - **Copy** is named **Copied** while it says so.
+- **The unread-output dot** on the narrow layout's Output tab is also announced, as "(new)".
+- **Navigation labels** in Vietnamese, Japanese and Chinese no longer repeat the word "navigation".
+- **Translations.** These now follow the interface language:
+  - the Home page title;
+  - the notification close button;
+  - CodeMirror's screen-reader announcements for search, replace, folding and deleted selections.
+
+### Fixed
+
+- **The Appearance button** no longer claims to open a menu (`aria-haspopup`). It is a disclosure for a panel.
+- **The About page and the batch queue.** Their scroll areas are labelled regions, so the label is valid ARIA.
+- **The format picker sheet** on phones has a description, which also removes Radix's console warning.
+- **Page loading** is announced (`role="status"`), and the output panel's loading spinner is exposed as an image with a label.
+
+### Tests
+
+- **axe-core scan.** It covers every page, the input in an error state, the consent screen, and the Options, Batch and format-picker sheets. A guard test checks that the scan really reports violations.
+- **Focus tests.** They cover the skip link, focus after navigation and after consent, and Back to top.
+- **Unit tests** for the new attributes and labels.
+
+### Docs
+
+- **Accessibility guidance** for contributors:
+  - CONTRIBUTING, CLAUDE.md and the PR template have accessibility checks.
+  - The bug report template asks about assistive technology.
+  - [`docs/tested-viewports.md`](docs/tested-viewports.md) links the accessibility checks to run before a release.
+- **The Vietnamese mirrors**, `docs/i18n/vi/PRIVACY.md` and `docs/i18n/vi/dev_env.md`, now describe the site-wide rate limits added in 2.0.2.
+- **Other fixes:**
+  - The README credits match DISCLAIMER and THIRD-PARTY.
+  - Outdated ROADMAP notes are corrected.
+  - Version examples now use 2.2.0.
+
+### Dependencies
+
+- `axe-core` 4.14.0 (MPL-2.0), test-only; nothing new ships to users.
+
 ## [2.1.1] — 2026-11-04
 
 A maintenance release: every dependency at its latest version, no feature or behavior change. It supersedes Dependabot PRs #163–#169. `bundle.android.versionCode` 20101.

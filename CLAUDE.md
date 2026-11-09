@@ -13,7 +13,7 @@ GitHub Pages (`poli0981.github.io/jsonPrism`) now only redirects to the new doma
 
 The maintainer is **Kokone** ([@poli0981](https://github.com/poli0981)). Audience: the developer community on the open-source Discord server plus YouTube viewers who watch indie/visual-novel gameplay and occasionally want a quick devtool.
 
-**Current release**: 2.1.1. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what is next.
+**Current release**: 2.2.0. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what is next.
 
 ## Stack — exact versions matter
 
@@ -87,6 +87,15 @@ The same React UI runs in the browser and in Tauri (desktop + Android).
 - **Tailwind class order**: rely on `prettier-plugin-tailwindcss`; never hand-sort.
 - **Don't fight the theme system**. Use the tokens (`--color-prism-*`, `--color-success`, `--color-warning`, `bg-background`, …), which have separate light and dark values. No hard-coded hex. Animations go behind `motion-safe:`.
 - **i18n everything user-facing** in all four locales: `en.json`, `vi.json`, `ja.json`, `zh-CN.json` (`src/i18n/__tests__/locales.test.ts` enforces key parity). Libraries return error *codes*; components translate them.
+- **Accessibility** (target WCAG 2.2 AA; see [`ACCESSIBILITY.md`](ACCESSIBILITY.md)). There is no `eslint-plugin-jsx-a11y` (it doesn't support ESLint 10); the axe-core scan in `src/app/__tests__/a11y.test.tsx` is the automated check, so extend it for new pages and dialogs.
+  - **Elements:** native elements or the Radix-based `ui/` components only. No click handlers on `div`/`span`, no positive `tabIndex`.
+  - **Names:** every control has an accessible name from i18n. Icon-only buttons get `aria-label` and decorative icons `aria-hidden`. The name starts with the visible label (WCAG 2.5.3).
+  - **Focus:**
+    - Never `outline-none` without a `focus-visible:ring-*` replacement; the one exception is an element focused only from code with `tabIndex={-1}`, like `<main>`.
+    - A focusable scroll area needs `role="region"` and an `aria-label`.
+    - Move focus with `focusMain()` (`src/lib/focus.ts`) when content is replaced.
+  - **Announcements:** use the existing live regions (input error, output alert, status-bar state, batch chips, toasts). Never announce text that changes on every keystroke.
+  - **Docs:** a behaviour change or new known limitation updates `ACCESSIBILITY.md` and its Vietnamese mirror.
 - **Logging**: use `createLogger(scope)` from `src/lib/logger.ts`, not `console.*` (ESLint warns). Logs stay in memory and feed About → Copy diagnostics; never log user content.
 - **Heavy work off the main thread**: conversions of large inputs and batch jobs go through `src/lib/convert-client.ts` (Web Worker); keep `convert-worker.ts` free of DOM access.
 

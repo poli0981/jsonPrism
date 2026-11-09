@@ -6,8 +6,9 @@
     "home": "Chuyển đổi",
     "about": "Giới thiệu",
     "github": "GitHub",
-    "label": "Điều hướng chính",
-    "home_brand": "Trang chủ JSONPrism"
+    "label": "Chính",
+    "home_brand": "Trang chủ JSONPrism",
+    "skip_to_content": "Bỏ qua, tới nội dung chính"
   },
   "home": {
     "input_label": "JSON đầu vào",
@@ -35,7 +36,10 @@
     "error_position": "Dòng {{line}}, Cột {{column}}",
     "jsonc_hint": "Có vẻ đây là JSONC — JSON có comment hoặc dấu phẩy thừa.",
     "jsonc_switch": "Chuyển JSONC → JSON",
-    "output_aria": "Kết quả {{format}} (chỉ đọc)"
+    "output_aria": "Kết quả {{format}} (chỉ đọc)",
+    "document_title": "JSONPrism · Chuyển JSON sang 12 định dạng",
+    "format_picker_description": "Chọn một định dạng. Định dạng không dùng được theo chiều hiện tại sẽ bị tắt.",
+    "output_unread": "(mới)"
   },
   "formats": {
     "jsonl": "JSONL",
@@ -191,7 +195,8 @@
   },
   "shortcut": {
     "download": "Tải về",
-    "settings": "Tuỳ chọn"
+    "settings": "Tuỳ chọn",
+    "leave_editor": "Rời trình soạn thảo"
   },
   "settings": {
     "title": "Tuỳ chọn",
@@ -357,7 +362,8 @@
       "discussions": "Thảo luận",
       "demo": "Ứng dụng web",
       "license": "Giấy phép (Apache 2.0)",
-      "releases": "Bản phát hành & tải về"
+      "releases": "Bản phát hành & tải về",
+      "accessibility": "Tuyên bố trợ năng (accessibility)"
     },
     "disclaimer": {
       "title": "Lưu ý",
@@ -385,7 +391,8 @@
     "loading": "Đang tải…",
     "scroll_to_top": "Về đầu trang",
     "close": "Đóng",
-    "notifications": "Thông báo"
+    "notifications": "Thông báo",
+    "close_notification": "Đóng thông báo"
   },
   "consent": {
     "title": "Trước khi bắt đầu",
@@ -455,7 +462,17 @@
       "folded_code": "mã đã thu gọn",
       "unfold": "mở rộng",
       "diagnostics": "Chẩn đoán",
-      "no_diagnostics": "Không có chẩn đoán"
-    }
+      "no_diagnostics": "Không có chẩn đoán",
+      "folded_lines": "Đã thu gọn các dòng",
+      "unfolded_lines": "Đã mở rộng các dòng",
+      "to": "đến",
+      "current_match": "kết quả khớp hiện tại",
+      "on_line": "ở dòng",
+      "replaced_match_on_line": "đã thay kết quả khớp ở dòng $",
+      "replaced_matches": "đã thay $ kết quả khớp",
+      "selection_deleted": "Đã xoá vùng chọn",
+      "control_character": "Ký tự điều khiển"
+    },
+    "tab_hint": "Phím Tab dùng để thụt lề. Để rời trình soạn thảo, nhấn Esc rồi nhấn Tab."
   }
 }

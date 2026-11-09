@@ -58,7 +58,7 @@ npm run preview:cf               # wrangler dev tại http://localhost:8787 (t�
 - `.dev.vars` chứa secret `TURNSTILE_SECRET` của Worker khi chạy local. File
   này đã được gitignore; tuyệt đối không đưa secret production vào đây.
 - `npm run preview:cf` phục vụ `dist/` giống hệt production (`_headers`,
-  `_redirects`, SPA fallback) cùng với Worker `/api/*`. Trên localhost app
+  `_redirects`, SPA fallback) phía sau Worker (rate limit, `/api/*`). Trên localhost app
   dùng sitekey test của Cloudflare, nên bước kiểm tra Turnstile trong Consent
   Gate tự pass.
 - `npm run cf:types` — tạo lại `worker-configuration.d.ts` (đã gitignore) sau
