@@ -140,6 +140,7 @@ tiếng Việt, tiếng Nhật và tiếng Trung giản thể.
 | --- | --- | --- | --- | --- |
 | 2026-11 | 2.1.1 | Windows 11: website trên Edge, Brave và Firefox; ứng dụng Windows (WebView2) | Narrator; chỉ bàn phím, không dùng chuột (maintainer) | Không có lỗi chặn |
 | 2026-11-09 | 2.2.0 | Chromium (bản development) | Đi bằng bàn phím qua các thay đổi của 2.2.0: skip link, focus sau khi chuyển trang và sau màn hình đồng ý, chỉ báo focus | Đạt |
+| 2026-11-09 | 2.2.0 | iPhone 14 Pro (máy thật), iOS 26: website production trên Brave và Chrome | Kiểm tra thủ công bằng cảm ứng (maintainer) | Hoạt động đúng |
 | Mỗi pull request | — | jsdom trong CI | [axe-core](https://github.com/dequelabs/axe-core) trên mọi trang, màn hình đồng ý và từng sheet; kiểm tra vai trò và tên bằng Testing Library | Bắt buộc đạt |
 | 2026-10-22 | 2.0.0 | Giả lập thiết bị trên Chromium, từ 360 × 740 tới 1280 × 800, sáng và tối | Kiểm tra bố cục bằng mắt | Xem [các viewport đã kiểm thử](../../tested-viewports.md) |
 

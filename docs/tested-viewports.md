@@ -10,6 +10,16 @@ Status legend:
 
 Recommended minimum viewport: **360 × 640**. Phones in landscape orientation are best-effort — see [recommendation](#recommendation).
 
+## v2.2.0 check (2026-11-09)
+
+The maintainer checked the production website (https://jsonprism.poli0981.dev) on a real phone.
+
+| Device | Viewport | Browsers | Status | Notes |
+| --- | --- | --- | --- | --- |
+| iPhone 14 Pro (iOS 26) | 393 × 852 | Brave, Chrome | ✅ | Real device; everything works as expected |
+
+The accessibility checks for this release are recorded in [`ACCESSIBILITY.md` → Tested with](../ACCESSIBILITY.md#tested-with).
+
 ## v2.0.0 check (2026-10-22)
 
 Chromium device emulation against the production build served by `wrangler dev` (`npm run preview:cf`), in the light and the dark theme at each size.
