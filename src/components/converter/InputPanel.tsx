@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDropzone, type FileRejection } from 'react-dropzone';
 import { Eraser, FileText, FolderOpen, MessageSquareCode } from 'lucide-react';
@@ -48,6 +48,7 @@ export function InputPanel({
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
+  const errorId = useId();
 
   const { converter, isReverse, accept, fileInputAccept, allowedExtensions } = useFileAccept(
     format,
@@ -216,6 +217,7 @@ export function InputPanel({
       </div>
 
       <div
+        id={errorId}
         role="status"
         aria-live="polite"
         className={cn(
@@ -254,6 +256,8 @@ export function InputPanel({
           onChange={onChange}
           language={editorLanguageFor(format, direction)}
           ariaLabel={inputLabel}
+          ariaDescribedBy={errorId}
+          ariaInvalid={!!error}
           placeholder={
             isReverse
               ? t('home.input_placeholder_format', {

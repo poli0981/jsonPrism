@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useId, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import CodeMirror, {
   EditorState,
@@ -34,6 +34,10 @@ export interface CodeEditorProps {
   placeholder?: string;
   /** Accessible name for the editable region (screen readers). */
   ariaLabel?: string;
+  /** Space-separated ids of elements that describe the editor (hints, errors). */
+  ariaDescribedBy?: string;
+  /** Marks the content invalid, e.g. while the input doesn't parse. */
+  ariaInvalid?: boolean;
 }
 
 /**
@@ -173,7 +177,9 @@ function languageExtensions(language: EditorLanguage, readOnly: boolean) {
   }
 }
 
-// English phrases used by CodeMirror's search panel, folding and lint UI.
+// English phrases used by CodeMirror's search panel, folding and lint UI, and
+// in what it announces to screen readers (search, replace, folding, deletion).
+// `$` is CodeMirror's placeholder for a number; translations keep it.
 const PHRASE_KEYS: Record<string, string> = {
   Find: 'find',
   Replace: 'replace',
@@ -194,6 +200,15 @@ const PHRASE_KEYS: Record<string, string> = {
   unfold: 'unfold',
   Diagnostics: 'diagnostics',
   'No diagnostics': 'no_diagnostics',
+  'Folded lines': 'folded_lines',
+  'Unfolded lines': 'unfolded_lines',
+  to: 'to',
+  'current match': 'current_match',
+  'on line': 'on_line',
+  'replaced match on line $': 'replaced_match_on_line',
+  'replaced $ matches': 'replaced_matches',
+  'Selection deleted': 'selection_deleted',
+  'Control character': 'control_character',
 };
 
 export function CodeEditor({
@@ -204,10 +219,15 @@ export function CodeEditor({
   className,
   placeholder,
   ariaLabel,
+  ariaDescribedBy,
+  ariaInvalid = false,
 }: CodeEditorProps) {
   const { resolvedTheme } = useTheme();
   const { t: translate, i18n } = useTranslation();
   const wrap = value.length < WRAP_LIMIT_CHARS;
+  // Tab indents in the editable editor (WCAG 2.1.2: say how to leave it).
+  const tabHintId = useId();
+  const describedBy = [readOnly ? undefined : tabHintId, ariaDescribedBy].filter(Boolean).join(' ');
 
   const phrases = useMemo(() => {
     const entries = Object.entries(PHRASE_KEYS).map(([phrase, key]) => [
@@ -265,8 +285,15 @@ export function CodeEditor({
         '.cm-placeholder': {
           color: 'var(--muted-foreground)',
         },
+        // Focus ring drawn inside the editor: the wrapper clips overflow.
         '&.cm-focused': {
-          outline: 'none',
+          outline: '2px solid var(--color-ring)',
+          outlineOffset: '-2px',
+        },
+        // The read-only output focuses its scroller, not the content.
+        '.cm-scroller:focus-visible': {
+          outline: '2px solid var(--color-ring)',
+          outlineOffset: '-2px',
         },
       },
       { dark: isDark },
@@ -279,15 +306,22 @@ export function CodeEditor({
       phrases,
       EditorView.contentAttributes.of({
         ...(ariaLabel ? { 'aria-label': ariaLabel } : {}),
+        ...(describedBy ? { 'aria-describedby': describedBy } : {}),
+        ...(ariaInvalid ? { 'aria-invalid': 'true' } : {}),
         ...(readOnly ? { 'aria-readonly': 'true' } : {}),
       }),
       ...(readOnly ? [focusableScroller(ariaLabel)] : []),
       theme,
     ];
-  }, [ariaLabel, language, phrases, readOnly, resolvedTheme, wrap]);
+  }, [ariaInvalid, ariaLabel, describedBy, language, phrases, readOnly, resolvedTheme, wrap]);
 
   return (
     <div className={cn('h-full overflow-hidden', className)}>
+      {!readOnly && (
+        <span id={tabHintId} className="sr-only">
+          {translate('editor.tab_hint')}
+        </span>
+      )}
       <CodeMirror
         // The wrapper div this component renders must fill the panel too, or
         // `height="100%"` has nothing to resolve against: the editor grows to

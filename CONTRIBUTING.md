@@ -59,9 +59,17 @@ npm run tauri:android:dev   # Android emulator or device
    requirements). For tool versions, `package.json` and this file are
    authoritative.
 
-3. **Keep PRs focused.** One feature or one fix per PR. Refactors as separate PRs.
+3. **Keep the UI accessible.** For any UI change:
+   - Do a keyboard-only pass of what you changed: focus is visible and never stuck.
+   - Give every control an accessible name in all four locales.
+   - Put animations behind `motion-safe:`.
+   - Extend the axe-core scan in `src/app/__tests__/a11y.test.tsx` when you add a page or dialog.
 
-4. **Fill in the [PR template](.github/PULL_REQUEST_TEMPLATE.md)**: what
+   [`ACCESSIBILITY.md`](ACCESSIBILITY.md#contributor-expectations) has the full list.
+
+4. **Keep PRs focused.** One feature or one fix per PR. Refactors as separate PRs.
+
+5. **Fill in the [PR template](.github/PULL_REQUEST_TEMPLATE.md)**: what
    changed, why, how you tested it, screenshots if UI, and whether AI
    tools helped.
 
@@ -169,6 +177,16 @@ Use the [Bug Report](https://github.com/poli0981/jsonPrism/issues/new?template=b
 - Expected vs actual output
 
 Security vulnerabilities never go in a public issue. See [SECURITY.md](SECURITY.md).
+
+### Accessibility issues
+
+Something hard or impossible to use with a keyboard, screen reader, zoom or other assistive technology? Use the [Accessibility issue](https://github.com/poli0981/jsonPrism/issues/new?template=accessibility.md) template. You don't need to know the cause. [ACCESSIBILITY.md](ACCESSIBILITY.md) covers:
+
+- what is supported and tested;
+- the known limitations;
+- how reports are triaged.
+
+Fixes for those limitations are welcome.
 
 ### Feature requests
 

@@ -7,7 +7,8 @@
     "about": "About",
     "github": "GitHub",
     "label": "Main",
-    "home_brand": "JSONPrism home"
+    "home_brand": "JSONPrism home",
+    "skip_to_content": "Skip to content"
   },
   "home": {
     "input_label": "Input JSON",
@@ -35,7 +36,10 @@
     "error_position": "Ln {{line}}, Col {{column}}",
     "jsonc_hint": "This looks like JSONC — JSON with comments or trailing commas.",
     "jsonc_switch": "Convert JSONC → JSON",
-    "output_aria": "{{format}} output (read-only)"
+    "output_aria": "{{format}} output (read-only)",
+    "document_title": "JSONPrism · Disperse JSON into 12 formats",
+    "format_picker_description": "Choose a format. Formats that don't work in the current direction are disabled.",
+    "output_unread": "(new)"
   },
   "formats": {
     "jsonl": "JSONL",
@@ -191,7 +195,8 @@
   },
   "shortcut": {
     "download": "Download",
-    "settings": "Settings"
+    "settings": "Settings",
+    "leave_editor": "Leave editor"
   },
   "settings": {
     "title": "Options",
@@ -357,7 +362,8 @@
       "discussions": "Discussions",
       "demo": "Web app",
       "license": "License (Apache 2.0)",
-      "releases": "Releases & downloads"
+      "releases": "Releases & downloads",
+      "accessibility": "Accessibility statement"
     },
     "disclaimer": {
       "title": "Disclaimer",
@@ -385,7 +391,8 @@
     "loading": "Loading…",
     "scroll_to_top": "Back to top",
     "close": "Close",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "close_notification": "Close notification"
   },
   "consent": {
     "title": "Before you start",
@@ -455,7 +462,17 @@
       "folded_code": "folded code",
       "unfold": "unfold",
       "diagnostics": "Diagnostics",
-      "no_diagnostics": "No diagnostics"
-    }
+      "no_diagnostics": "No diagnostics",
+      "folded_lines": "Folded lines",
+      "unfolded_lines": "Unfolded lines",
+      "to": "to",
+      "current_match": "current match",
+      "on_line": "on line",
+      "replaced_match_on_line": "replaced match on line $",
+      "replaced_matches": "replaced $ matches",
+      "selection_deleted": "Selection deleted",
+      "control_character": "Control character"
+    },
+    "tab_hint": "Tab indents. To leave the editor, press Escape, then Tab."
   }
 }

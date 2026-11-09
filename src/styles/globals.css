@@ -288,6 +288,42 @@
     display: none;
   }
 
+  /* Default keyboard-focus indicator in the theme's ring colour (≥ 3:1 against
+     both backgrounds). Components that draw their own ring use `outline-none`
+     plus `focus-visible:ring-*`, which overrides this from the utilities layer. */
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+
+  /* Windows contrast themes (forced colours) drop box-shadow rings and
+     author backgrounds, so focus and "selected" state would vanish. Restore
+     them with system colours. `!important` in this earliest layer outranks
+     the `outline-none` utility (important declarations reverse layer order). */
+  @media (forced-colors: active) {
+    :focus-visible {
+      outline: 2px solid Highlight !important;
+      outline-offset: 2px !important;
+    }
+    [aria-pressed='true'],
+    [role='radio'][aria-checked='true'],
+    [role='tab'][aria-selected='true'] {
+      forced-color-adjust: none;
+      background-color: Highlight;
+      color: HighlightText;
+    }
+    [role='switch'] {
+      border: 1px solid ButtonText;
+    }
+    [role='switch'] > span {
+      forced-color-adjust: none;
+      background-color: ButtonText;
+    }
+    [role='switch'][data-state='checked'] > span {
+      background-color: Highlight;
+    }
+  }
+
   /* Respect the OS "reduce motion" setting everywhere, including tw-animate-css. */
   @media (prefers-reduced-motion: reduce) {
     *,

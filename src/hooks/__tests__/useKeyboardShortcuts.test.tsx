@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useKeyboardShortcuts } from '../useKeyboardShortcuts';
+import { ariaModShortcut, useKeyboardShortcuts } from '../useKeyboardShortcuts';
 
 function press(init: KeyboardEventInit) {
   const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...init });
@@ -52,5 +52,16 @@ describe('useKeyboardShortcuts', () => {
     press({ code: 'KeyS', ctrlKey: true });
     expect(first).not.toHaveBeenCalled();
     expect(second).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('ariaModShortcut', () => {
+  it('names Control on Windows and Linux, Meta on macOS', () => {
+    const platform = vi.spyOn(navigator, 'platform', 'get');
+    platform.mockReturnValue('Win32');
+    expect(ariaModShortcut('S')).toBe('Control+S');
+    platform.mockReturnValue('MacIntel');
+    expect(ariaModShortcut(',')).toBe('Meta+,');
+    platform.mockRestore();
   });
 });

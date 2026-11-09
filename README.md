@@ -62,6 +62,19 @@ Twelve target formats. Six of them — JSONL, CSV, TSV, YAML, TOML and RESX — 
 
 Details: [`PRIVACY.md`](PRIVACY.md).
 
+## Accessibility
+
+JSONPrism aims for **WCAG 2.2 AA** on the website and in the apps:
+
+- **Keyboard:** everything works with the keyboard alone, with a skip link and a visible focus indicator.
+- **Screen readers:** controls have names, and errors and state changes are announced, in all four languages.
+- **Display:** light, dark or system theme with text at 4.5:1 or better, plus support for reduced motion and Windows contrast themes.
+- **Zoom:** works on the website, and in the desktop apps with Ctrl/⌘ + = and −.
+
+The maintainer tests it with Narrator and the keyboard alone, and every pull request runs an axe-core scan.
+
+Known limitations and how to report a barrier: [`ACCESSIBILITY.md`](ACCESSIBILITY.md).
+
 ## Tech stack
 
 - **Vite 8** + **React 19.3** + **TypeScript 7** (native compiler; the `typescript` dependency is a TS 6 alias kept only for typescript-eslint)
@@ -328,6 +341,7 @@ Bug reports and feature requests belong in [GitHub Issues](https://github.com/po
 | [`PRIVACY.md`](PRIVACY.md) | What stays on your device, and the web-only Cloudflare services (hosting, Turnstile, Web Analytics). |
 | [`TERMS.md`](TERMS.md) | ToS / EULA — acceptable use, license inheritance, user data ownership. |
 | [`SECURITY.md`](SECURITY.md) | How to report vulnerabilities; response SLAs. |
+| [`ACCESSIBILITY.md`](ACCESSIBILITY.md) | Accessibility goals (WCAG 2.2 AA), what's tested, known limitations, how to report a barrier. |
 | [`DISCLAIMER.md`](DISCLAIMER.md) | One-person + AI-assisted project; no warranty. |
 | [`THIRD-PARTY.md`](THIRD-PARTY.md) | Every dependency: version, license, link. |
 | [`MAINTAINERS.md`](MAINTAINERS.md) | Who's responsible for what. |
@@ -353,8 +367,8 @@ Hang out, ask questions, or follow updates:
 
 Substantial parts of JSONPrism's code, tests, translations, and docs
 were drafted with AI assistance: **Claude Chat** and **Claude Code
-(Opus 4.7, 1M context)** for v1.x, and **Claude Code (Opus 5.5)** for
-v2.0.0. See [DISCLAIMER.md](DISCLAIMER.md) for the full AI-assist
+(Opus 4.7 and 4.8)** for v1.x, and **Claude Code (Opus 5.5)** for
+v2.x. See [DISCLAIMER.md](DISCLAIMER.md) for the full AI-assist
 disclosure. The Japanese and Simplified Chinese translations, and parts
 of the Vietnamese one, are AI-generated and best-effort; contributions
 from native speakers are welcomed.

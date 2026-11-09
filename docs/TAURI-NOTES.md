@@ -60,6 +60,7 @@ intentionally narrow (trimmed in 2.0.0):
 | Permission | Why |
 | --- | --- |
 | `core:default` | Tauri's core set (app, event, path, window, webview, …), including the `tauri://drag-drop` events. |
+| `core:webview:allow-set-webview-zoom` | Page zoom (2.2.0). On macOS and Linux, `zoomHotkeysEnabled` injects a script that zooms with Ctrl/⌘ + = and − through this command. On Windows, WebView2's own zoom controls are used. |
 | `opener:default` | Opens `https://` and `mailto:` links in the system browser / mail app via `openUrl`. Works on Android, where the shell plugin's `open()` has no URL handler. |
 | `dialog:allow-open`, `dialog:allow-save` | Native open / save dialogs only — no message, ask or confirm dialogs. |
 | `fs:default` | The fs plugin's baseline: the app's own data directories; denies the webview data folder. |
@@ -99,6 +100,18 @@ default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'
 - The theme is applied before first paint by `public/theme-init.js`, an
   external blocking script rather than an inline one, so neither CSP needs
   `'unsafe-inline'` for scripts (the reason is spelled out in `index.html`).
+
+## Page zoom
+
+`app.windows[0].zoomHotkeysEnabled` is `true` since 2.2.0. It is off by default in Tauri, and before 2.2.0 the desktop apps could only scale with the OS display setting (WCAG 1.4.4 Resize Text).
+
+| Platform | Behaviour |
+| --- | --- |
+| Windows | Sets WebView2's `IsZoomControlEnabled`: Ctrl + = / − and Ctrl + mouse wheel both work. |
+| macOS, Linux | Tauri injects a script for Ctrl/⌘ + = / −, in 20 % steps from 20 % to 1000 %. It calls `set_webview_zoom`, so it needs the permission above. |
+| Android | Not supported by Tauri. Pinch-zoom and text size follow the system WebView defaults; see the known limitations in [`ACCESSIBILITY.md`](../ACCESSIBILITY.md#known-limitations). |
+
+The zoom level isn't saved between launches.
 
 ## Consent gate
 

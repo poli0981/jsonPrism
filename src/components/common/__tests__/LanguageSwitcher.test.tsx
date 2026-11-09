@@ -17,11 +17,12 @@ describe('LanguageSwitcher', () => {
     const group = screen.getByRole('group', { name: 'Language' });
     const buttons = within(group).getAllByRole('button');
     expect(buttons.map((b) => b.textContent)).toEqual(['EN', 'VI', 'JA', 'ZH']);
-    expect(within(group).getByRole('button', { name: 'English' })).toHaveAttribute(
+    expect(within(group).getByRole('button', { name: 'EN English' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
-    expect(within(group).getByRole('button', { name: '日本語' })).toHaveAttribute('lang', 'ja');
+    // Names start with the visible code (WCAG 2.5.3) and add the native name.
+    expect(within(group).getByRole('button', { name: 'JA 日本語' })).toHaveAttribute('lang', 'ja');
     expect(screen.getByRole('combobox', { name: 'Language' })).toHaveValue('en');
   });
 
@@ -29,14 +30,14 @@ describe('LanguageSwitcher', () => {
     const user = userEvent.setup();
     render(<LanguageSwitcher />);
 
-    await user.click(screen.getByRole('button', { name: 'Tiếng Việt' }));
+    await user.click(screen.getByRole('button', { name: 'VI Tiếng Việt' }));
     expect(i18n.resolvedLanguage).toBe('vi');
     expect(document.documentElement.lang).toBe('vi');
-    expect(screen.getByRole('button', { name: 'Tiếng Việt' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'VI Tiếng Việt' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
-    expect(screen.getByRole('button', { name: 'English' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'EN English' })).toHaveAttribute(
       'aria-pressed',
       'false',
     );
@@ -51,7 +52,7 @@ describe('LanguageSwitcher', () => {
     expect(i18n.resolvedLanguage).toBe('zh-CN');
     expect(document.documentElement.lang).toBe('zh-CN');
     expect(screen.getByRole('combobox')).toHaveValue('zh-CN');
-    expect(screen.getByRole('button', { name: '简体中文' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'ZH 简体中文' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
@@ -68,6 +69,9 @@ describe('LanguageSwitcher', () => {
       </I18nextProvider>,
     );
     expect(screen.getByRole('combobox')).toHaveValue('en');
-    expect(screen.getByRole('button', { name: 'English' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'EN English' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
   });
 });

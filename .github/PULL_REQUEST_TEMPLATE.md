@@ -35,6 +35,7 @@ CI must pass before the PR can be merged.
 - [ ] `npm run cf:check`
 - [ ] Rust changed: `cargo fmt --check` and `cargo clippy --all-targets --locked -- -D warnings` in `src-tauri/`
 - [ ] Manual smoke (describe what you clicked / loaded, and on which platform: Web / Windows / macOS / Linux / Android)
+- [ ] UI changed: keyboard-only pass of what changed (visible focus, nothing stuck), accessible names in all four locales, `motion-safe:` animations, no colour-only meaning — see [ACCESSIBILITY.md](https://github.com/poli0981/jsonPrism/blob/main/ACCESSIBILITY.md#contributor-expectations). Screen reader used, if any:
 
 ## Screenshots / recordings (UI changes only)
 

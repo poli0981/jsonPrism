@@ -1,6 +1,6 @@
 # Disclaimer
 
-**Last updated**: 2026-10-22
+**Last updated**: 2026-11-09
 
 ## Project status
 
@@ -28,7 +28,7 @@ Apache 2.0 disclaimer-of-warranty clause applies in full.
 This project openly uses AI tools during development:
 
 - **Claude Chat** and **Claude Code** — Claude Opus 4.7 and 4.8 for the 1.x
-  releases, Claude Opus 5.5 for 2.0 — used for drafting code,
+  releases, Claude Opus 5.5 for 2.x — used for drafting code,
   refactoring, writing tests and documentation, generating translations
   and reviewing changes.
 - All AI-generated code is reviewed by the maintainer before it is merged.

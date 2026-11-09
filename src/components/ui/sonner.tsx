@@ -14,6 +14,7 @@ export function Toaster(props: ToasterProps) {
       closeButton
       containerAriaLabel={t('common.notifications')}
       toastOptions={{
+        closeButtonAriaLabel: t('common.close_notification'),
         classNames: {
           toast:
             'group toast group-[.toaster]:bg-card group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg group-[.toaster]:font-sans',

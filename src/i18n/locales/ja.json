@@ -6,8 +6,9 @@
     "home": "変換",
     "about": "概要",
     "github": "GitHub",
-    "label": "メインナビゲーション",
-    "home_brand": "JSONPrism ホーム"
+    "label": "メイン",
+    "home_brand": "JSONPrism ホーム",
+    "skip_to_content": "本文へスキップ"
   },
   "home": {
     "input_label": "JSON 入力",
@@ -35,7 +36,10 @@
     "error_position": "{{line}} 行 {{column}} 列",
     "jsonc_hint": "JSONC（コメントや末尾カンマを含む JSON）のようです。",
     "jsonc_switch": "JSONC → JSON に変換",
-    "output_aria": "{{format}} の出力（読み取り専用）"
+    "output_aria": "{{format}} の出力（読み取り専用）",
+    "document_title": "JSONPrism · JSON を 12 形式に変換",
+    "format_picker_description": "形式を選択します。現在の方向で使えない形式は無効になっています。",
+    "output_unread": "(新規)"
   },
   "formats": {
     "jsonl": "JSONL",
@@ -191,7 +195,8 @@
   },
   "shortcut": {
     "download": "ダウンロード",
-    "settings": "設定"
+    "settings": "設定",
+    "leave_editor": "エディターから出る"
   },
   "settings": {
     "title": "オプション",
@@ -324,7 +329,8 @@
       "discussions": "ディスカッション",
       "demo": "Web アプリ",
       "license": "ライセンス (Apache 2.0)",
-      "releases": "リリースとダウンロード"
+      "releases": "リリースとダウンロード",
+      "accessibility": "アクセシビリティ方針"
     },
     "disclaimer": {
       "title": "免責事項",
@@ -352,7 +358,8 @@
     "loading": "読み込み中…",
     "scroll_to_top": "トップへ戻る",
     "close": "閉じる",
-    "notifications": "通知"
+    "notifications": "通知",
+    "close_notification": "通知を閉じる"
   },
   "social": {
     "discord": "Discord",
@@ -455,7 +462,17 @@
       "folded_code": "折りたたまれたコード",
       "unfold": "展開",
       "diagnostics": "診断",
-      "no_diagnostics": "診断なし"
-    }
+      "no_diagnostics": "診断なし",
+      "folded_lines": "行を折りたたみました",
+      "unfolded_lines": "行を展開しました",
+      "to": "〜",
+      "current_match": "現在の一致",
+      "on_line": "行",
+      "replaced_match_on_line": "$ 行目の一致を置換しました",
+      "replaced_matches": "$ 件の一致を置換しました",
+      "selection_deleted": "選択範囲を削除しました",
+      "control_character": "制御文字"
+    },
+    "tab_hint": "Tab キーでインデントします。エディターから出るには、Esc を押してから Tab を押します。"
   }
 }

@@ -28,6 +28,9 @@ export function ScrollToTop({ scrollRef, threshold = 320 }: ScrollToTopProps) {
     if (!el) return;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     el.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    // The button hides at the top; hand focus to the content it scrolled
+    // (a focusable region) rather than leaving it on a hidden control.
+    if (el.tabIndex >= 0) el.focus({ preventScroll: true });
   };
 
   return (

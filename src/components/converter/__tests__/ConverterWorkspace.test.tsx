@@ -379,6 +379,8 @@ describe('ConverterWorkspace — mobile layout', () => {
 
     type('[{"a":1}]');
     expect(badgeOn(outputTab)).toBe(true);
+    // The dot is visual only; the tab's name says it too.
+    expect(outputTab).toHaveAccessibleName('Output (new)');
 
     await user.click(outputTab);
     expect(outputTab).toHaveAttribute('aria-selected', 'true');

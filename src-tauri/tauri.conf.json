@@ -22,6 +22,7 @@
         "fullscreen": false,
         "transparent": false,
         "dragDropEnabled": true,
+        "zoomHotkeysEnabled": true,
         "theme": null
       }
     ],
@@ -78,7 +79,7 @@
     },
     "android": {
       "minSdkVersion": 31,
-      "versionCode": 20101
+      "versionCode": 20200
     }
   },
   "plugins": {

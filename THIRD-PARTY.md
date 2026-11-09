@@ -3,7 +3,7 @@
 JSONPrism is built on top of open-source libraries. This page lists each
 direct dependency declared in [`package.json`](package.json) and
 [`src-tauri/Cargo.toml`](src-tauri/Cargo.toml), the exact version used by
-**JSONPrism 2.1.1**, the upstream license, and a link to the project. It
+**JSONPrism 2.2.0**, the upstream license, and a link to the project. It
 also lists the third-party services the website uses.
 
 Versions are the ones locked in [`package-lock.json`](package-lock.json)
@@ -145,6 +145,7 @@ shipped in the app.
 | `@testing-library/dom` | 10.4.2 | MIT | [testing-library.com](https://testing-library.com/) |
 | `@testing-library/jest-dom` | 7.0.1 | MIT | [testing-library.com](https://testing-library.com/) |
 | `@testing-library/user-event` | 14.6.8 | MIT | [testing-library.com](https://testing-library.com/) |
+| `axe-core` | 4.14.0 | MPL-2.0 | [github.com/dequelabs/axe-core](https://github.com/dequelabs/axe-core) |
 | `@types/node` | 26.6.6 | MIT | [github.com/DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped) |
 | `@types/papaparse` | 5.5.2 | MIT | [github.com/DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped) |
 | `@types/react` | 19.3.0 | MIT | [github.com/DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped) |
@@ -192,7 +193,7 @@ of the project.
 Substantial portions of JSONPrism's code, tests, translations, and docs
 were drafted with AI assistance from Anthropic: **Claude Chat** +
 **Claude Code** with Claude Opus 4.7 and 4.8 for the 1.x releases, and
-**Claude Code** with Claude Opus 5.5 for 2.0.0. The Japanese and Simplified
+**Claude Code** with Claude Opus 5.5 for 2.x. The Japanese and Simplified
 Chinese translations, and parts of the Vietnamese one, are AI-generated.
 The maintainer reviews every change before it is merged. See
 [DISCLAIMER.md](DISCLAIMER.md).

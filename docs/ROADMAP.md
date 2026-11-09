@@ -4,7 +4,7 @@ This document is the **single source of truth** for what's done, what's next, an
 
 Update it as work lands — keep the project status honest.
 
-**Current release: v2.1.1 (2026-11-04).** The web app runs at https://jsonprism.poli0981.dev (Cloudflare Workers); desktop and Android builds are on [GitHub Releases](https://github.com/poli0981/jsonPrism/releases).
+**Current release: v2.2.0 (2026-11-09).** The web app runs at https://jsonprism.poli0981.dev (Cloudflare Workers); desktop and Android builds are on [GitHub Releases](https://github.com/poli0981/jsonPrism/releases).
 
 ---
 
@@ -83,8 +83,8 @@ Goal: make the four working converters production-quality and the UX delightful 
 - [x] Keyboard shortcuts: ⌘/Ctrl+K (clear), ⌘/Ctrl+S (download) — *⌘/Ctrl+K removed in 2.0.0: it clashed with the browser's search shortcut*
 - [x] Status bar showing: input bytes, output bytes, parse time, shortcut hints
 - [x] Shape detection hint (scalar / object / array / flat-object / array-of-objects)
-- [x] Disabled-format chips show "P2"/"P3" badge with tooltip
-- [x] Cmd/Ctrl+, to open settings — *deferred at the time; added in a later 1.x release*
+- [x] Disabled-format chips show "P2"/"P3" badge with tooltip — *badges retired once every format shipped; a disabled chip now explains why in its tooltip*
+- [x] Cmd/Ctrl+, to open settings — *deferred at the time; added in 2.0.0*
 
 ### Deliverable
 
@@ -178,7 +178,7 @@ Split into three sub-phases for digestibility.
 
 8/9 formats production-ready. Batch up to 500 files. Desktop builds for Windows / macOS / Linux. JSONPrism becomes a "real" tool, not just a website.
 
-**Currently at Phase 2A — only RESX (Phase 3) remains as a stub.**
+*Written during Phase 2A, when only RESX (Phase 3) was still a stub; Phase 3 has since shipped.*
 
 ---
 
@@ -243,7 +243,7 @@ Codebase hygiene plus a small UX addition — no converter behavior changed.
 
 - [x] Decomposed three oversized components (`BatchPanel`, `ConverterWorkspace`, `InputPanel`) into focused pure utilities, leaf components, and hooks — behavior-preserving, all 193 tests still green.
 - [x] Integrated `knip` for dead-code analysis: `knip.json` config, `npm run knip` script, and a CI step. Initial sweep removed orphaned code and a phantom dependency.
-- [x] Scroll-to-top button on the long, scrollbar-hidden About page (respects `prefers-reduced-motion`).
+- [x] Scroll-to-top button on the long, scrollbar-hidden About page (respects `prefers-reduced-motion`). — *since 2.0.0 the scrollbar shows unless **Appearance → Hide scrollbars** is on; since 2.2.0 the button hands focus back to the page*
 
 ---
 
@@ -373,7 +373,57 @@ The most common "this isn't valid JSON" paste — config files with comments —
 
 ---
 
+## Phase 10 — 2.2.0: Accessibility ✅
+
+**Status**: complete (shipped in v2.2.0, 2026-11-09)
+
+The release adds an accessibility statement and fixes the gaps that an audit against WCAG 2.2 AA found. The maintainer's keyboard-only and Narrator pass on 2.1.1 found no blockers; these fixes cover what that pass didn't reach.
+
+- [x] **Docs and process:**
+  - [`ACCESSIBILITY.md`](../ACCESSIBILITY.md) and its [Vietnamese mirror](i18n/vi/ACCESSIBILITY.md): goals, what works, keyboard reference, tested-with table, supported environments, known limitations, contributor expectations, and reporting with severity levels and response times.
+  - An accessibility issue template and a PR checklist item.
+  - Rules in CONTRIBUTING and CLAUDE.md.
+- [x] **Focus:**
+  - A skip link.
+  - Focus moves to `<main>` after a navigation and after the consent gate.
+  - Visible focus everywhere: a global `:focus-visible` outline, and inset rings on scroll areas and the editors.
+  - In Windows contrast themes (`forced-colors`), focus, the pressed or selected state, and switches stay visible.
+- [x] **Input editor:** an "Escape, then Tab" hint (screen-reader description and status bar), and `aria-invalid` with `aria-describedby` pointing at the current error.
+- [x] **Screen readers:**
+  - Only the status bar's state is a live region.
+  - The language buttons and Copy have names that start with their visible labels.
+  - Download and Options expose `aria-keyshortcuts`.
+  - The unread-output dot has text.
+  - The format-picker sheet has a description.
+  - Loading has `role="status"`.
+  - Back to top hands focus back to the content.
+- [x] **Translated screen-reader strings:**
+  - the toast close button;
+  - CodeMirror's search, replace, fold and delete announcements;
+  - the Home page title.
+
+  Navigation labels no longer repeat "navigation".
+- [x] **Desktop apps:** page zoom with Ctrl/⌘ + = and − (`zoomHotkeysEnabled`, with the `core:webview:allow-set-webview-zoom` permission).
+- [x] **Automated check:** an axe-core scan of every page, the consent gate and each sheet runs in `npm test`. The About page links the statement.
+
+### Deliverable
+
+An accessibility statement backed by tests. **949 tests in 95 files.**
+
+---
+
 ## Beyond — Ideas (no commitment)
+
+### Accessibility follow-ups
+
+These are tracked as known limitations in [`ACCESSIBILITY.md`](../ACCESSIBILITY.md#known-limitations).
+
+- **Non-text contrast:** text-field and switch outlines at 3:1 (WCAG 1.4.11).
+- **Android:** follow the system font size and allow pinch-zoom in the WebView; a TalkBack pass on a real device.
+- **More screen readers:** NVDA, VoiceOver and Orca passes, and Windows contrast themes checked on real hardware.
+- **Layout switch:** keep editor focus and undo history when the layout changes at 768 px.
+- **New tabs:** announce links that open a new tab or the system browser.
+- **Long output:** a way to read it in a screen reader's browse mode, such as a plain-text view.
 
 ### Deferred from 2.0.0
 

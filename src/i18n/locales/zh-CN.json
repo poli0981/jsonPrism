@@ -6,8 +6,9 @@
     "home": "转换",
     "about": "关于",
     "github": "GitHub",
-    "label": "主导航",
-    "home_brand": "JSONPrism 首页"
+    "label": "主要",
+    "home_brand": "JSONPrism 首页",
+    "skip_to_content": "跳到主要内容"
   },
   "home": {
     "input_label": "JSON 输入",
@@ -35,7 +36,10 @@
     "error_position": "第 {{line}} 行，第 {{column}} 列",
     "jsonc_hint": "这看起来是 JSONC——带注释或尾随逗号的 JSON。",
     "jsonc_switch": "转换 JSONC → JSON",
-    "output_aria": "{{format}} 输出（只读）"
+    "output_aria": "{{format}} 输出（只读）",
+    "document_title": "JSONPrism · 将 JSON 转换为 12 种格式",
+    "format_picker_description": "选择一种格式。当前方向下不可用的格式已禁用。",
+    "output_unread": "(新)"
   },
   "formats": {
     "jsonl": "JSONL",
@@ -191,7 +195,8 @@
   },
   "shortcut": {
     "download": "下载",
-    "settings": "设置"
+    "settings": "设置",
+    "leave_editor": "离开编辑器"
   },
   "settings": {
     "title": "选项",
@@ -324,7 +329,8 @@
       "discussions": "讨论区",
       "demo": "网页版",
       "license": "许可证 (Apache 2.0)",
-      "releases": "版本与下载"
+      "releases": "版本与下载",
+      "accessibility": "无障碍声明"
     },
     "disclaimer": {
       "title": "免责声明",
@@ -352,7 +358,8 @@
     "loading": "加载中…",
     "scroll_to_top": "回到顶部",
     "close": "关闭",
-    "notifications": "通知"
+    "notifications": "通知",
+    "close_notification": "关闭通知"
   },
   "social": {
     "discord": "Discord",
@@ -455,7 +462,17 @@
       "folded_code": "已折叠代码",
       "unfold": "展开",
       "diagnostics": "诊断",
-      "no_diagnostics": "无诊断"
-    }
+      "no_diagnostics": "无诊断",
+      "folded_lines": "已折叠行",
+      "unfolded_lines": "已展开行",
+      "to": "至",
+      "current_match": "当前匹配",
+      "on_line": "位于行",
+      "replaced_match_on_line": "已替换第 $ 行的匹配",
+      "replaced_matches": "已替换 $ 处匹配",
+      "selection_deleted": "已删除选区",
+      "control_character": "控制字符"
+    },
+    "tab_hint": "Tab 键用于缩进。要离开编辑器，请先按 Esc，再按 Tab。"
   }
 }

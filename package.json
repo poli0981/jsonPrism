@@ -1,7 +1,7 @@
 {
   "name": "jsonprism",
   "private": true,
-  "version": "2.1.1",
+  "version": "2.2.0",
   "type": "module",
   "description": "Disperse JSON into 12 formats (six convert back, plus JSONC → JSON) — JSONL, CSV, TSV, YAML, XML, TOML, RESX, Markdown, SQL, BSON, CBOR, MessagePack. Conversion runs locally in your browser or desktop app.",
   "author": "poli0981 <code@poli0981.dev> (https://github.com/poli0981)",
@@ -103,6 +103,7 @@
     "@typescript/native": "npm:typescript@^7.0.2",
     "@vitejs/plugin-react": "^6.2.1",
     "@vitest/coverage-v8": "^5.1.0",
+    "axe-core": "^4.14.0",
     "eslint": "^10.14.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",

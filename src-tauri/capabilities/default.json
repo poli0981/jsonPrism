@@ -1,10 +1,11 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "JSONPrism main window: native open/save dialogs, reading files the user picks or drops, writing where they choose to save, and opening links in the system browser. Picked and dropped paths are added to the fs scope at runtime; the static scope only covers common folders.",
+  "description": "JSONPrism main window: native open/save dialogs, reading files the user picks or drops, writing where they choose to save, opening links in the system browser, and page zoom (Ctrl/Cmd + and -). Picked and dropped paths are added to the fs scope at runtime; the static scope only covers common folders.",
   "windows": ["main"],
   "permissions": [
     "core:default",
+    "core:webview:allow-set-webview-zoom",
     "opener:default",
     "dialog:allow-open",
     "dialog:allow-save",

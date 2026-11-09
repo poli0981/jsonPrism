@@ -204,10 +204,14 @@ export function ConverterWorkspace() {
               <TabsTrigger value="output" className="relative">
                 {t('home.tab_output')}
                 {hasUnreadOutput && (
-                  <span
-                    aria-hidden
-                    className="bg-primary absolute top-1 right-1 h-1.5 w-1.5 rounded-full"
-                  />
+                  <>
+                    <span
+                      aria-hidden
+                      className="bg-primary absolute top-1 right-1 h-1.5 w-1.5 rounded-full"
+                    />
+                    {/* The dot alone is visual; say it in the tab's name too. */}{' '}
+                    <span className="sr-only">{t('home.output_unread')}</span>
+                  </>
                 )}
               </TabsTrigger>
             </TabsList>
@@ -215,14 +219,14 @@ export function ConverterWorkspace() {
             <TabsContent
               value="input"
               forceMount
-              className="min-h-0 flex-1 data-[state=inactive]:hidden"
+              className="focus-visible:ring-ring min-h-0 flex-1 focus-visible:ring-2 focus-visible:ring-inset data-[state=inactive]:hidden"
             >
               {inputPanel}
             </TabsContent>
             <TabsContent
               value="output"
               forceMount
-              className="min-h-0 flex-1 data-[state=inactive]:hidden"
+              className="focus-visible:ring-ring min-h-0 flex-1 focus-visible:ring-2 focus-visible:ring-inset data-[state=inactive]:hidden"
             >
               {outputPanel}
             </TabsContent>
