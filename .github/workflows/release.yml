@@ -124,7 +124,8 @@ jobs:
             runner: windows-latest
             args: ''
           - name: macOS (universal)
-            runner: macos-14
+            # macos-14 images were retired on 2026-11-02.
+            runner: macos-15
             args: '--target universal-apple-darwin'
           # The oldest supported Ubuntu keeps the AppImage/deb glibc floor low.
           - name: Linux
