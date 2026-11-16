@@ -45,6 +45,9 @@ updates:
         patterns: ['@radix-ui/*']
       cloudflare:
         patterns: [wrangler, '@cloudflare/*', '@marsidev/react-turnstile']
+      # fast-xml-parser re-exports fast-xml-builder; keep the two in step.
+      xml:
+        patterns: [fast-xml-parser, fast-xml-builder]
       npm-minor-patch:
         update-types: [minor, patch]
 
