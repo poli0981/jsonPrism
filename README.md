@@ -6,7 +6,9 @@
 
 One JSON input. Multi-target formats. Fully on your device.
 
+[![Status: maintenance mode](https://img.shields.io/badge/status-maintenance_mode-yellow.svg)](#project-status)
 [![CI](https://github.com/poli0981/jsonPrism/actions/workflows/ci.yml/badge.svg)](https://github.com/poli0981/jsonPrism/actions/workflows/ci.yml)
+[![Qodana](https://github.com/poli0981/jsonPrism/actions/workflows/qodana.yml/badge.svg)](https://github.com/poli0981/jsonPrism/actions/workflows/qodana.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=poli0981_jsonPrism&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=poli0981_jsonPrism)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
@@ -17,6 +19,18 @@ One JSON input. Multi-target formats. Fully on your device.
 ---
 
 JSONPrism is a refracting tool for developers. It takes a single JSON input and disperses it into many target formats — like white light through a prism. **Conversion runs entirely on your device** — in the browser, the desktop app or the Android app — so your data never leaves it.
+
+## Project status
+
+**Maintenance mode** since 2.2.1 (November 2026). JSONPrism is feature-complete, and it stays maintained:
+
+- dependency updates on a regular schedule, and fast fixes for high or critical CVEs and serious runtime security issues;
+- major language, runtime and framework upgrades (for example Node 24 → 26, TypeScript 6 → 7);
+- bug, UI/UX and accessibility fixes, and adding or removing a converter when people really need it;
+- translation fixes: wording that doesn't fit a culture or region, and spelling mistakes that could mislead;
+- changes the Cloudflare or Worker platform forces, and website incidents such as DDoS or bot spam.
+
+New features are not planned, except the rare one that is genuinely necessary. Feature issues and pull requests outside this list are closed automatically. The full policy is in [CONTRIBUTING.md](CONTRIBUTING.md#maintenance-mode).
 
 ## Target formats
 

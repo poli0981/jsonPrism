@@ -1,39 +1,21 @@
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import '@/i18n';
 import { App } from '../App';
 import { axeViolations } from '@/test/axe';
+import { stubRangeGeometry } from '@/test/range-geometry';
 import { useConsentStore } from '@/stores/consentStore';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
 
 vi.mock('@/lib/analytics', () => ({ loadWebAnalytics: vi.fn(() => false) }));
 
-// jsdom has no layout engine; CodeMirror measures text ranges to draw the
-// cursor and selection layers. Empty geometry is enough here.
-const emptyRect = { x: 0, y: 0, width: 0, height: 0, top: 0, right: 0, bottom: 0, left: 0 };
-const rangeGeometry = ['getClientRects', 'getBoundingClientRect'] as const;
-const originalGeometry = rangeGeometry.map((key) =>
-  Object.getOwnPropertyDescriptor(Range.prototype, key),
-);
-
-beforeAll(() => {
-  Range.prototype.getClientRects = () => [] as unknown as DOMRectList;
-  Range.prototype.getBoundingClientRect = () => ({ ...emptyRect, toJSON: () => emptyRect });
-});
+stubRangeGeometry();
 
 beforeEach(() => {
   // axe probes <canvas> for icon fonts; jsdom only logs "not implemented".
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
-});
-
-afterAll(() => {
-  rangeGeometry.forEach((key, i) => {
-    const original = originalGeometry[i];
-    if (original) Object.defineProperty(Range.prototype, key, original);
-    else Reflect.deleteProperty(Range.prototype, key);
-  });
 });
 
 function renderApp(path = '/') {

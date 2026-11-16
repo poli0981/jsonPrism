@@ -33,5 +33,5 @@ export function saveConsent(consent: StoredConsent): void {
 }
 
 export function isConsentValid(consent: StoredConsent | null): boolean {
-  return !!consent && consent.accepted === true && consent.version === CONSENT_VERSION;
+  return !!consent && consent.accepted && consent.version === CONSENT_VERSION;
 }

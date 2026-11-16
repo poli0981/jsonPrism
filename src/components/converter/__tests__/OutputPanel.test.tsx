@@ -56,6 +56,13 @@ afterEach(() => {
 const copyButton = () => screen.getByRole('button', { name: /^Cop(y|ied)$/ });
 const downloadButton = () => screen.getByRole('button', { name: 'Download' });
 
+/** Advances the fake timers inside act(); the block body keeps act() synchronous. */
+function advance(ms: number) {
+  act(() => {
+    vi.advanceTimersByTime(ms);
+  });
+}
+
 async function lastDownloaded(): Promise<{ blob: Blob; name: string; bytes: number[] }> {
   const [blob, name] = vi.mocked(downloadBlob).mock.lastCall!;
   return { blob, name, bytes: [...new Uint8Array(await blob.arrayBuffer())] };
@@ -145,12 +152,12 @@ describe('OutputPanel — copy', () => {
     await act(async () => fireEvent.click(copyButton()));
     expect(copyButton()).toHaveTextContent('Copied');
 
-    act(() => vi.advanceTimersByTime(1000));
+    advance(1000);
     await act(async () => fireEvent.click(copyButton()));
-    act(() => vi.advanceTimersByTime(1000));
+    advance(1000);
     expect(copyButton()).toHaveTextContent('Copied');
 
-    act(() => vi.advanceTimersByTime(500));
+    advance(500);
     expect(copyButton()).toHaveTextContent('Copy');
     expect(copyButton()).not.toHaveTextContent('Copied');
   });

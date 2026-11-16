@@ -1,3 +1,5 @@
+// XMLValidator is deprecated in fast-xml-parser 5 (see the note in xml.ts).
+// noinspection JSDeprecatedSymbols
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import type { Converter } from './types';
 import { errorMessage } from '@/lib/errors';
@@ -194,6 +196,7 @@ export const resxConverter: Converter<ResxOptions> = {
     if (/<!DOCTYPE/i.test(text)) {
       return { ok: false, error: 'Not a RESX file: DOCTYPE declarations are not supported.' };
     }
+    // noinspection JSDeprecatedSymbols
     const validation = XMLValidator.validate(text);
     if (validation !== true) {
       return {

@@ -6,7 +6,9 @@
 
 Một JSON đầu vào. Đa định dạng đích. Chạy hoàn toàn trên thiết bị của bạn.
 
+[![Status: maintenance mode](https://img.shields.io/badge/status-maintenance_mode-yellow.svg)](#trạng-thái-dự-án)
 [![CI](https://github.com/poli0981/jsonPrism/actions/workflows/ci.yml/badge.svg)](https://github.com/poli0981/jsonPrism/actions/workflows/ci.yml)
+[![Qodana](https://github.com/poli0981/jsonPrism/actions/workflows/qodana.yml/badge.svg)](https://github.com/poli0981/jsonPrism/actions/workflows/qodana.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=poli0981_jsonPrism&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=poli0981_jsonPrism)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
@@ -17,6 +19,18 @@ Một JSON đầu vào. Đa định dạng đích. Chạy hoàn toàn trên thi�
 ---
 
 JSONPrism là công cụ "tán sắc" cho developer. Nhận một JSON đầu vào và phân tách ra nhiều định dạng đích — như ánh sáng trắng đi qua lăng kính. **Việc chuyển đổi diễn ra hoàn toàn trên thiết bị của bạn** — trong trình duyệt, app desktop hay app Android — nên dữ liệu không bao giờ rời khỏi máy.
+
+## Trạng thái dự án
+
+**Đang ở giai đoạn bảo trì** từ bản 2.2.1 (tháng 11/2026). JSONPrism đã đủ tính năng và vẫn được duy trì:
+
+- cập nhật thư viện định kỳ; vá nhanh các CVE mức high trở lên và lỗ hổng bảo mật nghiêm trọng của runtime;
+- nâng cấp lớn ngôn ngữ, runtime, framework (ví dụ Node 24 → 26, TypeScript 6 → 7);
+- sửa lỗi, lỗi UI/UX và trợ năng (accessibility); thêm hoặc bỏ converter khi thật sự có người cần;
+- sửa bản dịch: câu chữ không hợp văn hoá hay giọng địa phương, lỗi chính tả dễ gây hiểu nhầm;
+- thay đổi do Cloudflare hoặc nền tảng Worker bắt buộc, và sự cố website như DDoS hay bot spam.
+
+Không thêm tính năng mới, trừ trường hợp hiếm thật sự cần thiết. Issue và pull request đề xuất tính năng ngoài danh sách trên sẽ tự động bị đóng. Chính sách đầy đủ ở [CONTRIBUTING.md](CONTRIBUTING.md#maintenance-mode) (tiếng Anh).
 
 ## Định dạng hỗ trợ
 

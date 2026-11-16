@@ -6,7 +6,55 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
-No unreleased changes at this time. Future work tracked in `docs/ROADMAP.md` under "Beyond".
+No unreleased changes. JSONPrism is in maintenance mode: [CONTRIBUTING.md → Maintenance mode](CONTRIBUTING.md#maintenance-mode) lists what still changes.
+
+## [2.2.1] — 2026-11-16
+
+A maintenance release, and the start of **maintenance mode**. JSONPrism is feature-complete. From now on it gets dependency and security updates, major runtime upgrades, bug, UI/UX, accessibility and translation fixes, converter additions or removals that people really need, and Cloudflare or website fixes, but no new features. Conversions work exactly as before, nothing new is collected, and you are not asked to accept the terms again. `bundle.android.versionCode` 20201.
+
+### Dependencies
+
+- **npm (app):** i18next 27.1.3 and react-i18next 18.0.2 are new majors; their changed defaults don't apply here (`fallbackLng` is set, no translation is empty, no `Trans`, SSR or mocks). Also lucide-react 1.73, zustand 5.1, react-dropzone 20.2, papaparse 5.7.1, fast-xml-parser 5.12.1, `@codemirror/lint` 6.9.8 and `@tauri-apps/plugin-opener` 2.7.3.
+- **npm (dev):**
+  - ESLint 10.15, typescript-eslint 8.72.2, eslint-plugin-react-refresh 0.5.8;
+  - Vite 8.3.8, `@vitejs/plugin-react` 6.3, Tailwind CSS and `@tailwindcss/vite` 4.3.5;
+  - Prettier 3.10.1, knip 6.45.1, wrangler 4.162;
+  - jsdom 31.0.1 (a new major, tests only), `@testing-library/user-event` 14.6.12.
+- **Rust:** `cargo update` within semver: wry 0.57.2, tauri-plugin-opener 2.7.3 and 43 other crates.
+- **GitHub Actions:** SonarSource/sonarqube-scan-action 8.5.0, actions/setup-java 6.3.0.
+- `fast-xml-builder` 1.3.2 is now a direct dependency (see Fixed).
+- All 414 packages have verified registry signatures, and `THIRD-PARTY.md` matches both lockfiles again.
+- Supersedes Dependabot PRs #183–#191.
+
+### Fixed
+
+Findings from the first Qodana run. None of them is visible in the app.
+
+- **XML builder:** the XML converter now uses `fast-xml-builder` directly. fast-xml-parser 5 deprecated its own `XMLBuilder` export, which only re-exported that package, so the output is identical.
+- **React types:** imported from `react` instead of read from the global `React` namespace.
+- **Tests:**
+  - synchronous `act()` calls no longer return a promise nobody awaits;
+  - the jsdom Range geometry stub is shared, and restored correctly after each file.
+- **Small cleanups:** two redundant regular-expression constructs and a redundant boolean comparison.
+
+### Project
+
+- **Maintenance mode:**
+  - a status badge and section in both READMEs;
+  - the policy in [CONTRIBUTING.md](CONTRIBUTING.md#maintenance-mode);
+  - converter and translation issue templates instead of the feature request template;
+  - a scope checklist in the pull request template.
+- **Auto-close:** `maintenance-triage.yml` closes out-of-scope feature requests with a bilingual comment.
+- **Qodana:** Qodana for JS (native mode) and Qodana for Rust (Early Access) run on every push and pull request and report to Qodana Cloud.
+- **Cleanup:** merged and stale branches and old worktrees were removed.
+
+### Security
+
+- No known vulnerability affects the app or the website.
+- i18next 27.1.3 includes the fix for GHSA-q76c-gcvw-89x9. That issue needs a backend connector, which JSONPrism doesn't use.
+- `npm audit` still lists minimatch < 11.0.1 (GHSA-g3hv-75wg-m249, moderate) through typescript-eslint, a development tool:
+  - ESLint 10.15 itself has moved to minimatch 11;
+  - `@typescript-eslint/typescript-estree` still requires minimatch 10, but only for typed-linting globs, which this project's ESLint config doesn't use.
 
 ## [2.2.0] — 2026-11-09
 

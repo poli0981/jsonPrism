@@ -1,8 +1,11 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Feature ideas (maintenance mode)
+    url: https://github.com/poli0981/jsonPrism/discussions/categories/ideas
+    about: JSONPrism is in maintenance mode and takes no new features. Share ideas in Discussions, with no commitment. To add or remove a format, use the Converter request template.
   - name: Questions & general discussion
     url: https://github.com/poli0981/jsonPrism/discussions
-    about: Ask about usage, share workflows, or propose ideas before opening an issue.
+    about: Ask about usage or share your workflows.
   - name: Security vulnerability
     url: https://github.com/poli0981/jsonPrism/security/advisories/new
     about: Report security issues privately via a GitHub Security Advisory, or email security@poli0981.dev. Never in a public issue.

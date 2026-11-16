@@ -13,7 +13,20 @@ GitHub Pages (`poli0981.github.io/jsonPrism`) now only redirects to the new doma
 
 The maintainer is **Kokone** ([@poli0981](https://github.com/poli0981)). Audience: the developer community on the open-source Discord server plus YouTube viewers who watch indie/visual-novel gameplay and occasionally want a quick devtool.
 
-**Current release**: 2.2.0. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what is next.
+**Current release**: 2.2.1. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what is next.
+
+**Status: maintenance mode** (since 2.2.1). Don't propose new features. Every change must fall under the policy in [`CONTRIBUTING.md` → Maintenance mode](CONTRIBUTING.md#maintenance-mode):
+
+- dependency updates;
+- security fixes (a CVE rated high or critical, a serious runtime issue);
+- major language, runtime or framework upgrades;
+- bug, UI/UX and accessibility fixes;
+- adding or removing a converter when there is a real need;
+- translation fixes;
+- Cloudflare/Worker changes;
+- website incidents.
+
+`.github/workflows/maintenance-triage.yml` closes out-of-scope issues and pull requests (label `out-of-scope`).
 
 ## Stack — exact versions matter
 
@@ -157,7 +170,7 @@ npm run build        # verify production output
 npm run preview:cf   # the real Cloudflare setup on http://localhost:8787
 ```
 
-CI (`.github/workflows/ci.yml`) also runs `format:check`, `knip`, coverage, `cf:check`, SonarQube Cloud and `cargo fmt`/`clippy`. The maintainer typically uses **WebStorm** (JetBrains license), so Prettier and ESLint run on save.
+CI (`.github/workflows/ci.yml`) also runs `format:check`, `knip`, coverage, `cf:check`, SonarQube Cloud and `cargo fmt`/`clippy`. `.github/workflows/qodana.yml` runs Qodana for JS (native mode, `qodana.yaml`) and Qodana for Rust (Early Access, Docker, `src-tauri/qodana.yaml`) with the `QODANA_TOKEN_TS_JS` and `QODANA_TOKEN_RUST` secrets; both jobs skip without their token. The maintainer typically uses **WebStorm** (JetBrains license), so Prettier and ESLint run on save.
 
 ## Communication preferences
 

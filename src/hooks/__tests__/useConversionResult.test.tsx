@@ -71,6 +71,13 @@ function okOutcome(output: string, ms = 12): TimedOutcome {
 const big = (marker: string) =>
   JSON.stringify({ marker, blob: 'x'.repeat(WORKER_THRESHOLD_CHARS) });
 
+/** Advances the fake timers inside act(); the block body keeps act() synchronous. */
+function advance(ms: number) {
+  act(() => {
+    vi.advanceTimersByTime(ms);
+  });
+}
+
 describe('useConversionResult — small inputs (main thread)', () => {
   it('is idle for empty or blank input', () => {
     const { result, rerender } = setup();
@@ -221,10 +228,10 @@ describe('useConversionResult — large inputs (worker)', () => {
     const { result } = setup({ input, format: 'yaml', options: { indent: 2 } });
 
     expect(result.current).toMatchObject({ output: '', pending: true });
-    act(() => vi.advanceTimersByTime(199));
+    advance(199);
     expect(client.convertLive).not.toHaveBeenCalled();
 
-    act(() => vi.advanceTimersByTime(1));
+    advance(1);
     expect(client.convertLive).toHaveBeenCalledTimes(1);
     expect(client.convertLive).toHaveBeenCalledWith<[ConversionRequest]>({
       text: input,
@@ -247,10 +254,10 @@ describe('useConversionResult — large inputs (worker)', () => {
     client.convertLive.mockReturnValue(new Promise(() => {}));
     const { rerender } = setup({ input: big('1') });
     for (const marker of ['2', '3', '4']) {
-      act(() => vi.advanceTimersByTime(100));
+      advance(100);
       rerender({ input: big(marker), format: 'csv', direction: 'forward', options: CSV_OPTIONS });
     }
-    act(() => vi.advanceTimersByTime(200));
+    advance(200);
     expect(client.convertLive).toHaveBeenCalledTimes(1);
     expect(client.convertLive.mock.calls[0]![0]).toMatchObject({ text: big('4') });
   });
@@ -260,14 +267,14 @@ describe('useConversionResult — large inputs (worker)', () => {
     const second = deferred();
     client.convertLive.mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise);
     const { result, rerender } = setup({ input: big('a') });
-    act(() => vi.advanceTimersByTime(200));
+    advance(200);
     await act(async () => first.resolve(okOutcome('A')));
     expect(result.current).toMatchObject({ output: 'A', pending: false });
 
     rerender({ input: big('b'), format: 'csv', direction: 'forward', options: CSV_OPTIONS });
     expect(result.current).toMatchObject({ output: 'A', pending: true });
 
-    act(() => vi.advanceTimersByTime(200));
+    advance(200);
     await act(async () => second.resolve(okOutcome('B')));
     expect(result.current).toMatchObject({ output: 'B', pending: false });
   });
@@ -277,10 +284,10 @@ describe('useConversionResult — large inputs (worker)', () => {
     const fresh = deferred();
     client.convertLive.mockReturnValueOnce(stale.promise).mockReturnValueOnce(fresh.promise);
     const { result, rerender } = setup({ input: big('old') });
-    act(() => vi.advanceTimersByTime(200));
+    advance(200);
 
     rerender({ input: big('new'), format: 'csv', direction: 'forward', options: CSV_OPTIONS });
-    act(() => vi.advanceTimersByTime(200));
+    advance(200);
     await act(async () => stale.resolve(okOutcome('OLD')));
     expect(result.current).toMatchObject({ output: '', pending: true });
 
@@ -292,7 +299,7 @@ describe('useConversionResult — large inputs (worker)', () => {
     const run = deferred();
     client.convertLive.mockReturnValueOnce(run.promise);
     const { result } = setup({ input: big('a') });
-    act(() => vi.advanceTimersByTime(200));
+    advance(200);
 
     await act(async () => run.reject(new Error('The conversion ran out of resources.')));
     expect(result.current).toMatchObject({
@@ -306,7 +313,7 @@ describe('useConversionResult — large inputs (worker)', () => {
     const run = deferred();
     client.convertLive.mockReturnValueOnce(run.promise);
     const { result } = setup({ input: big('a') });
-    act(() => vi.advanceTimersByTime(200));
+    advance(200);
 
     await act(async () => run.reject(new SupersededError()));
     expect(result.current).toMatchObject({ output: '', outputError: null, pending: true });
@@ -334,7 +341,7 @@ describe('useConversionResult — large inputs (worker)', () => {
     for (const [outcome, expected] of outcomes) {
       client.convertLive.mockResolvedValueOnce(outcome);
       const { result, unmount } = setup({ input: big('k') });
-      act(() => vi.advanceTimersByTime(200));
+      advance(200);
       await act(async () => {});
       expect(result.current).toMatchObject({ ...expected, pending: false });
       unmount();
@@ -345,7 +352,7 @@ describe('useConversionResult — large inputs (worker)', () => {
     const run = deferred();
     client.convertLive.mockReturnValueOnce(run.promise);
     const { unmount, renders } = setup({ input: big('a') });
-    act(() => vi.advanceTimersByTime(200));
+    advance(200);
     unmount();
     const count = renders.length;
     await act(async () => run.resolve(okOutcome('late')));
@@ -355,7 +362,7 @@ describe('useConversionResult — large inputs (worker)', () => {
   it('cancels the pending timer when the input shrinks below the threshold', () => {
     const { result, rerender } = setup({ input: big('a'), format: 'jsonl', options: {} });
     rerender({ input: '[{"a":1}]', format: 'jsonl', direction: 'forward', options: {} });
-    act(() => vi.advanceTimersByTime(1000));
+    advance(1000);
     expect(client.convertLive).not.toHaveBeenCalled();
     expect(result.current).toMatchObject({ output: '{"a":1}\n', pending: false });
   });

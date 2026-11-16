@@ -11,6 +11,11 @@ website always runs the latest code on `main`.
 | 2.x   | ✅ |
 | < 2.0 | ❌ |
 
+JSONPrism has been in
+[maintenance mode](CONTRIBUTING.md#maintenance-mode) since 2.2.1. That
+doesn't change this policy: security fixes keep shipping, and a dependency
+with a high or critical CVE is fixed as soon as possible.
+
 ## Reporting a vulnerability
 
 **Please do not open a public GitHub Issue for security reports.**
@@ -78,7 +83,7 @@ attestations generated in GitHub Actions:
 
 ```bash
 sha256sum -c SHA256SUMS.txt --ignore-missing
-gh attestation verify JSONPrism_2.2.0_x64-setup.exe --repo poli0981/jsonPrism
+gh attestation verify JSONPrism_2.2.1_x64-setup.exe --repo poli0981/jsonPrism
 ```
 
 The desktop installers are not yet code-signed, so Windows SmartScreen

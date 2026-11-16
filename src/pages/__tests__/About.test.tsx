@@ -172,7 +172,7 @@ describe('Copy diagnostics', () => {
       '',
       'Recent log:',
     ]);
-    expect(lines[6]).toMatch(/^\d{4}-\d{2}-\d{2}T\S+ WARN \[convert\] Slow conversion 1200$/);
+    expect(lines[6]).toMatch(/^\d{4}-\d{2}-\d{2}T\S+ WARN \[convert] Slow conversion 1200$/);
     expect(success).toHaveBeenCalledWith('Diagnostics copied — paste them into your bug report.');
     expect(copyButton().querySelector('svg')).toHaveClass('lucide-check');
 

@@ -1,4 +1,10 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, Monitor, Moon, SlidersHorizontal, Sun } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
@@ -53,7 +59,7 @@ export function AppearanceMenu() {
     };
   }, [open]);
 
-  const onPanelKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  const onPanelKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
     if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Home' && e.key !== 'End') return;
     const items = Array.from(
       panelRef.current?.querySelectorAll<HTMLElement>('[data-menu-item]') ?? [],

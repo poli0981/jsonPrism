@@ -1,6 +1,10 @@
 <!--
 Thanks for contributing to JSONPrism!
 
+JSONPrism is in maintenance mode (CONTRIBUTING.md → "Maintenance mode"):
+new features are out of scope, and `feat:` pull requests from outside
+contributors are closed automatically.
+
 Please fill in the sections below. PRs missing required context (no summary,
 no test plan, off-topic preamble) may be closed without review.
 See CONTRIBUTING.md → "Auto-ignored contributions" for what gets dismissed.
@@ -18,6 +22,17 @@ describing it in a public PR.
 -
 
 Closes #
+
+## Scope
+
+<!-- Required. Tick what this PR is. Anything else is out of scope while JSONPrism is in maintenance mode. -->
+
+- [ ] Bug fix, broken UI/UX or accessibility fix
+- [ ] Translation or wording fix
+- [ ] Add or remove a converter, agreed in issue #
+- [ ] Dependency update, security fix, or major language/runtime/framework upgrade
+- [ ] Cloudflare / Worker change, or a fix for a website incident
+- [ ] Docs or tests only
 
 ## Test plan
 

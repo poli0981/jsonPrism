@@ -1,6 +1,6 @@
 # Accessibility
 
-**Last reviewed**: 2026-11-09 · **Applies to**: JSONPrism 2.2.0 (website, desktop and Android apps)
+**Last reviewed**: 2026-11-09 · **Applies to**: JSONPrism 2.2.x (website, desktop and Android apps)
 
 JSONPrism should work for everyone who needs to convert JSON, whatever
 input device, screen reader, display setting or language they use. This

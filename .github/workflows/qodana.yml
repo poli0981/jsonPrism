@@ -1,0 +1,149 @@
+name: Qodana
+
+# JetBrains Qodana static analysis, reported to Qodana Cloud (Ultimate licence):
+#   • js   — Qodana for JS in native mode: the web app, the Worker, workflows and
+#            docs. Project "jsonprism-js-ts", secret QODANA_TOKEN_TS_JS,
+#            configuration in qodana.yaml.
+#   • rust — Qodana for Rust (Early Access, Docker only): the Tauri shell in
+#            src-tauri/. Project "jsonprism-rust", secret QODANA_TOKEN_RUST,
+#            configuration in src-tauri/qodana.yaml.
+# Dependabot and fork pull requests get no secrets, so both jobs skip there.
+# Results: Qodana Cloud, check annotations, a pull-request comment and the
+# qodana-js / qodana-rust artifacts (SARIF and logs).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: qodana-${{ github.ref }}
+  # Only superseded PR runs are cancelled; every commit on main gets a full run.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  WRANGLER_SEND_METRICS: 'false'
+
+jobs:
+  js:
+    name: Qodana · JS/TS
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      checks: write # annotations
+      pull-requests: write # summary comment
+    env:
+      QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_TS_JS }}
+    steps:
+      - name: Skip without a token
+        if: env.QODANA_TOKEN == ''
+        run: echo "::notice::QODANA_TOKEN_TS_JS is not available to this run; skipping analysis."
+
+      - name: Checkout
+        if: env.QODANA_TOKEN != ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The pull request's head, not the merge commit.
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node
+        if: env.QODANA_TOKEN != ''
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        if: env.QODANA_TOKEN != ''
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      # worker-configuration.d.ts is generated and gitignored; without it the
+      # Worker's Env types don't resolve. (wrangler builds dist/ first.)
+      - name: Generate Worker types
+        if: env.QODANA_TOKEN != ''
+        run: npm run cf:types
+
+      - name: Qodana scan
+        if: env.QODANA_TOKEN != ''
+        uses: JetBrains/qodana-action@3e8d76ff0e0241618abd808682f426afe84bab3f # v2026.2.2
+        with:
+          args: --linter qodana-js --within-docker false
+          pr-mode: false
+          upload-result: true
+          artifact-name: qodana-js
+          primary-cache-key: qodana-2026.2-js-${{ github.ref }}-${{ github.sha }}
+          # A prefix, so pull requests can restore the cache saved on main.
+          additional-cache-key: qodana-2026.2-js-
+          cache-default-branch-only: true
+
+  rust:
+    name: Qodana · Rust (EAP)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      checks: write # annotations
+      pull-requests: write # summary comment
+    env:
+      QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_RUST }}
+    steps:
+      - name: Skip without a token
+        if: env.QODANA_TOKEN == ''
+        run: echo "::notice::QODANA_TOKEN_RUST is not available to this run; skipping analysis."
+
+      - name: Checkout
+        if: env.QODANA_TOKEN != ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node
+        if: env.QODANA_TOKEN != ''
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        if: env.QODANA_TOKEN != ''
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      # tauri::generate_context!() embeds the icons and ../dist at compile time.
+      - name: Generate icons
+        if: env.QODANA_TOKEN != ''
+        run: npm run tauri:icon
+
+      - name: Build the web app
+        if: env.QODANA_TOKEN != ''
+        run: npm run build
+
+      # Docker mode mounts --repository-root, so ../dist stays visible from
+      # the src-tauri project directory. The container runs as root so the
+      # bootstrap in src-tauri/qodana.yaml can apt-get the C toolchain and
+      # the GTK/WebKit headers that build scripts need.
+      - name: Qodana scan
+        if: env.QODANA_TOKEN != ''
+        uses: JetBrains/qodana-action@3e8d76ff0e0241618abd808682f426afe84bab3f # v2026.2.2
+        env:
+          # Keep Cargo's registry in the mounted Qodana cache, which the
+          # action saves between runs on main.
+          CARGO_HOME: /data/cache/cargo
+        with:
+          args: --linter qodana-rust --repository-root . --project-dir src-tauri --user root
+          env-vars-to-linter: CARGO_HOME
+          pr-mode: false
+          upload-result: true
+          artifact-name: qodana-rust
+          primary-cache-key: qodana-2026.2-rust-${{ github.ref }}-${{ github.sha }}
+          # A prefix, so pull requests can restore the cache saved on main.
+          additional-cache-key: qodana-2026.2-rust-
+          cache-default-branch-only: true

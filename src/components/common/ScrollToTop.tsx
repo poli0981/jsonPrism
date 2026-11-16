@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ScrollToTopProps {
   /** The scroll container to watch and scroll back to top. */
-  scrollRef: React.RefObject<HTMLDivElement | null>;
+  scrollRef: RefObject<HTMLDivElement | null>;
   /** Reveal the button once the container is scrolled past this many pixels. */
   threshold?: number;
 }

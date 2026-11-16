@@ -354,6 +354,30 @@ after a rollback or a dashboard change.
   (`sonar.qualitygate.wait=false`).
 - CodeQL runs through GitHub's default setup (no workflow file).
 
+## Qodana
+
+- Workflow `qodana.yml` ("Qodana") runs on every push to `main`, every pull
+  request to `main`, and by hand. Results go to Qodana Cloud (Ultimate
+  licence). They also come back as check annotations, a pull-request
+  comment and the `qodana-js` / `qodana-rust` artifacts (SARIF and logs).
+- **Job `js`**: Qodana for JS in native mode (`--within-docker false`).
+  - Runs on Node 26 with the runner's `node_modules`; `npm run cf:types`
+    runs first so the Worker's types resolve.
+  - Config `qodana.yaml`, Cloud project `jsonprism-js-ts`, secret
+    `QODANA_TOKEN_TS_JS`.
+- **Job `rust`**: Qodana for Rust, Early Access, Docker only
+  (`jetbrains/qodana-rust:2026.2-eap`).
+  - `src-tauri/` is the project directory and the repository root is
+    mounted. The job builds `dist/` and the icons first, because
+    `tauri::generate_context!()` embeds them.
+  - Config `src-tauri/qodana.yaml`, Cloud project `jsonprism-rust`, secret
+    `QODANA_TOKEN_RUST`.
+- Both jobs skip without their token (Dependabot and fork pull requests).
+  Findings are reported, not enforced: there is no quality gate.
+- If the licence lapses, the jobs fail at the licence check, but only in
+  this workflow; CI and the Discord notifier are unaffected. Renew the
+  licence, or delete the two secrets so the jobs skip.
+
 ## Releases (desktop + Android)
 
 The web app ships continuously from `main`; tags are for the desktop and
