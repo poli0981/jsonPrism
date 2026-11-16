@@ -5,6 +5,15 @@
 version: '1.0'
 linter: qodana-rust
 
+# The image ships Rust but no C toolchain or GTK/WebKit headers, so build
+# scripts and proc macros can't compile ("linker `cc` not found") and the
+# analysis is incomplete. Install what the CI `rust` job installs. This needs
+# the container to run as root (--user root in the workflow).
+bootstrap: >-
+  apt-get update -qq &&
+  DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends
+  build-essential pkg-config libssl-dev libgtk-3-dev libwebkit2gtk-4.1-dev
+
 profile:
   name: qodana.recommended
 

@@ -127,17 +127,18 @@ jobs:
         run: npm run build
 
       # Docker mode mounts --repository-root, so ../dist stays visible from
-      # the src-tauri project directory.
+      # the src-tauri project directory. The container runs as root so the
+      # bootstrap in src-tauri/qodana.yaml can apt-get the C toolchain and
+      # the GTK/WebKit headers that build scripts need.
       - name: Qodana scan
         if: env.QODANA_TOKEN != ''
         uses: JetBrains/qodana-action@3e8d76ff0e0241618abd808682f426afe84bab3f # v2026.2.2
         env:
-          # The image's CARGO_HOME (/usr/local/cargo) belongs to root, but the
-          # container runs as the runner's user, so `cargo metadata` can't
-          # download crates there. Keep Cargo's registry in the mounted cache.
+          # Keep Cargo's registry in the mounted Qodana cache, which the
+          # action saves between runs on main.
           CARGO_HOME: /data/cache/cargo
         with:
-          args: --linter qodana-rust --repository-root . --project-dir src-tauri
+          args: --linter qodana-rust --repository-root . --project-dir src-tauri --user root
           env-vars-to-linter: CARGO_HOME
           pr-mode: false
           upload-result: true
