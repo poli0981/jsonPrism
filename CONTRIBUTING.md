@@ -267,7 +267,10 @@ when a locale is missing a key or has an extra one, changes a
 `{{variable}}`, or leaves a value empty. If you aren't confident in a
 translation, say so in the PR.
 
-To add a new language:
+A new language counts as a new feature, so while JSONPrism is in
+[maintenance mode](#maintenance-mode), ask in
+[Discussions → Ideas](https://github.com/poli0981/jsonPrism/discussions/categories/ideas)
+before you start. The steps stay here for reference. To add a new language:
 
 1. Copy `src/i18n/locales/en.json` to `src/i18n/locales/<locale>.json` and translate every value (keep `{{variables}}` unchanged)
 2. Import it in `src/i18n/index.ts` and add it to `resources` and `SUPPORTED_LANGUAGES`
