@@ -25,7 +25,7 @@ copyright and license notices. This file is a starting point.
 | `react` | 19.3.1 | MIT | [react.dev](https://react.dev/) |
 | `react-dom` | 19.3.1 | MIT | [react.dev](https://react.dev/) |
 | `react-router` | 8.5.1 | MIT | [reactrouter.com](https://reactrouter.com/) |
-| `tailwindcss` (devDep) | 4.3.4 | MIT | [tailwindcss.com](https://tailwindcss.com/) |
+| `tailwindcss` (devDep) | 4.3.5 | MIT | [tailwindcss.com](https://tailwindcss.com/) |
 | `tw-animate-css` (devDep) | 1.4.0 | MIT | [github.com/Wombosvideo/tw-animate-css](https://github.com/Wombosvideo/tw-animate-css) |
 | `tailwind-merge` | 3.7.0 | MIT | [github.com/dcastil/tailwind-merge](https://github.com/dcastil/tailwind-merge) |
 | `class-variance-authority` | 0.7.1 | Apache-2.0 | [cva.style](https://cva.style/) |
@@ -34,9 +34,9 @@ copyright and license notices. This file is a starting point.
 | `@radix-ui/react-slot` | 1.5.0 | MIT | [radix-ui.com](https://www.radix-ui.com/) |
 | `@radix-ui/react-switch` | 1.4.1 | MIT | [radix-ui.com](https://www.radix-ui.com/) |
 | `@radix-ui/react-tabs` | 1.2.1 | MIT | [radix-ui.com](https://www.radix-ui.com/) |
-| `lucide-react` | 1.67.0 | ISC | [lucide.dev](https://lucide.dev/) |
+| `lucide-react` | 1.73.0 | ISC | [lucide.dev](https://lucide.dev/) |
 | `sonner` | 2.0.8 | MIT | [sonner.emilkowal.ski](https://sonner.emilkowal.ski/) |
-| `react-dropzone` | 20.1.4 | MIT | [react-dropzone.js.org](https://react-dropzone.js.org/) |
+| `react-dropzone` | 20.2.0 | MIT | [react-dropzone.js.org](https://react-dropzone.js.org/) |
 
 The component patterns under `src/components/ui/` are generated from
 **[shadcn/ui](https://ui.shadcn.com/)** (MIT) — copied into the repo, not
@@ -57,18 +57,18 @@ build-time packages whose generated CSS ships in the bundle.
 | `@codemirror/lang-markdown` | 6.5.2 | MIT | [codemirror.net](https://codemirror.net/) |
 | `@codemirror/lang-sql` | 6.10.0 | MIT | [codemirror.net](https://codemirror.net/) |
 | `@codemirror/legacy-modes` | 6.5.5 | MIT | [codemirror.net](https://codemirror.net/) |
-| `@codemirror/lint` | 6.9.7 | MIT | [codemirror.net](https://codemirror.net/) |
+| `@codemirror/lint` | 6.9.8 | MIT | [codemirror.net](https://codemirror.net/) |
 | `@lezer/highlight` | 1.2.5 | MIT | [lezer.codemirror.net](https://lezer.codemirror.net/) |
 
 ## Parsers / serialization
 
 | Package | Version | License | Link |
 |---|---|---|---|
-| `papaparse` | 5.7.0 | MIT | [papaparse.com](https://www.papaparse.com/) |
+| `papaparse` | 5.7.1 | MIT | [papaparse.com](https://www.papaparse.com/) |
 | `js-yaml` | 5.5.0 | MIT | [github.com/nodeca/js-yaml](https://github.com/nodeca/js-yaml) |
 | `smol-toml` | 1.9.1 | BSD-3-Clause | [github.com/squirrelchat/smol-toml](https://github.com/squirrelchat/smol-toml) |
-| `fast-xml-parser` | 5.12.0 | MIT | [github.com/NaturalIntelligence/fast-xml-parser](https://github.com/NaturalIntelligence/fast-xml-parser) |
-| `bson` | 7.3.3 | Apache-2.0 | [github.com/mongodb/js-bson](https://github.com/mongodb/js-bson) |
+| `fast-xml-parser` | 5.12.1 | MIT | [github.com/NaturalIntelligence/fast-xml-parser](https://github.com/NaturalIntelligence/fast-xml-parser) |
+| `bson` | 7.3.4 | Apache-2.0 | [github.com/mongodb/js-bson](https://github.com/mongodb/js-bson) |
 | `cbor-x` | 1.6.9 | MIT | [github.com/kriszyp/cbor-x](https://github.com/kriszyp/cbor-x) |
 | `@msgpack/msgpack` | 3.1.3 | ISC | [msgpack.org](https://msgpack.org/) |
 | `fflate` | 0.8.3 | MIT | [github.com/101arrowz/fflate](https://github.com/101arrowz/fflate) |
@@ -77,9 +77,9 @@ build-time packages whose generated CSS ships in the bundle.
 
 | Package | Version | License | Link |
 |---|---|---|---|
-| `zustand` | 5.0.16 | MIT | [github.com/pmndrs/zustand](https://github.com/pmndrs/zustand) |
-| `i18next` | 26.7.1 | MIT | [i18next.com](https://www.i18next.com/) |
-| `react-i18next` | 17.1.12 | MIT | [react.i18next.com](https://react.i18next.com/) |
+| `zustand` | 5.1.0 | MIT | [github.com/pmndrs/zustand](https://github.com/pmndrs/zustand) |
+| `i18next` | 27.1.3 | MIT | [i18next.com](https://www.i18next.com/) |
+| `react-i18next` | 18.0.2 | MIT | [react.i18next.com](https://react.i18next.com/) |
 | `i18next-browser-languagedetector` | 8.3.0 | MIT | [github.com/i18next/i18next-browser-languageDetector](https://github.com/i18next/i18next-browser-languageDetector) |
 
 ## Cloudflare (web build)
@@ -87,7 +87,7 @@ build-time packages whose generated CSS ships in the bundle.
 | Package | Version | License | Link |
 |---|---|---|---|
 | `@marsidev/react-turnstile` | 1.6.3 | MIT | [github.com/marsidev/react-turnstile](https://github.com/marsidev/react-turnstile) |
-| `wrangler` (devDep) | 4.157.0 | MIT OR Apache-2.0 | [github.com/cloudflare/workers-sdk](https://github.com/cloudflare/workers-sdk) |
+| `wrangler` (devDep) | 4.162.0 | MIT OR Apache-2.0 | [github.com/cloudflare/workers-sdk](https://github.com/cloudflare/workers-sdk) |
 
 `@marsidev/react-turnstile` renders the Turnstile widget on the website
 only. `wrangler` runs, type-checks and deploys the Worker in `worker/`.
@@ -101,7 +101,7 @@ The services themselves are covered under
 | `@tauri-apps/api` | 2.12.4 | Apache-2.0 OR MIT | [tauri.app](https://tauri.app/) |
 | `@tauri-apps/plugin-dialog` | 2.8.4 | MIT OR Apache-2.0 | [tauri.app](https://tauri.app/) |
 | `@tauri-apps/plugin-fs` | 2.7.1 | MIT OR Apache-2.0 | [tauri.app](https://tauri.app/) |
-| `@tauri-apps/plugin-opener` | 2.7.2 | MIT OR Apache-2.0 | [tauri.app](https://tauri.app/) |
+| `@tauri-apps/plugin-opener` | 2.7.3 | MIT OR Apache-2.0 | [tauri.app](https://tauri.app/) |
 | `@tauri-apps/cli` (devDep) | 2.12.4 | Apache-2.0 OR MIT | [tauri.app](https://tauri.app/) |
 
 ### Rust crates (`src-tauri/Cargo.lock`)
@@ -112,7 +112,7 @@ The services themselves are covered under
 | `tauri-build` (build dependency) | 2.7.4 | Apache-2.0 OR MIT | [crates.io/crates/tauri-build](https://crates.io/crates/tauri-build) |
 | `tauri-plugin-dialog` | 2.8.4 | Apache-2.0 OR MIT | [crates.io/crates/tauri-plugin-dialog](https://crates.io/crates/tauri-plugin-dialog) |
 | `tauri-plugin-fs` | 2.7.1 | Apache-2.0 OR MIT | [crates.io/crates/tauri-plugin-fs](https://crates.io/crates/tauri-plugin-fs) |
-| `tauri-plugin-opener` | 2.7.2 | Apache-2.0 OR MIT | [crates.io/crates/tauri-plugin-opener](https://crates.io/crates/tauri-plugin-opener) |
+| `tauri-plugin-opener` | 2.7.3 | Apache-2.0 OR MIT | [crates.io/crates/tauri-plugin-opener](https://crates.io/crates/tauri-plugin-opener) |
 | `tauri-plugin-single-instance` (desktop only) | 2.5.5 | Apache-2.0 OR MIT | [crates.io/crates/tauri-plugin-single-instance](https://crates.io/crates/tauri-plugin-single-instance) |
 | `serde` | 1.0.229 | MIT OR Apache-2.0 | [serde.rs](https://serde.rs/) |
 | `serde_json` | 1.0.154 | MIT OR Apache-2.0 | [github.com/serde-rs/json](https://github.com/serde-rs/json) |
@@ -124,27 +124,27 @@ shipped in the app.
 
 | Package | Version | License | Link |
 |---|---|---|---|
-| `vite` | 8.3.5 | MIT | [vite.dev](https://vite.dev/) |
-| `@vitejs/plugin-react` | 6.2.1 | MIT | [github.com/vitejs/vite-plugin-react](https://github.com/vitejs/vite-plugin-react) |
-| `@tailwindcss/vite` | 4.3.4 | MIT | [tailwindcss.com](https://tailwindcss.com/) |
+| `vite` | 8.3.8 | MIT | [vite.dev](https://vite.dev/) |
+| `@vitejs/plugin-react` | 6.3.0 | MIT | [github.com/vitejs/vite-plugin-react](https://github.com/vitejs/vite-plugin-react) |
+| `@tailwindcss/vite` | 4.3.5 | MIT | [tailwindcss.com](https://tailwindcss.com/) |
 | `@typescript/native` (alias of `typescript@^7`) | 7.0.2 | Apache-2.0 | [typescriptlang.org](https://www.typescriptlang.org/) |
 | `typescript` (alias of `@typescript/typescript6`, wraps TypeScript 6.0.3) | 6.0.2 | Apache-2.0 | [typescriptlang.org](https://www.typescriptlang.org/) |
-| `eslint` | 10.14.0 | MIT | [eslint.org](https://eslint.org/) |
+| `eslint` | 10.15.0 | MIT | [eslint.org](https://eslint.org/) |
 | `@eslint/js` | 10.0.1 | MIT | [eslint.org](https://eslint.org/) |
-| `typescript-eslint` | 8.72.1 | MIT | [typescript-eslint.io](https://typescript-eslint.io/) |
+| `typescript-eslint` | 8.72.2 | MIT | [typescript-eslint.io](https://typescript-eslint.io/) |
 | `eslint-plugin-react-hooks` | 7.1.1 | MIT | [github.com/facebook/react](https://github.com/facebook/react) |
-| `eslint-plugin-react-refresh` | 0.5.7 | MIT | [github.com/ArnaudBarre/eslint-plugin-react-refresh](https://github.com/ArnaudBarre/eslint-plugin-react-refresh) |
+| `eslint-plugin-react-refresh` | 0.5.8 | MIT | [github.com/ArnaudBarre/eslint-plugin-react-refresh](https://github.com/ArnaudBarre/eslint-plugin-react-refresh) |
 | `globals` | 17.14.0 | MIT | [github.com/sindresorhus/globals](https://github.com/sindresorhus/globals) |
-| `prettier` | 3.9.10 | MIT | [prettier.io](https://prettier.io/) |
+| `prettier` | 3.10.1 | MIT | [prettier.io](https://prettier.io/) |
 | `prettier-plugin-tailwindcss` | 0.8.1 | MIT | [github.com/tailwindlabs/prettier-plugin-tailwindcss](https://github.com/tailwindlabs/prettier-plugin-tailwindcss) |
-| `knip` | 6.44.1 | ISC | [knip.dev](https://knip.dev/) |
+| `knip` | 6.45.1 | ISC | [knip.dev](https://knip.dev/) |
 | `vitest` | 5.1.0 | MIT | [vitest.dev](https://vitest.dev/) |
 | `@vitest/coverage-v8` | 5.1.0 | MIT | [vitest.dev](https://vitest.dev/) |
-| `jsdom` | 30.1.3 | MIT | [github.com/jsdom/jsdom](https://github.com/jsdom/jsdom) |
+| `jsdom` | 31.0.1 | MIT | [github.com/jsdom/jsdom](https://github.com/jsdom/jsdom) |
 | `@testing-library/react` | 16.3.3 | MIT | [testing-library.com](https://testing-library.com/) |
 | `@testing-library/dom` | 10.4.2 | MIT | [testing-library.com](https://testing-library.com/) |
 | `@testing-library/jest-dom` | 7.0.1 | MIT | [testing-library.com](https://testing-library.com/) |
-| `@testing-library/user-event` | 14.6.8 | MIT | [testing-library.com](https://testing-library.com/) |
+| `@testing-library/user-event` | 14.6.12 | MIT | [testing-library.com](https://testing-library.com/) |
 | `axe-core` | 4.14.0 | MPL-2.0 | [github.com/dequelabs/axe-core](https://github.com/dequelabs/axe-core) |
 | `@types/node` | 26.6.6 | MIT | [github.com/DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped) |
 | `@types/papaparse` | 5.5.2 | MIT | [github.com/DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped) |
