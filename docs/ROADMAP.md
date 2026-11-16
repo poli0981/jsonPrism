@@ -4,6 +4,8 @@ This document is the **single source of truth** for what's done, what's next, an
 
 Update it as work lands — keep the project status honest.
 
+**Status: maintenance mode since v2.2.1 (2026-11-16).** No new features; see [Phase 11](#phase-11--maintenance-mode-) for what is still done.
+
 **Current release: v2.2.0 (2026-11-09).** The web app runs at https://jsonprism.poli0981.dev (Cloudflare Workers); desktop and Android builds are on [GitHub Releases](https://github.com/poli0981/jsonPrism/releases).
 
 ---
@@ -263,7 +265,7 @@ Compliance + reliability + first-paint performance. No converter behavior change
 
 ## Phase 7 — Android (sideload APK) 🔜
 
-**Status**: in progress — the APK has shipped with every release since v1.7.0 (2026-06-16); only the real-device checks below remain.
+**Status**: in progress — the APK has shipped with every release since v1.7.0 (2026-06-16); only the real-device checks below remain, handled as maintenance since 2.2.1.
 
 Goal: ship JSONPrism as an Android app users sideload from a `.apk`. Same React UI, no behavior change to the converters. **Minimum Android 12 (API 31)** — older devices are blocked by the OS.
 
@@ -412,7 +414,35 @@ An accessibility statement backed by tests. **949 tests in 95 files.**
 
 ---
 
+## Phase 11 — Maintenance mode 📋
+
+**Status**: ongoing since v2.2.1 (2026-11-16)
+
+JSONPrism is feature-complete. From 2.2.1 on it is maintained, not extended: no new features unless one is judged genuinely necessary. The accepted changes, and how out-of-scope issues and pull requests are closed, are in [CONTRIBUTING.md → Maintenance mode](../CONTRIBUTING.md#maintenance-mode).
+
+What 2.2.1 set up for it:
+
+- [x] **Policy:**
+  - a status section and badge in both READMEs;
+  - the policy in CONTRIBUTING;
+  - converter and translation issue templates (the feature-request template is gone);
+  - a scope checklist in the pull request template.
+- [x] **Auto-close:** `maintenance-triage.yml` closes, with a bilingual comment:
+  - feature issues and `feat:` pull requests from outside contributors;
+  - anything the maintainer labels `out-of-scope`.
+- [x] **Qodana:** Qodana for JS (native mode) and Qodana for Rust (Early Access) on every push and pull request, reported to Qodana Cloud.
+- [x] **Dependencies:** every dependency at its latest release, including i18next 27, react-i18next 18 and jsdom 31.
+
+Earlier work still open, now handled as maintenance:
+
+- the Android real-device checks (Phase 7);
+- the accessibility follow-ups below.
+
+---
+
 ## Beyond — Ideas (no commitment)
+
+**Frozen while JSONPrism is in maintenance mode.** An item moves only if it falls under the [maintenance policy](../CONTRIBUTING.md#maintenance-mode), for example a security need or a converter people really need.
 
 ### Accessibility follow-ups
 

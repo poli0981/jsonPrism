@@ -2,6 +2,44 @@
 
 Thanks for considering a contribution! JSONPrism is an open-source project under Apache License 2.0.
 
+## Maintenance mode
+
+Since 2.2.1 (November 2026) JSONPrism is in **maintenance mode**. It is
+feature-complete and stays maintained, but it doesn't grow new features.
+These changes are still accepted:
+
+1. **Dependency updates** on a regular schedule (weekly, grouped by
+   Dependabot).
+2. **Security fixes**, as soon as possible: a dependency with a high or
+   critical CVE, or a serious security issue in a runtime such as Node.js.
+3. **Major upgrades** of a language, runtime or framework, for example
+   Node 24 → 26 or TypeScript 6 → 7.
+4. **Issues and pull requests** that:
+   - add or remove a converter when people really need it (open a
+     [converter request](#converter-requests) first);
+   - fix a bug, a broken UI/UX or an accessibility barrier.
+5. **Language fixes**: wording that doesn't fit a culture or region, and
+   spelling mistakes that could mislead (see [Translations](#translations)).
+6. **Cloudflare / Worker** changes when the platform changes significantly.
+7. **Website incidents** such as DDoS or bot spam.
+
+Anything else is out of scope, new features in particular, unless the
+maintainer judges one genuinely necessary.
+
+- The [maintenance triage workflow](.github/workflows/maintenance-triage.yml)
+  closes feature issues and `feat:` pull requests from outside contributors
+  automatically. It also closes anything the maintainer labels
+  `out-of-scope`.
+- Feature ideas are welcome in
+  [Discussions → Ideas](https://github.com/poli0981/jsonPrism/discussions/categories/ideas),
+  with no commitment.
+- If your issue or pull request was closed by mistake, reply to it and the
+  maintainer will take another look.
+
+Releases ship only when one of these changes needs one, for example a
+security fix for the desktop and Android apps. The website keeps deploying
+from `main`.
+
 ## Prerequisites
 
 | Tool | Version | Notes |
@@ -53,6 +91,10 @@ npm run tauri:android:dev   # Android emulator or device
    `cargo clippy --all-targets --locked -- -D warnings` in that folder.
    Run `npm run tauri:icon` and `npm run build` first: the Rust build
    embeds the generated icons and `dist/`.
+
+   The **Qodana** workflow (Qodana for JS and Qodana for Rust) needs
+   Qodana Cloud tokens, so it skips on pull requests from forks. The
+   maintainer reviews its findings before merging.
 
 2. **Match the project style.** Read [`CLAUDE.md`](CLAUDE.md) for the
    non-negotiable code conventions (converter shape, error handling, i18n
@@ -188,13 +230,23 @@ Something hard or impossible to use with a keyboard, screen reader, zoom or othe
 
 Fixes for those limitations are welcome.
 
-### Feature requests
+### Converter requests
 
-Use the [Feature Request](https://github.com/poli0981/jsonPrism/issues/new?template=feature_request.md) template. We prioritize features that:
+A format can still be added or removed when people really need it. Open a
+[Converter request](https://github.com/poli0981/jsonPrism/issues/new?template=converter_request.md)
+first and describe the workflow it serves. A pull request that adds a
+converter without an agreed request may be closed. A new converter must:
 
 - Fit the "one JSON → many formats" core mission
 - Run entirely on the user's device (conversion never touches a server)
 - Have a clear use case from a real workflow
+
+### Feature ideas
+
+New features are out of scope while JSONPrism is in
+[maintenance mode](#maintenance-mode). Share ideas in
+[Discussions → Ideas](https://github.com/poli0981/jsonPrism/discussions/categories/ideas):
+they are read, but nothing is scheduled.
 
 ### Translations
 
@@ -202,7 +254,11 @@ Currently bundled: **English** (`en`), **Tiếng Việt** (`vi`), **日本語**
 (`ja`), **简体中文** (`zh-CN`). The Japanese and Simplified Chinese
 locales, and parts of the Vietnamese one, are AI-generated and not
 professionally reviewed; see [DISCLAIMER.md](DISCLAIMER.md).
-Native-speaker corrections are very welcome.
+Native-speaker corrections are very welcome. Wording that reads wrong for
+a culture or region, or a spelling mistake that could mislead, counts as a
+bug: report it with the
+[Translation or wording issue](https://github.com/poli0981/jsonPrism/issues/new?template=translation.md)
+template, or fix it in a pull request.
 
 Every user-facing string goes through i18next, so a new or changed string
 means editing **all four** files in `src/i18n/locales/`. The parity test
@@ -222,7 +278,9 @@ To add a new language:
 
 ### Adding a new converter
 
-See the **"Adding a new converter — checklist"** section in [`CLAUDE.md`](CLAUDE.md).
+Start with a [converter request](#converter-requests). Once it is agreed,
+follow the **"Adding a new converter — checklist"** section in
+[`CLAUDE.md`](CLAUDE.md).
 
 Briefly:
 
@@ -255,6 +313,10 @@ Prefixes: `feat`, `fix`, `perf`, `refactor`, `docs`, `test`, `build`
 To keep the maintainer's review queue manageable, the following are
 closed without review:
 
+- **New features outside the [maintenance scope](#maintenance-mode).**
+  Feature issues and `feat:` pull requests from outside contributors are
+  closed automatically. Other out-of-scope items are closed with the
+  `out-of-scope` label.
 - **PRs with suspicious code.** If a diff looks like obfuscated/minified
   code, hidden network calls, or subtly tampered third-party files, it
   will be flagged. If CodeQL or Dependabot also flag it, the contributor

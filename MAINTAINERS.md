@@ -8,6 +8,10 @@ JSONPrism is co-authored with AI tooling — see [DISCLAIMER.md](DISCLAIMER.md)
 for details. The maintainer is the single point of human review for every
 merged PR.
 
+Since 2.2.1 the project is in **maintenance mode**: no new features, only
+the changes listed in
+[CONTRIBUTING.md → Maintenance mode](CONTRIBUTING.md#maintenance-mode).
+
 ## Responsibilities
 
 - **Code review** — reviews and merges every PR, including AI-assisted
@@ -26,10 +30,14 @@ merged PR.
 - **Community** — issues, Discussions and the Discord server, and
   enforcement of the [Code of Conduct](CODE_OF_CONDUCT.md). Vulnerability
   reports are triaged as described in [SECURITY.md](SECURITY.md).
+- **Triage** — keeps issues and pull requests within the maintenance
+  scope, closing the rest with the `out-of-scope` label (the triage
+  workflow posts the explanation).
 
 ## Contact
 
-- Bug reports & feature requests: [GitHub Issues](https://github.com/poli0981/jsonPrism/issues)
+- Bug reports, translation fixes and converter requests: [GitHub Issues](https://github.com/poli0981/jsonPrism/issues)
+- Feature ideas (no commitment while in maintenance mode): [Discussions → Ideas](https://github.com/poli0981/jsonPrism/discussions/categories/ideas)
 - Accessibility barriers: the [Accessibility issue](https://github.com/poli0981/jsonPrism/issues/new?template=accessibility.md) template, or [code@poli0981.dev](mailto:code@poli0981.dev) — see [ACCESSIBILITY.md](ACCESSIBILITY.md)
 - Discussion / Q&A: [GitHub Discussions](https://github.com/poli0981/jsonPrism/discussions)
 - Community chat: [Discord](https://discord.gg/2aNR3aVt)
