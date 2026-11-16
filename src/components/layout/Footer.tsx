@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BlueskyIcon, DiscordIcon, XIcon } from '@/components/common/SocialIcons';
 
@@ -44,7 +45,7 @@ export function Footer() {
 interface SocialLinkProps {
   href: string;
   label: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
 }
 
 function SocialLink({ href, label, icon }: SocialLinkProps) {

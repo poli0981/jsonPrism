@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Link, NavLink } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { GithubIcon } from '@/components/common/SocialIcons';
@@ -50,7 +51,7 @@ export function Header() {
 interface NavItemProps {
   to: string;
   end?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 function NavItem({ to, end, children }: NavItemProps) {

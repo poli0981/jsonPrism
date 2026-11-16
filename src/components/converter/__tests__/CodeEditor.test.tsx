@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, createEvent, fireEvent, render } from '@testing-library/react';
 import { EditorView } from '@codemirror/view';
 import { diagnosticCount, forceLinting } from '@codemirror/lint';
@@ -7,28 +7,10 @@ import '@/i18n';
 import { parseJsonInput } from '@/lib/detect';
 import { editorLanguageFor } from '@/lib/editor-language';
 import { ThemeProvider, type Theme } from '@/lib/theme';
+import { stubRangeGeometry } from '@/test/range-geometry';
 import { CodeEditor, type CodeEditorProps, type EditorLanguage } from '../CodeEditor';
 
-// jsdom has no layout engine; CodeMirror measures text ranges to draw the
-// cursor and selection layers. Empty geometry is enough for these tests.
-const emptyRect = { x: 0, y: 0, width: 0, height: 0, top: 0, right: 0, bottom: 0, left: 0 };
-const rangeGeometry = ['getClientRects', 'getBoundingClientRect'] as const;
-const originalGeometry = rangeGeometry.map((key) =>
-  Object.getOwnPropertyDescriptor(Range.prototype, key),
-);
-
-beforeAll(() => {
-  Range.prototype.getClientRects = () => [] as unknown as DOMRectList;
-  Range.prototype.getBoundingClientRect = () => ({ ...emptyRect, toJSON: () => emptyRect });
-});
-
-afterAll(() => {
-  rangeGeometry.forEach((key, i) => {
-    const original = originalGeometry[i];
-    if (original) Object.defineProperty(Range.prototype, key, original);
-    else Reflect.deleteProperty(Range.prototype, key);
-  });
-});
+stubRangeGeometry();
 
 afterEach(async () => {
   await i18n.changeLanguage('en');

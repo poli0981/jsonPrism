@@ -151,14 +151,14 @@ export default defineConfig(({ mode }) => ({
             // One chunk per parser library.
             { name: 'p-yaml', priority: 70, test: /js-yaml/ },
             { name: 'p-csv', priority: 70, test: /papaparse/ },
-            { name: 'p-xml', priority: 70, test: /fast-xml-parser/ },
+            { name: 'p-xml', priority: 70, test: /fast-xml-(?:parser|builder)/ },
             { name: 'p-toml', priority: 70, test: /smol-toml/ },
             { name: 'p-bson', priority: 70, test: /node_modules[\\/]bson[\\/]/ },
             { name: 'p-cbor', priority: 70, test: /node_modules[\\/]cbor-x[\\/]/ },
             { name: 'p-msgpack', priority: 70, test: /node_modules[\\/]@msgpack[\\/]/ },
             { name: 'fflate', priority: 70, test: /fflate/ },
             // Radix primitives + icon set.
-            { name: 'ui', priority: 60, test: /(?:@radix-ui|lucide-react)/ },
+            { name: 'ui', priority: 60, test: /@radix-ui|lucide-react/ },
           ],
         },
       },

@@ -1,9 +1,10 @@
+import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 interface ToolbarButtonProps {
   onClick: () => void;
   label: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   disabled?: boolean;
   /** Shown instead of `label` (visually) without changing the accessible name. */
   visibleLabel?: string;

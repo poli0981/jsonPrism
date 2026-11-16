@@ -150,7 +150,9 @@ describe('useBatchActions.start', () => {
         return '[2]';
       },
     });
-    act(() => useBatchStore.getState().addFiles([slow]));
+    act(() => {
+      useBatchStore.getState().addFiles([slow]);
+    });
     let second!: Promise<void>;
     act(() => {
       second = result.current.start();

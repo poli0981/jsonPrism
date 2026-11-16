@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, ClipboardCopy, ExternalLink, Heart, Mail, ShieldCheck, Users } from 'lucide-react';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
@@ -18,7 +18,7 @@ import { tauriHostInfo } from '@/lib/tauri';
 interface CommunityPlatform {
   key: 'discord' | 'x' | 'bluesky' | 'mastodon' | 'telegram' | 'youtube';
   url: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
 }
 
 const COMMUNITY: CommunityPlatform[] = [
@@ -359,9 +359,9 @@ function Section({
   title,
   children,
 }: {
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <section className="mt-12">

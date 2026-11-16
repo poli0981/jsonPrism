@@ -68,6 +68,7 @@ build-time packages whose generated CSS ships in the bundle.
 | `js-yaml` | 5.5.0 | MIT | [github.com/nodeca/js-yaml](https://github.com/nodeca/js-yaml) |
 | `smol-toml` | 1.9.1 | BSD-3-Clause | [github.com/squirrelchat/smol-toml](https://github.com/squirrelchat/smol-toml) |
 | `fast-xml-parser` | 5.12.1 | MIT | [github.com/NaturalIntelligence/fast-xml-parser](https://github.com/NaturalIntelligence/fast-xml-parser) |
+| `fast-xml-builder` | 1.3.2 | MIT | [github.com/NaturalIntelligence/fast-xml-builder](https://github.com/NaturalIntelligence/fast-xml-builder) |
 | `bson` | 7.3.4 | Apache-2.0 | [github.com/mongodb/js-bson](https://github.com/mongodb/js-bson) |
 | `cbor-x` | 1.6.9 | MIT | [github.com/kriszyp/cbor-x](https://github.com/kriszyp/cbor-x) |
 | `@msgpack/msgpack` | 3.1.3 | ISC | [msgpack.org](https://msgpack.org/) |

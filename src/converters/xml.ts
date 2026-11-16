@@ -1,4 +1,11 @@
-import { XMLBuilder, XMLValidator } from 'fast-xml-parser';
+// Default import: the package's typings also declare a named `Builder`, but
+// its ES module only has the default export.
+import XMLBuilder from 'fast-xml-builder';
+// fast-xml-parser 5 deprecates XMLValidator in favour of the separate
+// fast-xml-validator package, which would bundle a second XML parser. The
+// built-in validator stays until fast-xml-parser removes it.
+// noinspection JSDeprecatedSymbols
+import { XMLValidator } from 'fast-xml-parser';
 import type { Converter } from './types';
 import { errorMessage } from '@/lib/errors';
 import { defineOwn } from '@/lib/json';
@@ -186,7 +193,8 @@ export const xmlConverter: Converter<XmlOptions> = {
         // `{"@_enabled": true}` must become enabled="true", not a bare attribute.
         suppressBooleanAttributes: false,
       });
-      const xml = builder.build({ [rootName]: body }) as string;
+      const xml = builder.build({ [rootName]: body });
+      // noinspection JSDeprecatedSymbols
       const validation = XMLValidator.validate(xml);
       if (validation !== true) {
         return {

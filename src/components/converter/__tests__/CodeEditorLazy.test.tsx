@@ -1,9 +1,10 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@/i18n';
 import type { CodeEditorProps } from '@/components/converter/CodeEditor';
 import type * as CodeEditorModule from '@/components/converter/CodeEditor';
 import { ThemeProvider } from '@/lib/theme';
+import { stubRangeGeometry } from '@/test/range-geometry';
 import { CodeEditorLazy } from '../CodeEditorLazy';
 
 // The real editor module, behind a switch that simulates a failed chunk load.
@@ -24,22 +25,7 @@ vi.mock('@/components/converter/CodeEditor', async (importOriginal) => {
   };
 });
 
-const emptyRect = { x: 0, y: 0, width: 0, height: 0, top: 0, right: 0, bottom: 0, left: 0 };
-const originalGetClientRects = Object.getOwnPropertyDescriptor(Range.prototype, 'getClientRects');
-beforeAll(() => {
-  // jsdom has no layout; CodeMirror measures ranges for the cursor layer.
-  Range.prototype.getClientRects = () => [] as unknown as DOMRectList;
-  Range.prototype.getBoundingClientRect = () => ({ ...emptyRect, toJSON: () => emptyRect });
-});
-
-afterAll(() => {
-  if (originalGetClientRects) {
-    Object.defineProperty(Range.prototype, 'getClientRects', originalGetClientRects);
-  } else {
-    Reflect.deleteProperty(Range.prototype, 'getClientRects');
-  }
-  Reflect.deleteProperty(Range.prototype, 'getBoundingClientRect');
-});
+stubRangeGeometry();
 
 afterEach(() => {
   chunk.broken = false;
