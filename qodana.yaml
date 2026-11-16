@@ -21,3 +21,7 @@ exclude:
       - src/components/ui
       # Analysed by Qodana for Rust (src-tauri/qodana.yaml)
       - src-tauri
+  # The webhook there is a ${{ secrets.… }} reference, not a hard-coded secret.
+  - name: HardcodedPasswords
+    paths:
+      - .github/workflows/notify-release-pipeline.yml

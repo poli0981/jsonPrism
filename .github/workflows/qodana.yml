@@ -79,7 +79,8 @@ jobs:
           upload-result: true
           artifact-name: qodana-js
           primary-cache-key: qodana-2026.2-js-${{ github.ref }}-${{ github.sha }}
-          additional-cache-key: qodana-2026.2-js-${{ github.ref }}
+          # A prefix, so pull requests can restore the cache saved on main.
+          additional-cache-key: qodana-2026.2-js-
           cache-default-branch-only: true
 
   rust:
@@ -130,11 +131,18 @@ jobs:
       - name: Qodana scan
         if: env.QODANA_TOKEN != ''
         uses: JetBrains/qodana-action@3e8d76ff0e0241618abd808682f426afe84bab3f # v2026.2.2
+        env:
+          # The image's CARGO_HOME (/usr/local/cargo) belongs to root, but the
+          # container runs as the runner's user, so `cargo metadata` can't
+          # download crates there. Keep Cargo's registry in the mounted cache.
+          CARGO_HOME: /data/cache/cargo
         with:
           args: --linter qodana-rust --repository-root . --project-dir src-tauri
+          env-vars-to-linter: CARGO_HOME
           pr-mode: false
           upload-result: true
           artifact-name: qodana-rust
           primary-cache-key: qodana-2026.2-rust-${{ github.ref }}-${{ github.sha }}
-          additional-cache-key: qodana-2026.2-rust-${{ github.ref }}
+          # A prefix, so pull requests can restore the cache saved on main.
+          additional-cache-key: qodana-2026.2-rust-
           cache-default-branch-only: true
