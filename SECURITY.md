@@ -83,7 +83,7 @@ attestations generated in GitHub Actions:
 
 ```bash
 sha256sum -c SHA256SUMS.txt --ignore-missing
-gh attestation verify JSONPrism_2.2.0_x64-setup.exe --repo poli0981/jsonPrism
+gh attestation verify JSONPrism_2.2.1_x64-setup.exe --repo poli0981/jsonPrism
 ```
 
 The desktop installers are not yet code-signed, so Windows SmartScreen

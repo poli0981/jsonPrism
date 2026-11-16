@@ -3,7 +3,7 @@
 JSONPrism is built on top of open-source libraries. This page lists each
 direct dependency declared in [`package.json`](package.json) and
 [`src-tauri/Cargo.toml`](src-tauri/Cargo.toml), the exact version used by
-**JSONPrism 2.2.0**, the upstream license, and a link to the project. It
+**JSONPrism 2.2.1**, the upstream license, and a link to the project. It
 also lists the third-party services the website uses.
 
 Versions are the ones locked in [`package-lock.json`](package-lock.json)

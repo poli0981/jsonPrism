@@ -37,7 +37,7 @@ announced, focus got stuck, text was unreadable at 200 % zoom).
 - Assistive technology and version: [e.g. NVDA 2026.3, VoiceOver, TalkBack, Narrator, Dragon, screen magnifier, none]
 - How you use the app: [keyboard only / screen reader / voice control / switch access / zoom or magnification / Windows contrast theme / other]
 - Platform: [Web / Windows / macOS / Linux / Android]
-- JSONPrism version: [e.g. 2.2.0 — see About → Build info]
+- JSONPrism version: [e.g. 2.2.1 — see About → Build info]
 - Browser (web) or OS version (apps): [e.g. Firefox on Windows 11, Safari on macOS 15, Android 15]
 
 ## How much does it block you?

@@ -6,7 +6,7 @@ Update it as work lands — keep the project status honest.
 
 **Status: maintenance mode since v2.2.1 (2026-11-16).** No new features; see [Phase 11](#phase-11--maintenance-mode-) for what is still done.
 
-**Current release: v2.2.0 (2026-11-09).** The web app runs at https://jsonprism.poli0981.dev (Cloudflare Workers); desktop and Android builds are on [GitHub Releases](https://github.com/poli0981/jsonPrism/releases).
+**Current release: v2.2.1 (2026-11-16).** The web app runs at https://jsonprism.poli0981.dev (Cloudflare Workers); desktop and Android builds are on [GitHub Releases](https://github.com/poli0981/jsonPrism/releases).
 
 ---
 

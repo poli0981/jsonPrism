@@ -5,7 +5,7 @@
 
 # Trợ năng (Accessibility)
 
-**Rà soát lần cuối**: 2026-11-09 · **Áp dụng cho**: JSONPrism 2.2.0 (website, ứng dụng desktop và Android)
+**Rà soát lần cuối**: 2026-11-09 · **Áp dụng cho**: JSONPrism 2.2.x (website, ứng dụng desktop và Android)
 
 JSONPrism muốn ai cần chuyển đổi JSON cũng dùng được, bất kể họ dùng
 thiết bị nhập nào, trình đọc màn hình nào, thiết lập hiển thị hay ngôn
